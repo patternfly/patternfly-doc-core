@@ -1,0 +1,11 @@
+---
+import { Page } from "../components/Page.tsx";
+
+const { title } = Astro.props;
+
+const mainContainerId = "main-content";
+---
+
+<Page title={title as string} mainContainerId={mainContainerId}>
+  <slot />
+</Page>
