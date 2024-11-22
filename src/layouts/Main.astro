@@ -1,11 +1,15 @@
 ---
-import { Page } from "../components/Page.tsx";
+import Page from "../components/Page.astro";
+import Masthead from "../components/Masthead.astro";
+import Navigation from "../components/Navigation.astro";
 
 const { title } = Astro.props;
 
 const mainContainerId = "main-content";
 ---
 
-<Page title={title as string} mainContainerId={mainContainerId}>
+<Page>
+  <Masthead slot="masthead" />
+  <Navigation slot="sidebar" />
   <slot />
 </Page>

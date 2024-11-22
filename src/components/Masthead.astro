@@ -1,0 +1,30 @@
+---
+import {
+  Brand,
+  Masthead as PFMasthead,
+  MastheadMain,
+  MastheadToggle,
+  MastheadBrand,
+  MastheadLogo,
+  MastheadContent,
+} from "@patternfly/react-core";
+import pfLogo from "/PF-HorizontalLogo-Color.svg?url";
+import Toolbar from "./Toolbar.astro";
+import { PageToggle } from "./PageToggle";
+---
+
+<PFMasthead>
+  <MastheadMain>
+    <MastheadToggle>
+      <PageToggle client:idle/>
+    </MastheadToggle>
+    <MastheadBrand>
+      <MastheadLogo>
+        <Brand src={pfLogo} alt="PatternFly" heights={{ default: "36px" }} />
+      </MastheadLogo>
+    </MastheadBrand>
+  </MastheadMain>
+  <MastheadContent>
+    <Toolbar />
+  </MastheadContent>
+</PFMasthead>

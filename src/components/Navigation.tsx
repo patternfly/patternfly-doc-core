@@ -6,6 +6,8 @@ import {
   PageSidebar,
   PageSidebarBody,
 } from "@patternfly/react-core";
+import { useStore } from "@nanostores/react";
+import { isNavOpen } from "../stores/navStore";
 
 interface NavOnSelectProps {
   groupId: number | string;
@@ -24,8 +26,10 @@ export const Navigation: React.FunctionComponent = () => {
       setActiveItem(selectedItem.itemId);
   };
 
+  const $isNavOpen = useStore(isNavOpen);
+
   return (
-    <PageSidebar>
+    <PageSidebar isSidebarOpen={$isNavOpen}>
       <PageSidebarBody>
         <Nav onSelect={onNavSelect}>
           <NavList>

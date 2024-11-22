@@ -18,7 +18,8 @@ import BellIcon from "@patternfly/react-icons/dist/esm/icons/bell-icon";
 import CogIcon from "@patternfly/react-icons/dist/esm/icons/cog-icon";
 import QuestionCircleIcon from "@patternfly/react-icons/dist/esm/icons/question-circle-icon";
 import EllipsisVIcon from "@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon";
-import imgAvatar from "@patternfly/react-core/src/components/assets/avatarImg.svg";
+
+import imgAvatar from "/avatarImg.svg?url";
 
 import { KebabDropdownItems } from "./KebabDropdownItems";
 import { UserDropdownItems } from "./UserDropdownItems";
@@ -156,7 +157,7 @@ export const Toolbar: React.FunctionComponent = () => {
                 isExpanded={isDropdownOpen}
                 icon={
                   <Avatar
-                    src={imgAvatar as unknown as string}
+                    src={imgAvatar}
                     alt=""
                     size="sm"
                   />
