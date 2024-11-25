@@ -33,8 +33,8 @@ export const Navigation: React.FunctionComponent = () => {
       <PageSidebarBody>
         <Nav onSelect={onNavSelect}>
           <NavList>
-            <NavItem itemId={0} isActive={activeItem === 0} to="#system-panel">
-              System panel
+            <NavItem itemId={0} isActive={activeItem === 0} to="test">
+              Test
             </NavItem>
             <NavItem itemId={1} isActive={activeItem === 1} to="#policy">
               Policy
