@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Nav,
   NavList,
@@ -15,40 +15,50 @@ interface NavOnSelectProps {
   to: string;
 }
 
-export const Navigation: React.FunctionComponent = () => {
-  const [activeItem, setActiveItem] = useState(1);
+interface NavEntry {
+  id: string;
+  slug: string;
+  data: {
+    title: string;
+  };
+  collection: string;
+}
+
+interface NavigationProps {
+  navEntries: NavEntry[];
+}
+
+export const Navigation: React.FunctionComponent<NavigationProps> = ({
+  navEntries,
+}: NavigationProps) => {
+  const [activeItem, setActiveItem] = useState("");
 
   const onNavSelect = (
     _event: React.FormEvent<HTMLInputElement>,
     selectedItem: NavOnSelectProps
   ) => {
-    typeof selectedItem.itemId === "number" &&
+    typeof selectedItem.itemId === "string" &&
       setActiveItem(selectedItem.itemId);
   };
 
   const $isNavOpen = useStore(isNavOpen);
 
+  const navItems = navEntries.map((entry) => (
+    <NavItem
+      key={entry.id}
+      itemId={entry.id}
+      isActive={activeItem === entry.id}
+      to={`/${entry.collection}/${entry.slug}`}
+    >
+      {entry.data.title}
+    </NavItem>
+  ));
+
   return (
     <PageSidebar isSidebarOpen={$isNavOpen}>
       <PageSidebarBody>
         <Nav onSelect={onNavSelect}>
-          <NavList>
-            <NavItem itemId={0} isActive={activeItem === 0} to="test">
-              Test
-            </NavItem>
-            <NavItem itemId={1} isActive={activeItem === 1} to="#policy">
-              Policy
-            </NavItem>
-            <NavItem itemId={2} isActive={activeItem === 2} to="#auth">
-              Authentication
-            </NavItem>
-            <NavItem itemId={3} isActive={activeItem === 3} to="#network">
-              Network services
-            </NavItem>
-            <NavItem itemId={4} isActive={activeItem === 4} to="#server">
-              Server
-            </NavItem>
-          </NavList>
+          <NavList>{navItems}</NavList>
         </Nav>
       </PageSidebarBody>
     </PageSidebar>
