@@ -1,6 +1,6 @@
 ---
 import "../styles/global.scss"
-import Foo from '../components/Foo.astro'
+import MainLayout from "../layouts/Main.astro"
 ---
 
 <html lang="en">
@@ -12,6 +12,8 @@ import Foo from '../components/Foo.astro'
     <title>Astro</title>
   </head>
   <body>
-    <Foo />
+    <MainLayout title="PatternFly X Astro">
+      Page content
+    </MainLayout>
   </body>
 </html>
