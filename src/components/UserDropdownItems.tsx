@@ -1,3 +1,4 @@
+import React from "react";
 import { DropdownItem } from "@patternfly/react-core";
 
 export const UserDropdownItems: React.FunctionComponent = () => (
