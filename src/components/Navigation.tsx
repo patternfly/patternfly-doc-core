@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import React, { useState } from "react";
 import {
   Nav,
   NavList,
@@ -36,6 +36,7 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
     _event: React.FormEvent<HTMLInputElement>,
     selectedItem: NavOnSelectProps
   ) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     typeof selectedItem.itemId === "string" &&
       setActiveItem(selectedItem.itemId);
   };
