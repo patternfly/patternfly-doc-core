@@ -12,7 +12,7 @@ export default [
         '**/css',
         '.astro/*',
         '.history/*',
-        '**/.cache'
+        '**/.cache',
     ]
   },
   // add more generic rule sets here, such as:
@@ -26,7 +26,8 @@ export default [
         // ...
         processor: "astro/client-side-ts", // <- Uses the "client-side-ts" processor.
         rules: {
-          // ...
+          'react-compiler/react-in-jsx-scope': 'off',
+          'react-hooks/jsx-uses-react': 'off',
         },
       },
   {
