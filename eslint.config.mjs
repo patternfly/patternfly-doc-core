@@ -13,6 +13,7 @@ export default [
         '.astro/*',
         '.history/*',
         '**/.cache',
+        "**/*.d.ts",
     ]
   },
   // add more generic rule sets here, such as:
@@ -119,6 +120,7 @@ export default [
         'react-compiler/react-compiler': 'warn',
         'react-hooks/exhaustive-deps': 'warn',
         'react/no-unescaped-entities': ['error', { forbid: ['>', '}'] }],
+        "react/no-unknown-property": ["error", { ignore: ["class"] }],
         'spaced-comment': 'error',
         'use-isnan': 'error',
         'valid-typeof': 'off'
