@@ -7,5 +7,6 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "importHelpers": true,
+    "noUnusedLocals": false,
   }
 }
