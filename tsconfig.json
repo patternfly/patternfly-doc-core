@@ -5,7 +5,9 @@
     "jsxImportSource": "react",
     "target": "ES6",
     "module": "ESNext",
-    "moduleResolution": "node",
-    "importHelpers": true,
-  }
+    "moduleResolution": "bundler",
+    "importHelpers": true
+  },
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
 }
