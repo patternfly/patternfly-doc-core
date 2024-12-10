@@ -7,7 +7,7 @@ export default getViteConfig({
   },
   resolve: { 
     alias: {
-        '\\.(css|less)$': '<rootDir>/node_modules/@patternfly/react-styles/__mocks__/styleMock.js'
+        '\\.(css|less)$': '<rootDir>/src/__mocks__/styleMock.ts'
       },
     },   
 },);

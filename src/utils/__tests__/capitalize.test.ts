@@ -1,6 +1,6 @@
-import { capitalize } from "../capitalize";
-import {test, expect} from 'vitest';
+import { capitalize } from '../capitalize'
+import { test, expect } from 'vitest'
 
 test('capitalize', () => {
-  expect(capitalize('foo')).toBe('Foo');
-});
+  expect(capitalize('foo')).toBe('Foo')
+})

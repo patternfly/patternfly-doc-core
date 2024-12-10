@@ -1,47 +1,47 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import {
   Nav,
   NavList,
   NavItem,
   PageSidebar,
   PageSidebarBody,
-} from "@patternfly/react-core";
-import { useStore } from "@nanostores/react";
-import { isNavOpen } from "../stores/navStore";
+} from '@patternfly/react-core'
+import { useStore } from '@nanostores/react'
+import { isNavOpen } from '../stores/navStore'
 
 interface NavOnSelectProps {
-  groupId: number | string;
-  itemId: number | string;
-  to: string;
+  groupId: number | string
+  itemId: number | string
+  to: string
 }
 
 interface NavEntry {
   id: string;
   data: {
-    title: string;
-  };
-  collection: string;
+    title: string
+  }
+  collection: string
 }
 
 interface NavigationProps {
-  navEntries: NavEntry[];
+  navEntries: NavEntry[]
 }
 
 export const Navigation: React.FunctionComponent<NavigationProps> = ({
   navEntries,
 }: NavigationProps) => {
-  const [activeItem, setActiveItem] = useState("");
+  const [activeItem, setActiveItem] = useState('')
 
   const onNavSelect = (
     _event: React.FormEvent<HTMLInputElement>,
-    selectedItem: NavOnSelectProps
+    selectedItem: NavOnSelectProps,
   ) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    typeof selectedItem.itemId === "string" &&
-      setActiveItem(selectedItem.itemId);
-  };
+    typeof selectedItem.itemId === 'string' &&
+      setActiveItem(selectedItem.itemId)
+  }
 
-  const $isNavOpen = useStore(isNavOpen);
+  const $isNavOpen = useStore(isNavOpen)
 
   const sortedNavEntries = navEntries.sort((a, b) =>
     a.data.title.localeCompare(b.data.title)
@@ -56,7 +56,7 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
     >
       {entry.data.title}
     </NavItem>
-  ));
+  ))
 
   return (
     <PageSidebar isSidebarOpen={$isNavOpen}>
@@ -66,5 +66,5 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
         </Nav>
       </PageSidebarBody>
     </PageSidebar>
-  );
-};
+  )
+}

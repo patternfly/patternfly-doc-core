@@ -115,6 +115,7 @@ export default [
         'one-var': ['error', 'never'],
         'prefer-const': 'error',
         radix: ['error', 'as-needed'],
+        'react/react-in-jsx-scope': 'off',
         'react/prop-types': 0,
         'react/display-name': 0,
         'react-compiler/react-compiler': 'warn',

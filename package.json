@@ -8,9 +8,26 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "prettier": "prettier --write ./src",
     "lint": "eslint . --cache --cache-strategy content",
     "test": "vitest --config ./tsconfig.vitest.json",
     "test:watch": "vitest --watch"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-astro"
+    ],
+    "overrides": [
+      {
+        "files": "*.astro",
+        "options": {
+          "parser": "astro"
+        }
+      }
+    ],
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -42,6 +59,8 @@
     "eslint-plugin-react-compiler": "^19.0.0-beta-df7b47d-20241124",
     "eslint-plugin-react-hooks": "^5.1.0",
     "globals": "^15.12.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-astro": "^0.14.1",
     "semantic-release": "^24.2.0",
     "ts-node": "^10.9.2",
     "typescript-eslint": "^8.15.0",
