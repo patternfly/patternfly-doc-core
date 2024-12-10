@@ -17,7 +17,6 @@ interface NavOnSelectProps {
 
 interface NavEntry {
   id: string;
-  slug: string;
   data: {
     title: string;
   };
@@ -43,12 +42,16 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
 
   const $isNavOpen = useStore(isNavOpen);
 
-  const navItems = navEntries.map((entry) => (
+  const sortedNavEntries = navEntries.sort((a, b) =>
+    a.data.title.localeCompare(b.data.title)
+  );
+
+  const navItems = sortedNavEntries.map((entry) => (
     <NavItem
       key={entry.id}
       itemId={entry.id}
       isActive={activeItem === entry.id}
-      to={`/${entry.collection}/${entry.slug}`}
+      to={`/${entry.collection}/${entry.id}`}
     >
       {entry.data.title}
     </NavItem>

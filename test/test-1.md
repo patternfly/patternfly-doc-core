@@ -1,9 +1,8 @@
 ---
-layout: '../../layouts/Main.astro'
-title: 'Test title 2'
+title: 'Test title 1' 
 ---
 
-# Title 2
+# Title 1
 
 ## Section
 
