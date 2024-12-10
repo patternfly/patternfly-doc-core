@@ -1,0 +1,30 @@
+---
+import { getCollection, render } from 'astro:content'
+import { Title } from '@patternfly/react-core'
+import MainLayout from '../../layouts/Main.astro'
+
+export async function getStaticPaths() {
+  const content = await getCollection('textContent')
+  return content.map((entry) => {
+    return {
+      params: { id: entry.id, section: entry.data.section },
+      props: { entry, title: entry.data.title },
+    }
+  })
+}
+
+const { entry } = Astro.props
+const { title } = entry.data
+const { Content } = await render(entry)
+---
+
+<MainLayout>
+  {
+    title && (
+      <Title headingLevel="h1" size="4xl">
+        {title}
+      </Title>
+    )
+  }
+  <Content />
+</MainLayout>

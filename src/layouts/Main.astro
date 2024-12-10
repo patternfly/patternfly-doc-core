@@ -1,13 +1,26 @@
 ---
 import '@patternfly/patternfly/patternfly.css'
+import { ClientRouter } from 'astro:transitions'
 
 import Page from '../components/Page.astro'
 import Masthead from '../components/Masthead.astro'
 import Navigation from '../components/Navigation.astro'
 ---
 
-<Page>
-  <Masthead slot="masthead" />
-  <Navigation slot="sidebar" />
-  <slot />
-</Page>
+<html lang="en" transition:animate="none">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro</title>
+    <ClientRouter />
+  </head>
+  <body>
+    <Page>
+      <Masthead slot="masthead" />
+      <Navigation slot="sidebar" />
+      <slot />
+    </Page>
+  </body>
+</html>

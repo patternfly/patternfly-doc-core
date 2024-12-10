@@ -1,68 +1,56 @@
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Nav,
   NavList,
-  NavItem,
   PageSidebar,
   PageSidebarBody,
 } from '@patternfly/react-core'
 import { useStore } from '@nanostores/react'
 import { isNavOpen } from '../stores/navStore'
-
-interface NavOnSelectProps {
-  groupId: number | string
-  itemId: number | string
-  to: string
-}
-
-interface NavEntry {
-  id: string
-  data: {
-    title: string
-  }
-  collection: string
-}
+import { NavSection } from './NavSection'
+import { type TextContentEntry } from './NavEntry'
 
 interface NavigationProps {
-  navEntries: NavEntry[]
+  navEntries: TextContentEntry[]
 }
 
 export const Navigation: React.FunctionComponent<NavigationProps> = ({
   navEntries,
 }: NavigationProps) => {
+  const $isNavOpen = useStore(isNavOpen)
   const [activeItem, setActiveItem] = useState('')
+
+  useEffect(() => {
+    setActiveItem(window.location.pathname.split('/').reverse()[0])
+  }, [])
 
   const onNavSelect = (
     _event: React.FormEvent<HTMLInputElement>,
-    selectedItem: NavOnSelectProps,
+    selectedItem: { itemId: string | number },
   ) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    typeof selectedItem.itemId === 'string' &&
-      setActiveItem(selectedItem.itemId)
+    setActiveItem(selectedItem.itemId.toString())
   }
 
-  const $isNavOpen = useStore(isNavOpen)
+  const sections = new Set(navEntries.map((entry) => entry.data.section))
 
-  const sortedNavEntries = navEntries.sort((a, b) =>
-    a.data.title.localeCompare(b.data.title),
-  )
+  const navSections = Array.from(sections).map((section) => {
+    const entries = navEntries.filter((entry) => entry.data.section === section)
 
-  const navItems = sortedNavEntries.map((entry) => (
-    <NavItem
-      key={entry.id}
-      itemId={entry.id}
-      isActive={activeItem === entry.id}
-      to={`/${entry.collection}/${entry.id}`}
-    >
-      {entry.data.title}
-    </NavItem>
-  ))
+    return (
+      <NavSection
+        key={section}
+        entries={entries}
+        sectionId={section}
+        activeItem={activeItem}
+      />
+    )
+  })
 
   return (
     <PageSidebar isSidebarOpen={$isNavOpen}>
       <PageSidebarBody>
         <Nav onSelect={onNavSelect}>
-          <NavList>{navItems}</NavList>
+          <NavList>{navSections}</NavList>
         </Nav>
       </PageSidebarBody>
     </PageSidebar>
