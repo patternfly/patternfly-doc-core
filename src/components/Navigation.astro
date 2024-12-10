@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content'
 
 import { Navigation as ReactNav } from './Navigation.tsx'
 
-const navEntries = await getCollection('test')
+const navEntries = await getCollection('textContent')
 ---
 
-<ReactNav client:idle navEntries={navEntries} />
+<ReactNav client:only navEntries={navEntries} transition:animate="fade" />
