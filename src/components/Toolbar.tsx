@@ -1,4 +1,5 @@
-import { useState } from "react";
+import * as React from 'react'
+import { useState } from 'react'
 import {
   Avatar,
   Button,
@@ -13,53 +14,53 @@ import {
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
-} from "@patternfly/react-core";
-import BellIcon from "@patternfly/react-icons/dist/esm/icons/bell-icon";
-import CogIcon from "@patternfly/react-icons/dist/esm/icons/cog-icon";
-import QuestionCircleIcon from "@patternfly/react-icons/dist/esm/icons/question-circle-icon";
-import EllipsisVIcon from "@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon";
+} from '@patternfly/react-core'
+import BellIcon from '@patternfly/react-icons/dist/esm/icons/bell-icon'
+import CogIcon from '@patternfly/react-icons/dist/esm/icons/cog-icon'
+import QuestionCircleIcon from '@patternfly/react-icons/dist/esm/icons/question-circle-icon'
+import EllipsisVIcon from '@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon'
 
-import imgAvatar from "/avatarImg.svg?url";
+import imgAvatar from '/avatarImg.svg?url'
 
-import { KebabDropdownItems } from "./KebabDropdownItems";
-import { UserDropdownItems } from "./UserDropdownItems";
+import { KebabDropdownItems } from './KebabDropdownItems'
+import { UserDropdownItems } from './UserDropdownItems'
 
 export const Toolbar: React.FunctionComponent = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isKebabDropdownOpen, setIsKebabDropdownOpen] = useState(false);
-  const [isFullKebabDropdownOpen, setIsFullKebabDropdownOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isKebabDropdownOpen, setIsKebabDropdownOpen] = useState(false)
+  const [isFullKebabDropdownOpen, setIsFullKebabDropdownOpen] = useState(false)
 
   const onDropdownToggle = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+    setIsDropdownOpen(!isDropdownOpen)
+  }
 
   const onDropdownSelect = () => {
-    setIsDropdownOpen(false);
-  };
+    setIsDropdownOpen(false)
+  }
 
   const onKebabDropdownToggle = () => {
-    setIsKebabDropdownOpen(!isKebabDropdownOpen);
-  };
+    setIsKebabDropdownOpen(!isKebabDropdownOpen)
+  }
 
   const onKebabDropdownSelect = () => {
-    setIsKebabDropdownOpen(false);
-  };
+    setIsKebabDropdownOpen(false)
+  }
 
   const onFullKebabDropdownToggle = () => {
-    setIsFullKebabDropdownOpen(!isFullKebabDropdownOpen);
-  };
+    setIsFullKebabDropdownOpen(!isFullKebabDropdownOpen)
+  }
 
   const onFullKebabDropdownSelect = () => {
-    setIsFullKebabDropdownOpen(false);
-  };
+    setIsFullKebabDropdownOpen(false)
+  }
 
   return (
     <PFToolbar id="toolbar" isStatic>
       <ToolbarContent>
         <ToolbarGroup
           variant="action-group-plain"
-          align={{ default: "alignEnd" }}
-          gap={{ default: "gapNone", md: "gapMd" }}
+          align={{ default: 'alignEnd' }}
+          gap={{ default: 'gapNone', md: 'gapMd' }}
         >
           <ToolbarItem>
             <Button
@@ -70,7 +71,7 @@ export const Toolbar: React.FunctionComponent = () => {
           </ToolbarItem>
           <ToolbarGroup
             variant="action-group-plain"
-            visibility={{ default: "hidden", lg: "visible" }}
+            visibility={{ default: 'hidden', lg: 'visible' }}
           >
             <ToolbarItem>
               <Button
@@ -88,13 +89,13 @@ export const Toolbar: React.FunctionComponent = () => {
             </ToolbarItem>
           </ToolbarGroup>
           <ToolbarItem
-            visibility={{ default: "hidden", md: "visible", lg: "hidden" }}
+            visibility={{ default: 'hidden', md: 'visible', lg: 'hidden' }}
           >
             <Dropdown
               isOpen={isKebabDropdownOpen}
               onSelect={onKebabDropdownSelect}
               onOpenChange={(isOpen: boolean) => setIsKebabDropdownOpen(isOpen)}
-              popperProps={{ position: "right" }}
+              popperProps={{ position: 'right' }}
               toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
                 <MenuToggle
                   ref={toggleRef}
@@ -112,14 +113,14 @@ export const Toolbar: React.FunctionComponent = () => {
               </DropdownList>
             </Dropdown>
           </ToolbarItem>
-          <ToolbarItem visibility={{ md: "hidden" }}>
+          <ToolbarItem visibility={{ md: 'hidden' }}>
             <Dropdown
               isOpen={isFullKebabDropdownOpen}
               onSelect={onFullKebabDropdownSelect}
               onOpenChange={(isOpen: boolean) =>
                 setIsFullKebabDropdownOpen(isOpen)
               }
-              popperProps={{ position: "right" }}
+              popperProps={{ position: 'right' }}
               toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
                 <MenuToggle
                   ref={toggleRef}
@@ -144,24 +145,18 @@ export const Toolbar: React.FunctionComponent = () => {
             </Dropdown>
           </ToolbarItem>
         </ToolbarGroup>
-        <ToolbarItem visibility={{ default: "hidden", md: "visible" }}>
+        <ToolbarItem visibility={{ default: 'hidden', md: 'visible' }}>
           <Dropdown
             isOpen={isDropdownOpen}
             onSelect={onDropdownSelect}
             onOpenChange={(isOpen: boolean) => setIsDropdownOpen(isOpen)}
-            popperProps={{ position: "right" }}
+            popperProps={{ position: 'right' }}
             toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
               <MenuToggle
                 ref={toggleRef}
                 onClick={onDropdownToggle}
                 isExpanded={isDropdownOpen}
-                icon={
-                  <Avatar
-                    src={imgAvatar}
-                    alt=""
-                    size="sm"
-                  />
-                }
+                icon={<Avatar src={imgAvatar} alt="" size="sm" />}
               >
                 Ned Username
               </MenuToggle>
@@ -174,5 +169,5 @@ export const Toolbar: React.FunctionComponent = () => {
         </ToolbarItem>
       </ToolbarContent>
     </PFToolbar>
-  );
-};
+  )
+}

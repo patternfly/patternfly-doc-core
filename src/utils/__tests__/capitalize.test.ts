@@ -1,5 +1,6 @@
-import { capitalize } from "@patternfly/react-core";
+import { capitalize } from '../capitalize'
+import { test, expect } from 'vitest'
 
-it('capitalize', () => {
-  expect(capitalize('foo')).toBe('Foo');
-});
+test('capitalize', () => {
+  expect(capitalize('foo')).toBe('Foo')
+})
