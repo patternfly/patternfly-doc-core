@@ -1,9 +1,9 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection } from 'astro:content'
 
-import { Navigation as ReactNav } from "./Navigation.tsx";
+import { Navigation as ReactNav } from './Navigation.tsx'
 
-const navEntries = await getCollection("test");
+const navEntries = await getCollection('test')
 ---
 
 <ReactNav client:idle navEntries={navEntries} />
