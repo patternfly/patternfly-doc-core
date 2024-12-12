@@ -121,10 +121,11 @@ export default [
         'react-compiler/react-compiler': 'warn',
         'react-hooks/exhaustive-deps': 'warn',
         'react/no-unescaped-entities': ['error', { forbid: ['>', '}'] }],
-        "react/no-unknown-property": ["error", { ignore: ["class"] }],
+        "react/no-unknown-property": ["error", { ignore: ["class", "transition:animate"] }],
         'spaced-comment': 'error',
         'use-isnan': 'error',
-        'valid-typeof': 'off'
+        'valid-typeof': 'off',
+        'spaced-comment': 'off',
       }
-  }
+  },
 ];

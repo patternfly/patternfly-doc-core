@@ -1,4 +1,4 @@
-import { NavItem } from '@patternfly/react-core'
+import { NavItem } from '@patternfly/react-core/dist/esm/components/Nav/NavItem'
 
 export interface TextContentEntry {
   id: string
