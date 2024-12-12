@@ -19,7 +19,7 @@ export const NavEntry = ({ entry, isActive }: NavEntryProps) => {
   const { id: entryTitle, section } = entry.data
 
   return (
-    <NavItem itemId={id} to={`/${section}/${id}`} isActive={isActive}>
+    <NavItem itemId={id} to={`/${section}/${id}`} isActive={isActive} id={`nav-entry-${id}`}>
       {entryTitle}
     </NavItem>
   )

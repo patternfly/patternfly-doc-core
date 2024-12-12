@@ -1,0 +1,8 @@
+//extend the root tsconfig.json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+  }
+}

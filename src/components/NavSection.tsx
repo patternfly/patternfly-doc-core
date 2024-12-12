@@ -30,6 +30,7 @@ export const NavSection = ({
       title={sentenceCase(sectionId)}
       isActive={isActive}
       isExpanded={isExpanded}
+      id={`nav-section-${sectionId}`}
     >
       {items}
     </NavExpandable>

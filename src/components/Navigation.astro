@@ -6,4 +6,4 @@ import { Navigation as ReactNav } from './Navigation.tsx'
 const navEntries = await getCollection('textContent')
 ---
 
-<ReactNav client:only navEntries={navEntries} transition:animate="fade" />
+<ReactNav client:only="react" navEntries={navEntries} transition:animate="fade" />
