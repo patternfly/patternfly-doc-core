@@ -9,7 +9,7 @@ import { Content, PageSection } from '@patternfly/react-core'
   <slot name="sidebar" />
   <div class={styles.pageMainContainer}>
     <main class={styles.pageMain}>
-      <PageSection>
+      <PageSection transition:animate="none">
         <Content>
           <slot />
         </Content>
