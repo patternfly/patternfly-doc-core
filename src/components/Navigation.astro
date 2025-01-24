@@ -3,7 +3,11 @@ import { getCollection } from 'astro:content'
 
 import { Navigation as ReactNav } from './Navigation.tsx'
 
-const navEntries = await getCollection('textContent')
+import { content } from "../content"
+
+const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as any)))
+
+const navEntries = collections.flat();
 ---
 
-<ReactNav client:only="react" navEntries={navEntries} transition:animate="fade" />
+<ReactNav client:only="react" navEntries={navEntries as any} transition:animate="fade" />

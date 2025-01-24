@@ -2,10 +2,12 @@
 import { getCollection, render } from 'astro:content'
 import { Title } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
+import { content } from "../../content"
 
 export async function getStaticPaths() {
-  const content = await getCollection('textContent')
-  return content.map((entry) => ({
+  const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as any)))
+
+  return collections.flat().map((entry) => ({
       params: { id: entry.id, section: entry.data.section },
       props: { entry, title: entry.data.title },
     })

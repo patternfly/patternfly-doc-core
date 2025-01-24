@@ -2,10 +2,15 @@
   "name": "patternfly-doc-core",
   "type": "module",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
+    "build:cli": "tsc --build ./cli/tsconfig.json",
+    "build:cli:watch": "tsc --build --watch ./cli/tsconfig.json",
     "preview": "astro preview",
     "astro": "astro",
     "prettier": "prettier --write ./src",
@@ -13,6 +18,8 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
+  "main": "dist/cli/cli.js",
+  "bin": "./dist/cli/cli.js",
   "prettier": {
     "plugins": [
       "prettier-plugin-astro"
@@ -39,11 +46,13 @@
     "@types/react-dom": "^18.3.1",
     "astro": "^5.1.7",
     "change-case": "5.4.4",
+    "commander": "^13.0.0",
     "nanostores": "^0.11.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sass": "^1.81.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "glob": "^11.0.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",

@@ -8,6 +8,11 @@ export default defineConfig({
   vite: {
     ssr: {
       noExternal: ["@patternfly/*", "react-dropzone"],
+    },
+    server: {
+      fs: {
+        allow: ['./']
+      }
     }
   }
 });
