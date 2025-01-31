@@ -26,7 +26,10 @@ function defineContent(contentObj: CollectionDefinition) {
 
 export const collections = content.reduce(
   (acc, contentObj) => {
-    acc[contentObj.name] = defineContent(contentObj)
+    const def = defineContent(contentObj)
+    if (def) {
+      acc[contentObj.name] = def
+    }
     return acc
   },
   {} as Record<string, ReturnType<typeof defineContent>>,

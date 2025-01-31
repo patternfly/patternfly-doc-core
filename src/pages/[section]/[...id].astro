@@ -5,7 +5,7 @@ import MainLayout from '../../layouts/Main.astro'
 import { content } from "../../content"
 
 export async function getStaticPaths() {
-  const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as any)))
+  const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
 
   return collections.flat().map((entry) => ({
       params: { id: entry.id, section: entry.data.section },
