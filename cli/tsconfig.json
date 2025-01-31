@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "../dist/cli",
+    "skipLibCheck": true,
+    "module": "NodeNext",
+    "allowJs": true
+  },
+  "exclude": ["__tests__", "testData"],
+}
