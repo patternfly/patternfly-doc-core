@@ -18,12 +18,6 @@ import Navigation from '../components/Navigation.astro'
     <ClientRouter />
   </head>
   <body>
-    <script is:inline>
-      window.addEventListener('astro:after-swap', ()=>  {
-        const themePreference = window.localStorage.getItem ('theme-preference');
-        document?.querySelector('html')?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark' ); 
-        })
-    </script>
     <Page>
       <Masthead slot="masthead" />
       <Navigation slot="sidebar" />

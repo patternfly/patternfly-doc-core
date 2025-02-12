@@ -3,8 +3,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DocumentReleaseDropdown } from '../DocumentReleaseDropdown';
-import { snapshot } from 'node:test';
-import exp from 'constants';
 
 jest.mock('../../../versions.json', () => ({
   Releases: [

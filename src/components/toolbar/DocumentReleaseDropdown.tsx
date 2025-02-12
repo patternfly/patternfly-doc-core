@@ -26,6 +26,7 @@ export const DocumentReleaseDropdown: React.FunctionComponent = () => {
     <DropdownItem
       itemId={`${version.name}-latest-release`}
       key={`${version.name}-latest`}
+      // eslint-disable-next-line no-nested-ternary
       to={isLatest ? '/' : version.href ? version.href : `/${version.name}`}
       isExternalLink = {version.href ? true : false}
     >

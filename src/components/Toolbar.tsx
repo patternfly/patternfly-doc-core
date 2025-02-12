@@ -12,8 +12,7 @@ import { SearchComponent } from './toolbar/SearchComponent'
 import { DocumentReleaseDropdown } from './toolbar/DocumentReleaseDropdown';
 import GithubIcon from '@patternfly/react-icons/dist/esm/icons/github-icon';
 
-export const Toolbar: React.FunctionComponent = () => {
-  return (
+export const Toolbar: React.FunctionComponent = () => (
     <PFToolbar id="toolbar" isStatic>
       <ToolbarContent>
         <ToolbarGroup
@@ -45,4 +44,3 @@ export const Toolbar: React.FunctionComponent = () => {
       </ToolbarContent>
     </PFToolbar>
   )
-}
