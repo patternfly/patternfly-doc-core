@@ -6,6 +6,28 @@
       "name": "Development server",
       "request": "launch",
       "type": "node-terminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test Spec File",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+      "args": [
+        "--collectCoverage=false",
+        "--colors",
+        "--config",
+        "${workspaceRoot}/jest.config.ts",
+        "--runInBand"
+      ],
+      "internalConsoleOptions": "neverOpen",
+      "sourceMaps": true,
+      "skipFiles": [
+        "${workspaceRoot}/../../node_modules/**/*"
+      ],
+      "windows": {
+        "skipFiles": ["C:\\\\**\\\\node_modules\\\\**\\\\*"]
+      },
+      "stopOnEntry": true
     }
   ]
 }
