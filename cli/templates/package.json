@@ -1,0 +1,19 @@
+{
+  "name": "add-package-name",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "patternfly-doc-core start",
+    "build:docs": "patternfly-doc-core build",
+    "serve": "patternfly-doc-core serve",
+    "sync": "patternfly-doc-core sync",
+    "init:docs": "patternfly-doc-core init"
+  },
+  "author": "",
+  "license": "",
+  "description": "",
+  "devDependencies": {
+    "patternfly-doc-core": "latest"
+  }
+}

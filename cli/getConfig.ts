@@ -7,7 +7,8 @@ export interface CollectionDefinition {
 }
 
 export interface DocsConfig {
-  content: CollectionDefinition[]
+  content: CollectionDefinition[];
+  outputDir: string;
 }
 
 export async function getConfig(fileLocation: string): Promise<DocsConfig | undefined> {
