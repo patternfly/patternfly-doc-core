@@ -1,7 +1,7 @@
 import { getConfig } from '../getConfig'
 import { resolve } from 'path'
 
-it('should return the config when pf-docs.config.js exists', async () => {
+it('should return the config when pf-docs.config.mjs exists', async () => {
   const config = await getConfig(resolve('./cli/testData/good.config.js'))
   expect(config).toEqual({
     config: {
@@ -17,7 +17,7 @@ it('should return the config when pf-docs.config.js exists', async () => {
   })
 })
 
-it('should return undefined and log error when pf-docs.config.js does not exist', async () => {
+it('should return undefined and log error when pf-docs.config.mjs does not exist', async () => {
   const consoleErrorMock = jest.fn()
 
   jest.spyOn(console, 'error').mockImplementation(consoleErrorMock)
@@ -25,6 +25,6 @@ it('should return undefined and log error when pf-docs.config.js does not exist'
   const config = await getConfig('foo')
   expect(config).toBeUndefined()
   expect(consoleErrorMock).toHaveBeenCalledWith(
-    'pf-docs.config.js not found, have you created it at the root of your package?',
+    'pf-docs.config.mjs not found, have you created it at the root of your package?',
   )
 })

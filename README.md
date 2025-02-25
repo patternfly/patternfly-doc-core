@@ -15,7 +15,7 @@ Using this package for your documentation is accomplished in just a few simple s
 1. Install the documentation core using your projects dependency manager, e.g. `npm install` or `yarn install`
 1. Run the initialization script using your script runner, e.g. `npm run init:docs` or `yarn init:docs`
    - this will update a Vite config in the documentation so that it can access the files in your repo when running the development server
-1. Edit the `pf-docs.config.js` file in your project root to point the documentation core to your documentation files
+1. Edit the `pf-docs.config.mjs` file in your project root to point the documentation core to your documentation files
 
 ### Use
 

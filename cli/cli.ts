@@ -18,7 +18,7 @@ function updateContent(program: Command) {
 
   createCollectionContent(
     astroRoot,
-    `${process.cwd()}/pf-docs.config.js`,
+    `${process.cwd()}/pf-docs.config.mjs`,
     verbose,
   )
 }
@@ -48,7 +48,7 @@ program.command('setup').action(async () => {
 program.command('init').action(async () => {
   await setFsRootDir(astroRoot, currentDir)
   console.log(
-    '\nInitialization complete, next update your pf-docs.config.js file and then run the `start` script to start the dev server',
+    '\nInitialization complete, next update your pf-docs.config.mjs file and then run the `start` script to start the dev server',
   )
 })
 
@@ -59,7 +59,7 @@ program.command('start').action(async () => {
 
 program.command('build').action(async () => {
   updateContent(program)
-  const { outputDir } = await getConfig(`${currentDir}/pf-docs.config.js`)
+  const { outputDir } = await getConfig(`${currentDir}/pf-docs.config.mjs`)
   build({ root: astroRoot, outDir: join(currentDir, outputDir) })
 })
 

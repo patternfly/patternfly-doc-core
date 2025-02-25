@@ -6,7 +6,7 @@ export async function createConfigFile(
   astroRootDir: string,
   consumerRootDir: string,
 ) {
-  const configFileName = 'pf-docs.config.js'
+  const configFileName = 'pf-docs.config.mjs'
   const configFilePath = join(consumerRootDir, configFileName)
   const templateFilePath = join(
     astroRootDir,

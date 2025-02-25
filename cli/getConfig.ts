@@ -18,7 +18,7 @@ export async function getConfig(fileLocation: string): Promise<DocsConfig | unde
   } catch (e: any) {
     if (['ERR_MODULE_NOT_FOUND', 'MODULE_NOT_FOUND'].includes(e.code)) {
       console.error(
-        'pf-docs.config.js not found, have you created it at the root of your package?',
+        'pf-docs.config.mjs not found, have you created it at the root of your package?',
       )
       return
     }
