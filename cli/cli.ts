@@ -59,8 +59,14 @@ program.command('start').action(async () => {
 
 program.command('build').action(async () => {
   updateContent(program)
-  const { outputDir } = await getConfig(`${currentDir}/pf-docs.config.mjs`)
-  build({ root: astroRoot, outDir: join(currentDir, outputDir) })
+  const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
+  if (!config) {
+    console.error(
+      'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
+    )
+    return
+  }
+  build({ root: astroRoot, outDir: join(currentDir, config.outputDir) })
 })
 
 program.command('serve').action(async () => {
