@@ -1,5 +1,5 @@
 {
-  "name": "@pattternfly/patternfly-doc-core",
+  "name": "@patternfly/patternfly-doc-core",
   "type": "module",
   "version": "0.0.0-development",
   "publishConfig": {
