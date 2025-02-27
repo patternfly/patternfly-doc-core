@@ -5,6 +5,7 @@ import { ClientRouter } from 'astro:transitions'
 import Page from '../components/Page.astro'
 import Masthead from '../components/Masthead.astro'
 import Navigation from '../components/Navigation.astro'
+import EmotionButton from '../components/EmotionButton.tsx'
 ---
 
 <html lang="en" transition:animate="none">
@@ -18,6 +19,7 @@ import Navigation from '../components/Navigation.astro'
   </head>
   <body>
     <Page>
+      <EmotionButton server:defer />
       <Masthead slot="masthead" />
       <Navigation slot="sidebar" />
       <slot />
