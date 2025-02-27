@@ -22,5 +22,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Build dist
         run: npm build
+      - name: Build CLI
+        run: npm run build:cli
       - name: Release to NPM
         run: npx semantic-release
