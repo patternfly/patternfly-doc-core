@@ -20,8 +20,10 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
+      - name: Npm Install
+        run: npm install
       - name: Build dist
-        run: npm build
+        run: npm run build
       - name: Build CLI
         run: npm run build:cli
       - name: Release to NPM
