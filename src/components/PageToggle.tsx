@@ -1,5 +1,6 @@
 import type React from 'react'
 import { PageToggleButton } from '@patternfly/react-core'
+import styles from '@patternfly/react-styles/css/components/Page/page'
 import BarsIcon from '@patternfly/react-icons/dist/esm/icons/bars-icon'
 import { useStore } from '@nanostores/react'
 import { isNavOpen } from '../stores/navStore'
@@ -8,38 +9,26 @@ import { useEffect } from 'react'
 export const PageToggle: React.FunctionComponent = () => {
   const $isNavOpen = useStore(isNavOpen)
 
-  /** Applies sidebar styles to the island element astro creates as a wrapper for the sidebar.
-   * Without it the page content will not expand to fill the space left by the sidebar when it is collapsed.
-   */
-  function applySidebarStylesToIsland() {
-    const isClientSide = typeof window !== 'undefined'
-    const sideBarIsland = document.getElementById('page-sidebar')?.parentElement
-
-    if (!isClientSide || !sideBarIsland) {
-      return
-    }
-
-    if (!sideBarIsland.classList.contains('pf-v6-c-page__sidebar')) {
-      sideBarIsland.classList.add('pf-v6-c-page__sidebar', 'pf-m-expanded')
-    } else {
-      sideBarIsland.classList.toggle('pf-m-expanded')
-      sideBarIsland.classList.toggle('pf-m-collapsed')
-    }
-  }
-
   function onToggle() {
     isNavOpen.set(!$isNavOpen)
   }
 
   useEffect(() => {
-    applySidebarStylesToIsland()
+    const pageComp = document.querySelector(`.${styles.page}`);
+
+    if (pageComp) {
+      (pageComp as HTMLElement).style.setProperty(
+        `--${styles.page}__sidebar--Width`,
+        $isNavOpen ? '' : '0',
+      )
+    }
   }, [$isNavOpen])
 
   return (
     <PageToggleButton
-      variant="plain"
       aria-label="Global navigation"
       onSidebarToggle={onToggle}
+      isSidebarOpen={$isNavOpen}
     >
       <BarsIcon />
     </PageToggleButton>
