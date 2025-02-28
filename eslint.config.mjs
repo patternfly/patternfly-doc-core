@@ -48,7 +48,7 @@ export default [
         '@typescript-eslint/array-type': 'error',
         '@typescript-eslint/ban-types': 'off',
         '@typescript-eslint/consistent-type-assertions': 'error',
-        '@typescript-eslint/consistent-type-definitions': 'error',
+        '@typescript-eslint/consistent-type-definitions': 'off',
         '@typescript-eslint/explicit-member-accessibility': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/indent': 'off',

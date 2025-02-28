@@ -5,6 +5,7 @@ import { ClientRouter } from 'astro:transitions'
 import Page from '../components/Page.astro'
 import Masthead from '../components/Masthead.astro'
 import Navigation from '../components/Navigation.astro'
+
 ---
 
 <html lang="en" transition:animate="none">
@@ -24,3 +25,13 @@ import Navigation from '../components/Navigation.astro'
     </Page>
   </body>
 </html>
+
+<script>
+  const themePreference = window.localStorage.getItem ('theme-preference');
+  document?.querySelector('html')?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark' ); 
+  
+  document.addEventListener("astro:after-swap", () => {
+      const themePreference = window.localStorage.getItem ('theme-preference');
+      document?.querySelector('html')?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark' ); 
+  });
+</script>
