@@ -2,7 +2,7 @@
  * @type {import('semantic-release').GlobalConfig}
  */
 export default {
-  branches: ['main'],
+  branches: 'main',
   analyzeCommits: {
     preset: 'angular',
   },
