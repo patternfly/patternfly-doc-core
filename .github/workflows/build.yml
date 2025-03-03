@@ -58,4 +58,4 @@ jobs:
     - name: Build CLI
       run: npm run build:cli
     - name: Release to NPM
-      run: DEBUG=semantic-release:* semantic-release npx semantic-release@19.0.5 
+      run: DEBUG=semantic-release:* && npx semantic-release@19.0.5 
