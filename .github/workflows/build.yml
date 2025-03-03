@@ -59,4 +59,4 @@ jobs:
     - name: Release to NPM
       env:
         DEBUG: semantic-release:*
-      run: npx semantic-release@19.0.5 --branches main
+      run: npx semantic-release@19.0.5 --branches main --dry-run
