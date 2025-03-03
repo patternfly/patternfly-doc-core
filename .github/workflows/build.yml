@@ -58,4 +58,4 @@ jobs:
     - name: Build CLI
       run: npm run build:cli
     - name: Release to NPM
-      run: npx semantic-release
+      run: npx semantic-release@19.0.5
