@@ -66,6 +66,12 @@ program.command('build').action(async () => {
     )
     return
   }
+
+  if (!config.outputDir) {
+    console.error("No outputDir found in config file, an output directory must be defined in your config file e.g. 'dist'")
+    return
+  }
+    
   build({ root: astroRoot, outDir: join(currentDir, config.outputDir) })
 })
 
