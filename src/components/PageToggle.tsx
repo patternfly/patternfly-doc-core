@@ -1,4 +1,5 @@
 import type React from 'react'
+import styles from '@patternfly/react-styles/css/components/Page/page'
 import { PageToggleButton } from '@patternfly/react-core'
 import BarsIcon from '@patternfly/react-icons/dist/esm/icons/bars-icon'
 import { useStore } from '@nanostores/react'
@@ -21,14 +22,14 @@ export const PageToggle: React.FunctionComponent = () => {
       return
     }
 
-    if (!sideBarIsland.classList.contains('pf-v6-c-page__sidebar')) {
+    if (!sideBarIsland.classList.contains(styles.pageSidebar)) {
       sideBarIsland.classList.add(
-        'pf-v6-c-page__sidebar',
-        $isNavOpen ? 'pf-m-expanded' : 'pf-m-collapsed',
+        styles.pageSidebar,
+        $isNavOpen ? styles.modifiers.expanded : styles.modifiers.collapsed,
       )
     } else {
-      sideBarIsland.classList.toggle('pf-m-expanded')
-      sideBarIsland.classList.toggle('pf-m-collapsed')
+      sideBarIsland.classList.toggle(styles.modifiers.expanded)
+      sideBarIsland.classList.toggle(styles.modifiers.collapsed)
     }
     sideBarIsland.setAttribute('aria-hidden', `${!$isNavOpen}`)
   }
@@ -39,7 +40,7 @@ export const PageToggle: React.FunctionComponent = () => {
 
   useEffect(() => {
     applySidebarStylesToIsland()
-  }, [$isNavOpen])
+  }, [$isNavOpen, applySidebarStylesToIsland])
 
   return (
     <PageToggleButton
