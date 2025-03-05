@@ -1,12 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  Nav,
-  NavList,
-  PageSidebar,
-  PageSidebarBody,
-} from '@patternfly/react-core'
-import { useStore } from '@nanostores/react'
-import { isNavOpen } from '../stores/navStore'
+import { Nav, NavList, PageSidebarBody } from '@patternfly/react-core'
 import { NavSection } from './NavSection'
 import { type TextContentEntry } from './NavEntry'
 
@@ -17,7 +10,6 @@ interface NavigationProps {
 export const Navigation: React.FunctionComponent<NavigationProps> = ({
   navEntries,
 }: NavigationProps) => {
-  const $isNavOpen = useStore(isNavOpen)
   const [activeItem, setActiveItem] = useState('')
 
   useEffect(() => {
