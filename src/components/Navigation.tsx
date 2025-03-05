@@ -47,12 +47,11 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
   })
 
   return (
-    <PageSidebar isSidebarOpen={$isNavOpen}>
-      <PageSidebarBody>
-        <Nav onSelect={onNavSelect}>
-          <NavList>{navSections}</NavList>
-        </Nav>
-      </PageSidebarBody>
-    </PageSidebar>
+    // Can possibly add back PageSidebar wrapper when https://github.com/patternfly/patternfly/issues/7377 goes in
+    <PageSidebarBody id="page-sidebar-body">
+      <Nav onSelect={onNavSelect}>
+        <NavList>{navSections}</NavList>
+      </Nav>
+    </PageSidebarBody>
   )
 }

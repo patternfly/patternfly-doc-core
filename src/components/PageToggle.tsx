@@ -9,19 +9,37 @@ import { useEffect } from 'react'
 export const PageToggle: React.FunctionComponent = () => {
   const $isNavOpen = useStore(isNavOpen)
 
+  /** Applies sidebar styles to the island element astro creates as a wrapper for the sidebar.
+   * Without it the page content will not expand to fill the space left by the sidebar when it is collapsed.
+   */
+  // Possibly can refactor to remove applying classes when https://github.com/patternfly/patternfly/issues/7377 goes in
+  function applySidebarStylesToIsland() {
+    const isClientSide = typeof window !== 'undefined'
+    const sideBarIsland =
+      document.getElementById('page-sidebar-body')?.parentElement
+
+    if (!isClientSide || !sideBarIsland) {
+      return
+    }
+
+    if (!sideBarIsland.classList.contains('pf-v6-c-page__sidebar')) {
+      sideBarIsland.classList.add(
+        'pf-v6-c-page__sidebar',
+        $isNavOpen ? 'pf-m-expanded' : 'pf-m-collapsed',
+      )
+    } else {
+      sideBarIsland.classList.toggle('pf-m-expanded')
+      sideBarIsland.classList.toggle('pf-m-collapsed')
+    }
+    sideBarIsland.setAttribute('aria-hidden', `${!$isNavOpen}`)
+  }
+
   function onToggle() {
     isNavOpen.set(!$isNavOpen)
   }
 
   useEffect(() => {
-    const pageComp = document.querySelector(`.${styles.page}`);
-
-    if (pageComp) {
-      (pageComp as HTMLElement).style.setProperty(
-        `--${styles.page}__sidebar--Width`,
-        $isNavOpen ? '' : '0',
-      )
-    }
+    applySidebarStylesToIsland()
   }, [$isNavOpen])
 
   return (
