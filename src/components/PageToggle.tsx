@@ -1,6 +1,5 @@
 import type React from 'react'
 import { PageToggleButton } from '@patternfly/react-core'
-import styles from '@patternfly/react-styles/css/components/Page/page'
 import BarsIcon from '@patternfly/react-icons/dist/esm/icons/bars-icon'
 import { useStore } from '@nanostores/react'
 import { isNavOpen } from '../stores/navStore'
