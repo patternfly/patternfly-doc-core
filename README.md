@@ -8,7 +8,7 @@ Patternfly documentation core contains the base packages needed to build and rel
 
 Using this package for your documentation is accomplished in just a few simple steps:
 
-1. Run `npx patternfly-doc-core@latest setup` from the root of your repo. This will:
+1. Run `npx @patternfly/patternfly-doc-core@latest setup` from the root of your repo. This will:
    - add the documentation core as a dependency in your package
    - add the relevant scripts for using the documentation core to your package scripts
    - create the configuration file for customizing the documentation core

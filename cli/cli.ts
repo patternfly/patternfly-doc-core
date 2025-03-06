@@ -24,7 +24,7 @@ function updateContent(program: Command) {
 }
 
 const astroRoot = import.meta
-  .resolve('patternfly-doc-core')
+  .resolve('@patternfly/patternfly-doc-core')
   .replace('dist/cli/cli.js', '')
   .replace('file://', '')
 const currentDir = process.cwd()
