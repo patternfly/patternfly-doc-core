@@ -18,28 +18,24 @@ export const PageToggle: React.FunctionComponent = () => {
      * Without it the page content will not expand to fill the space left by the sidebar when it is collapsed.
      */
     // Possibly can refactor to remove applying classes when https://github.com/patternfly/patternfly/issues/7377 goes in
-    function applySidebarStylesToIsland() {
-      const isClientSide = typeof window !== 'undefined'
-      const sideBarIsland =
-        document.getElementById('page-sidebar-body')?.parentElement
+    const isClientSide = typeof window !== 'undefined'
+    const sideBarIsland =
+      document.getElementById('page-sidebar-body')?.parentElement
 
-      if (!isClientSide || !sideBarIsland) {
-        return
-      }
-
-      if (!sideBarIsland.classList.contains(styles.pageSidebar)) {
-        sideBarIsland.classList.add(
-          styles.pageSidebar,
-          $isNavOpen ? styles.modifiers.expanded : styles.modifiers.collapsed,
-        )
-      } else {
-        sideBarIsland.classList.toggle(styles.modifiers.expanded)
-        sideBarIsland.classList.toggle(styles.modifiers.collapsed)
-      }
-      sideBarIsland.setAttribute('aria-hidden', `${!$isNavOpen}`)
+    if (!isClientSide || !sideBarIsland) {
+      return
     }
 
-    applySidebarStylesToIsland()
+    if (!sideBarIsland.classList.contains(styles.pageSidebar)) {
+      sideBarIsland.classList.add(
+        styles.pageSidebar,
+        $isNavOpen ? styles.modifiers.expanded : styles.modifiers.collapsed,
+      )
+    } else {
+      sideBarIsland.classList.toggle(styles.modifiers.expanded)
+      sideBarIsland.classList.toggle(styles.modifiers.collapsed)
+    }
+    sideBarIsland.setAttribute('aria-hidden', `${!$isNavOpen}`)
   }, [$isNavOpen])
 
   return (
