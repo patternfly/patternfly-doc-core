@@ -1,12 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  Nav,
-  NavList,
-  PageSidebar,
-  PageSidebarBody,
-} from '@patternfly/react-core'
-import { useStore } from '@nanostores/react'
-import { isNavOpen } from '../stores/navStore'
+import { Nav, NavList, PageSidebarBody } from '@patternfly/react-core'
 import { NavSection } from './NavSection'
 import { type TextContentEntry } from './NavEntry'
 
@@ -17,7 +10,6 @@ interface NavigationProps {
 export const Navigation: React.FunctionComponent<NavigationProps> = ({
   navEntries,
 }: NavigationProps) => {
-  const $isNavOpen = useStore(isNavOpen)
   const [activeItem, setActiveItem] = useState('')
 
   useEffect(() => {
@@ -47,12 +39,11 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
   })
 
   return (
-    <PageSidebar isSidebarOpen={$isNavOpen}>
-      <PageSidebarBody>
-        <Nav onSelect={onNavSelect}>
-          <NavList>{navSections}</NavList>
-        </Nav>
-      </PageSidebarBody>
-    </PageSidebar>
+    // Can possibly add back PageSidebar wrapper when https://github.com/patternfly/patternfly/issues/7377 goes in
+    <PageSidebarBody id="page-sidebar-body">
+      <Nav onSelect={onNavSelect}>
+        <NavList>{navSections}</NavList>
+      </Nav>
+    </PageSidebarBody>
   )
 }
