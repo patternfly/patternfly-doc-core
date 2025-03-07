@@ -2,7 +2,11 @@
 # For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 
 name: Release
-
+env:
+      SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+      SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 on:
   push:
     branches:
@@ -11,11 +15,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-       SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
-       SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
-       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
