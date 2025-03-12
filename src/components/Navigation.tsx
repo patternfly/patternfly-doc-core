@@ -5,10 +5,12 @@ import { type TextContentEntry } from './NavEntry'
 
 interface NavigationProps {
   navEntries: TextContentEntry[]
+  navSectionOrder?: string[]
 }
 
 export const Navigation: React.FunctionComponent<NavigationProps> = ({
   navEntries,
+  navSectionOrder,
 }: NavigationProps) => {
   const [activeItem, setActiveItem] = useState('')
 
@@ -23,9 +25,31 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
     setActiveItem(selectedItem.itemId.toString())
   }
 
-  const sections = new Set(navEntries.map((entry) => entry.data.section))
+  const uniqueSections = Array.from(
+    new Set(navEntries.map((entry) => entry.data.section)),
+  )
 
-  const navSections = Array.from(sections).map((section) => {
+  // We want to list any ordered sections first, followed by any unordered sections sorted alphabetically
+  const [orderedSections, unorderedSections] = uniqueSections.reduce(
+    (acc, section) => {
+      if (!navSectionOrder) {
+        acc[1].push(section)
+        return acc
+      }
+
+      const index = navSectionOrder.indexOf(section)
+      if (index > -1) {
+        acc[0][index] = section
+      } else {
+        acc[1].push(section)
+      }
+      return acc
+    },
+    [[], []] as [string[], string[]],
+  )
+  const sortedSections = [...orderedSections, ...unorderedSections.sort()]
+
+  const navSections = sortedSections.map((section) => {
     const entries = navEntries.filter((entry) => entry.data.section === section)
 
     return (

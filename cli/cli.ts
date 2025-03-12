@@ -8,6 +8,7 @@ import { setFsRootDir } from './setFsRootDir.js'
 import { createConfigFile } from './createConfigFile.js'
 import { updatePackageFile } from './updatePackageFile.js'
 import { getConfig } from './getConfig.js'
+import { symLinkConfig } from './symLinkConfig.js'
 
 function updateContent(program: Command) {
   const { verbose } = program.opts()
@@ -47,6 +48,7 @@ program.command('setup').action(async () => {
 
 program.command('init').action(async () => {
   await setFsRootDir(astroRoot, currentDir)
+  await symLinkConfig(astroRoot, currentDir)
   console.log(
     '\nInitialization complete, next update your pf-docs.config.mjs file and then run the `start` script to start the dev server',
   )
