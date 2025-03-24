@@ -1,6 +1,33 @@
 ---
 import '../styles/global.scss'
 import MainLayout from '../layouts/Main.astro'
+import { PropsTable } from '../components/PropsTable'
+
+const propsData = [
+  {
+    name: 'variant',
+    type: "'success' | 'danger' | 'warning' | 'info' | 'custom'",
+    defaultValue: '',
+    description: 'Adds alert variant styles.',
+    isBeta: true,
+  },
+  {
+    name: 'children',
+    isRequired: true,
+    type: 'ReactNode',
+    defaultValue: '',
+    description: 'Content rendered inside the alert.',
+  },
+  {
+    name: 'timeoutAnimation',
+    isRequired: false,
+    type: undefined,
+    defaultValue: '3000',
+    description:
+      'If the user hovers over the alert and `timeout` expires, this is how long to wait before finally dismissing the alert.',
+    isDeprecated: true,
+  },
+]
 ---
 
 <html lang="en">
@@ -12,6 +39,16 @@ import MainLayout from '../layouts/Main.astro'
     <title>PatternFly</title>
   </head>
   <body>
-    <MainLayout title="PatternFly X Astro"> Page content </MainLayout>
+    <MainLayout title="PatternFly X Astro">
+      <PropsTable
+        componentName="Alert"
+        componentDescription="The main alert component."
+        componentProps={propsData}
+      />
+      <PropsTable
+        componentName="AlertGroup"
+        componentDescription="The container to render a list of alerts."
+      />
+    </MainLayout>
   </body>
 </html>
