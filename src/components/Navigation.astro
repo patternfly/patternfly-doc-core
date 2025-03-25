@@ -8,6 +8,9 @@ import { content } from "../content"
 const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
 
 const navEntries = collections.flat();
+// filter out duplicate component entries - default to react path
+// use entry.data.id for links here instead of entry.id because of filepaths
+// note: filepaths may not be unique, may want to consider using package name as well
 ---
 
 <ReactNav client:only="react" navEntries={navEntries} transition:animate="fade" />

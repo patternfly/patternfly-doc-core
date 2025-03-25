@@ -13,7 +13,7 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
   const [activeItem, setActiveItem] = useState('')
 
   useEffect(() => {
-    setActiveItem(window.location.pathname.split('/').reverse()[0])
+    setActiveItem(window.location.pathname.split('/').reverse()[0]) // won't work with tabs
   }, [])
 
   const onNavSelect = (

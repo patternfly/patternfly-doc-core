@@ -14,12 +14,20 @@ function defineContent(contentObj: CollectionDefinition) {
     return
   }
 
+  const tabMap: any = {
+    'react-component-docs': 'react', // look in filepath for demos, look for deprecated flag or source flag for dep
+    'core-component-docs': 'html' // or force tab in frontmatter for non-base tabs
+  };
+
   return defineCollection({
     loader: glob({ base: dir, pattern }),
     schema: z.object({
       id: z.string(),
       section: z.string(),
+      subsection: z.string().optional(),
       title: z.string().optional(),
+      tab: z.string().optional().default(tabMap[name])
+      // package: z.string().optional().default(packageName as string)
     }),
   })
 }
