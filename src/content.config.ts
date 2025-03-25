@@ -14,9 +14,10 @@ function defineContent(contentObj: CollectionDefinition) {
     return
   }
 
+  // Todo: expand to cover deprecated & demos tabs (look in filepath, or enforce tab in frontmatter for nonstandard tabs)
   const tabMap: any = {
-    'react-component-docs': 'react', // look in filepath for demos, look for deprecated flag or source flag for dep
-    'core-component-docs': 'html' // or force tab in frontmatter for non-base tabs
+    'react-component-docs': 'react',
+    'core-component-docs': 'html' 
   };
 
   return defineCollection({

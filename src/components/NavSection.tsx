@@ -27,12 +27,7 @@ export const NavSection = ({
     navItems = [
       ...sortedNavEntries
         .reduce((map, entry) => {
-          if (
-            !map.has(entry.data.id) ||
-            (entry.data?.tab === 'react' &&
-              map.has(entry.data.id) &&
-              map.get(entry.data.id).data.tab === 'html')
-          ) {
+          if (!map.has(entry.data.id)) {
             map.set(entry.data.id, entry)
           }
           return map

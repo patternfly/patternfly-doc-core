@@ -10,6 +10,7 @@ export async function getStaticPaths() {
   const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
 
   const flatCol =  collections.flat().map((entry) => {
+    // Build tabs dictionary
     // if no dictionary entry exists, and tab data exists
     if(componentTabs[entry.data.id] === undefined && entry.data.tab) { 
       componentTabs[entry.data.id] = [entry.data.tab];
@@ -48,6 +49,8 @@ export async function getStaticPaths() {
     return s1Index > s2Index ? 1 : -1;
   }
 
+  // Sort tabs entries based on above sort order
+  // Ensures all tabs are displayed in a consistent order & which tab gets displayed for a component route without a tab 
   Object.values(componentTabs).map((tabs: any) => {
     tabs.sort(sortSources)
   })

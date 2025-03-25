@@ -4,16 +4,10 @@ export const content = [
     "packageName":"@patternfly/react-core",
     "pattern":"**/components/**/*.md",
     "name":"react-component-docs"
-    // "build": {
-    //   "format": "directory"
-    // }
   }, 
   {
     "packageName":"@patternfly/patternfly",
     "pattern":"**/components/**/*.md",
     "name":"core-component-docs"
-    // "build": {
-    //   "format": "directory"
-    // }
   }
 ]
