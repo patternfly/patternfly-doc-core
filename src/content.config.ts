@@ -14,7 +14,7 @@ function defineContent(contentObj: CollectionDefinition) {
     return
   }
 
-  // Todo: expand to cover deprecated & demos tabs (look in filepath, or enforce tab in frontmatter for nonstandard tabs)
+  // Todo: expand for other packages that remain under the react umbrella (Table, CodeEditor, etc)
   const tabMap: any = {
     'react-component-docs': 'react',
     'core-component-docs': 'html' 
@@ -27,7 +27,7 @@ function defineContent(contentObj: CollectionDefinition) {
       section: z.string(),
       subsection: z.string().optional(),
       title: z.string().optional(),
-      tab: z.string().optional().default(tabMap[name])
+      tab: z.string().optional().default(tabMap[name]),
       // package: z.string().optional().default(packageName as string)
     }),
   })

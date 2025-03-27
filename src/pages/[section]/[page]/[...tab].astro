@@ -11,16 +11,25 @@ export async function getStaticPaths() {
 
   const flatCol =  collections.flat().map((entry) => {
     // Build tabs dictionary
+    let tab = entry.data.tab;
+    if(tab === 'react' || tab === 'html') { // if tab is default repo value, check for demos/deprecated
+      if(entry.id.includes('demos')) {
+        tab = `${tab}-demos`;
+      } else if (entry.id.includes('deprecated')) {
+        tab = `${tab}-deprecated`;
+      }
+    }
+
     // if no dictionary entry exists, and tab data exists
-    if(componentTabs[entry.data.id] === undefined && entry.data.tab) { 
-      componentTabs[entry.data.id] = [entry.data.tab];
+    if(componentTabs[entry.data.id] === undefined && tab) { 
+      componentTabs[entry.data.id] = [tab];
     // if dictionary entry & tab data exists, and entry does not include tab
-    } else if (componentTabs[entry.data.id] && entry.data.tab && !componentTabs[entry.data.id].includes(entry.data.tab)) { 
-      componentTabs[entry.data.id] = [...componentTabs[entry.data.id], entry.data.tab];
+    } else if (componentTabs[entry.data.id] && tab && !componentTabs[entry.data.id].includes(tab)) { 
+      componentTabs[entry.data.id] = [...componentTabs[entry.data.id], tab];
     }
 
     return {
-      params: { page: kebabCase(entry.data.id), section: entry.data.section, tab: entry.data.tab },
+      params: { page: kebabCase(entry.data.id), section: entry.data.section, tab },
       props: { entry, title: entry.data.title, component: entry.data.id,  package: entry.data.package },
     }
   })
@@ -72,13 +81,11 @@ const currentPath = Astro.url.pathname;
       </Title>
     )
   }
-  HELLO TAB 
-  <!-- {console.log(entry, id, componentTabs[id], currentPath)} -->
   {componentTabs[id] && (
     <PageSection id="ws-sticky-nav-tabs" stickyOnBreakpoint={{ default: 'top' }} type="tabs">
       <div class="pf-v6-c-tabs pf-m-page-insets pf-m-no-border-bottom">
         <ul class="pf-v6-c-tabs__list">
-          {componentTabs[id].map((tab: string, index: number) => ( // TODO: sort tabs array to standard
+          {componentTabs[id].map((tab: string) => (
             // eslint-disable-next-line react/jsx-key
             <li
               class={`pf-v6-c-tabs__item${currentPath === `/${section}/${kebabCase(id)}/${tab}` ? ' pf-m-current' : ''}`}
