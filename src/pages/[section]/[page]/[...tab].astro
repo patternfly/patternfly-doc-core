@@ -4,7 +4,7 @@ import { Title, PageSection, Content as PFContent } from '@patternfly/react-core
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from "../../../content"
 import { kebabCase } from 'change-case'
-import { componentTabs, tabNameMapping } from '../../../globals';
+import { componentTabs, tabNames } from '../../../globals';
 
 export async function getStaticPaths() {
   const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
@@ -91,7 +91,7 @@ const currentPath = Astro.url.pathname;
               class={`pf-v6-c-tabs__item${currentPath === `/${section}/${kebabCase(id)}/${tab}` ? ' pf-m-current' : ''}`}
             >
               <a class="pf-v6-c-tabs__link" href={`/${section}/${kebabCase(id)}/${tab}`}>
-                {tabNameMapping[tab]}
+                {tabNames[tab]}
               </a>
             </li>
           ))}

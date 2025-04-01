@@ -14,7 +14,7 @@ function defineContent(contentObj: CollectionDefinition) {
     return
   }
 
-  // Todo: expand for other packages that remain under the react umbrella (Table, CodeEditor, etc)
+  // TODO: Expand for other packages that remain under the react umbrella (Table, CodeEditor, etc)
   const tabMap: any = {
     'react-component-docs': 'react',
     'core-component-docs': 'html' 
@@ -27,8 +27,7 @@ function defineContent(contentObj: CollectionDefinition) {
       section: z.string(),
       subsection: z.string().optional(),
       title: z.string().optional(),
-      tab: z.string().optional().default(tabMap[name]),
-      // package: z.string().optional().default(packageName as string)
+      tab: z.string().optional().default(tabMap[name])
     }),
   })
 }
