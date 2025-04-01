@@ -12,34 +12,39 @@ import { css } from '@patternfly/react-styles'
 import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility'
 import textStyles from '@patternfly/react-styles/css/utilities/Text/text'
 
-type ComponentProp = {
+export type ComponentProp = {
   name: string
   isRequired?: boolean
   isBeta?: boolean
+  isHidden?: boolean
   isDeprecated?: boolean
   type?: string
   defaultValue?: string
-  description: string
+  description?: string
 }
 
 type PropsTableProps = {
   componentName: string
+  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   componentDescription?: string
   componentProps?: ComponentProp[]
 }
 
 export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
   componentName,
+  headingLevel = 'h3',
   componentDescription,
   componentProps,
 }) => {
-  const hasPropsToRender = !!componentProps?.length
+  const SectionHeading = headingLevel
+  const publicProps = componentProps?.filter((prop) => !prop.isHidden)
+  const hasPropsToRender = !!publicProps?.length
   const betaDeprecatedProps = hasPropsToRender
-    ? componentProps.filter((prop) => prop.isBeta && prop.isDeprecated)
+    ? publicProps.filter((prop) => prop.isBeta && prop.isDeprecated)
     : []
 
   if (betaDeprecatedProps.length) {
-    throw new Error(
+    console.error(
       `The following ${componentName} props have both the isBeta and isDeprecated tag: ${betaDeprecatedProps.map((prop) => prop.name).join(', ')}`,
     )
   }
@@ -64,16 +69,19 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
 
   return (
     <>
-      <h3>{componentName}</h3>
+      <SectionHeading>{componentName}</SectionHeading>
       <Stack hasGutter>
         {componentDescription && (
-          <div className={css(textStyles.textColorSubtle)}>
+          <div
+            data-testid="component-description"
+            className={css(textStyles.textColorSubtle)}
+          >
             {componentDescription}
           </div>
         )}
         {hasPropsToRender && (
           <>
-            <div id={`${componentName}-required`}>
+            <div id={`${componentName}-required-description`}>
               <span className={css(textStyles.textColorRequired)}>*</span>{' '}
               <span className={css(textStyles.textColorSubtle)}>
                 indicates a required prop
@@ -82,19 +90,19 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
             <Table
               variant="compact"
               aria-label={`Props for ${componentName}`}
-              aria-describedby={`${componentName}-required`}
+              aria-describedby={`${componentName}-required-description`}
               gridBreakPoint="grid-lg"
             >
               <Thead>
                 <Tr>
                   <Th width={20}>Name</Th>
                   <Th width={20}>Type</Th>
-                  <Th>Default</Th>
+                  <Th width={10}>Default</Th>
                   <Th>Description</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {componentProps?.map((prop: ComponentProp) => (
+                {publicProps.map((prop: ComponentProp) => (
                   <Tr key={prop.name}>
                     <Td>
                       <TableText wrapModifier="breakWord">
@@ -121,17 +129,17 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
                     </Td>
                     <Td>
                       <TableText wrapModifier="breakWord">
-                        {prop.type || 'No type info'}
+                        {prop.type || 'No type info available'}
                       </TableText>
                     </Td>
                     <Td>
                       <TableText wrapModifier="breakWord">
-                        {prop.defaultValue}
+                        {prop.defaultValue || '-'}
                       </TableText>
                     </Td>
                     <Td>
                       <TableText wrapModifier="breakWord">
-                        {prop.description}
+                        {prop.description || 'No description available.'}
                       </TableText>
                     </Td>
                   </Tr>

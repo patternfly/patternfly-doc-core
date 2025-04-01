@@ -16,7 +16,6 @@ const propsData = [
     isRequired: true,
     type: 'ReactNode',
     defaultValue: '',
-    description: 'Content rendered inside the alert.',
   },
   {
     name: 'timeoutAnimation',
@@ -26,6 +25,11 @@ const propsData = [
     description:
       'If the user hovers over the alert and `timeout` expires, this is how long to wait before finally dismissing the alert.',
     isDeprecated: true,
+  },
+  {
+    name: 'innerRef',
+    isHidden: true,
+    description: 'Ref to pass',
   },
 ]
 ---
@@ -49,6 +53,7 @@ const propsData = [
         componentName="AlertGroup"
         componentDescription="The container to render a list of alerts."
       />
+      <PropsTable componentName="AlertTitle" />
     </MainLayout>
   </body>
 </html>
