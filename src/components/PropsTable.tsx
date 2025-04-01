@@ -44,6 +44,7 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
     : []
 
   if (betaDeprecatedProps.length) {
+    // eslint-disable-next-line no-console
     console.error(
       `The following ${componentName} props have both the isBeta and isDeprecated tag: ${betaDeprecatedProps.map((prop) => prop.name).join(', ')}`,
     )

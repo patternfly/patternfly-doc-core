@@ -1,6 +1,5 @@
 import { render, screen, within } from '@testing-library/react'
 import { PropsTable, type ComponentProp } from '../PropsTable'
-import textStyles from '@patternfly/react-styles/css/utilities/Text/text'
 
 const componentName = 'TestComponent'
 const componentDescription =
