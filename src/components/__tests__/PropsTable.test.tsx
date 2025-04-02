@@ -44,7 +44,9 @@ it('Renders component description when componentDescription is passed in', () =>
     />,
   )
 
-  expect(screen.getByText(componentDescription)).toBeVisible()
+  expect(screen.getByTestId('component-description')).toHaveTextContent(
+    componentDescription,
+  )
 })
 
 it('Does not render props table if componentProps is not passed in', () => {
@@ -83,7 +85,7 @@ it('Throws error if component prop has isBeta and isDeprecated both set to true'
 
   expect(consoleSpy).toHaveBeenCalledTimes(1)
   expect(consoleSpy).toHaveBeenCalledWith(
-    'The following TestComponent props have both the isBeta and isDeprecated tag: propWithAllTableColumns',
+    `The ${propWithAllTableColumns.name} prop for TestComponent has both the isBeta and isDeprecated tag.`,
   )
   consoleSpy.mockRestore()
 })
@@ -101,7 +103,7 @@ it('Does not throw error if only one of isBeta or isDeprecated is passed', () =>
   consoleSpy.mockRestore()
 })
 
-it('Does not throw error if isBeta and isDeprecated both are not passed', () => {
+it('Does not throw error if neither isBeta nor isDeprecated are passed', () => {
   const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
   render(
     <PropsTable

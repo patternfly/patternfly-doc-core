@@ -39,32 +39,39 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
   const SectionHeading = headingLevel
   const publicProps = componentProps?.filter((prop) => !prop.isHidden)
   const hasPropsToRender = !!publicProps?.length
-  const betaDeprecatedProps = hasPropsToRender
-    ? publicProps.filter((prop) => prop.isBeta && prop.isDeprecated)
-    : []
-
-  if (betaDeprecatedProps.length) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `The following ${componentName} props have both the isBeta and isDeprecated tag: ${betaDeprecatedProps.map((prop) => prop.name).join(', ')}`,
-    )
-  }
 
   const renderTagLabel = (componentProp: ComponentProp) => {
-    const { isBeta, isDeprecated } = componentProp
+    const { name, isBeta, isDeprecated } = componentProp
     if (!isBeta && !isDeprecated) {
       return null
     }
 
+    if (isBeta && isDeprecated) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `The ${name} prop for ${componentName} has both the isBeta and isDeprecated tag.`,
+      )
+    }
+
     return (
-      <Label
-        // Would need design eyes on outline vs filled
-        variant="outline"
-        color={`${isBeta ? 'blue' : 'orange'}`}
-        isCompact
-      >
+      <Label color={`${isBeta ? 'blue' : 'grey'}`} isCompact>
         {isBeta ? 'Beta' : 'Deprecated'}
       </Label>
+    )
+  }
+
+  const renderRequiredDescription = (isRequired: boolean | undefined) => {
+    if (!isRequired) {
+      return null
+    }
+
+    return (
+      <>
+        <span aria-hidden="true" className={css(textStyles.textColorRequired)}>
+          *
+        </span>
+        <span className={css(accessibleStyles.screenReader)}>required</span>
+      </>
     )
   }
 
@@ -108,23 +115,7 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
                     <Td>
                       <TableText wrapModifier="breakWord">
                         {prop.name}
-                        {prop.isRequired ? (
-                          <>
-                            <span
-                              aria-hidden="true"
-                              className={css(textStyles.textColorRequired)}
-                            >
-                              *
-                            </span>
-                            <span
-                              className={css(accessibleStyles.screenReader)}
-                            >
-                              required
-                            </span>
-                          </>
-                        ) : (
-                          ''
-                        )}{' '}
+                        {renderRequiredDescription(prop.isRequired)}{' '}
                         {renderTagLabel(prop)}
                       </TableText>
                     </Td>
