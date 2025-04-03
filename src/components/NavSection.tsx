@@ -23,7 +23,7 @@ export const NavSection = ({
   const isActive = sortedNavEntries.some((entry) => entry.id === activeItem)
 
   let navItems = sortedNavEntries
-  if (sectionId === 'components') { 
+  if (sectionId === 'components' || sectionId === 'layouts') {
     // only display unique entry.data.id in the nav list if the section is components
     navItems = [
       ...sortedNavEntries

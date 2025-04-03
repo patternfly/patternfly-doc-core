@@ -4,7 +4,7 @@ import { Title, PageSection, Content as PFContent } from '@patternfly/react-core
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from "../../../content"
 import { kebabCase } from 'change-case'
-import { componentTabs, tabNames } from '../../../globals';
+import { componentTabs, tabNames, buildTab, sortTabs } from '../../../globals';
 
 export async function getStaticPaths() {
   const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
@@ -12,58 +12,22 @@ export async function getStaticPaths() {
   const flatCol =  collections.flat().map((entry) => {
     // Build tabs dictionary
     let tab = entry.data.tab;
-    if(tab === 'react' || tab === 'html') { // if tab is default repo value, check for demos/deprecated
+    if(tab) { // check for demos/deprecated
       if(entry.id.includes('demos')) {
         tab = `${tab}-demos`;
       } else if (entry.id.includes('deprecated')) {
         tab = `${tab}-deprecated`;
       }
     }
-
-    // if no dictionary entry exists, and tab data exists
-    if(componentTabs[entry.data.id] === undefined && tab) { 
-      componentTabs[entry.data.id] = [tab];
-    // if dictionary entry & tab data exists, and entry does not include tab
-    } else if (componentTabs[entry.data.id] && tab && !componentTabs[entry.data.id].includes(tab)) { 
-      componentTabs[entry.data.id] = [...componentTabs[entry.data.id], tab];
-    }
+    buildTab(entry, tab);
 
     return {
       params: { page: kebabCase(entry.data.id), section: entry.data.section, tab },
-      props: { entry, title: entry.data.title, component: entry.data.id,  package: entry.data.package },
+      props: { entry, ...entry.data },
     }
   })
 
-  const defaultOrder = 50;
-  const sourceOrder: any = {
-    react: 1,
-    'react-next': 1.1,
-    'react-demos': 2,
-    'react-deprecated': 2.1,
-    html: 3,
-    'html-demos': 4,
-    'design-guidelines': 99,
-    'accessibility': 100,
-    'upgrade-guide': 101,
-    'release-notes': 102,
-  };
-
-  const sortSources = (s1: string, s2: string) => {
-    const s1Index = sourceOrder[s1] || defaultOrder;
-    const s2Index = sourceOrder[s2] || defaultOrder;
-    if (s1Index === defaultOrder && s2Index === defaultOrder) {
-      return s1.localeCompare(s2);
-    }
-
-    return s1Index > s2Index ? 1 : -1;
-  }
-
-  // Sort tabs entries based on above sort order
-  // Ensures all tabs are displayed in a consistent order & which tab gets displayed for a component route without a tab 
-  Object.values(componentTabs).map((tabs: any) => {
-    tabs.sort(sortSources)
-  })
-
+  sortTabs() 
   return flatCol;
 }
 

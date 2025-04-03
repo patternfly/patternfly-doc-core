@@ -20,7 +20,10 @@ export const NavEntry = ({ entry, isActive }: NavEntryProps) => {
   const { id } = entry
   const { id: entryTitle, section } = entry.data
 
-  const _id = section === 'components' ? kebabCase(entryTitle) : id
+  const _id =
+    section === 'components' || section === 'layouts'
+      ? kebabCase(entryTitle)
+      : id
   return (
     <NavItem
       itemId={_id}
