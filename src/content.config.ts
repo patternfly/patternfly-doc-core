@@ -20,6 +20,7 @@ function defineContent(contentObj: CollectionDefinition) {
       id: z.string(),
       section: z.string(),
       title: z.string().optional(),
+      propComponents: z.array(z.string()).optional(),
     }),
   })
 }

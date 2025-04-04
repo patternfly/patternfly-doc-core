@@ -2,21 +2,42 @@
 import { getCollection, render } from 'astro:content'
 import { Title } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
-import { content } from "../../content"
+import { content } from '../../content'
+import { PropsTable } from '../../components/PropsTable'
 
 export async function getStaticPaths() {
-  const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
+  const collections = await Promise.all(
+    content.map(
+      async (entry) => await getCollection(entry.name as 'textContent'),
+    ),
+  )
 
   return collections.flat().map((entry) => ({
-      params: { id: entry.id, section: entry.data.section },
-      props: { entry, title: entry.data.title },
-    })
-  )
+    params: { id: entry.id, section: entry.data.section },
+    props: {
+      entry,
+      title: entry.data.title,
+      propComponents: entry.data.propComponents,
+    },
+  }))
 }
 
-const { entry } = Astro.props
+async function getPropsData(propComponents: string[]) {
+  if (!propComponents.length) {
+    return []
+  }
+
+  const url = new URL(`/props.json?components=${propComponents}`, Astro.url)
+  const response = await fetch(url)
+  const propsData = await response.json()
+
+  return propsData
+}
+
+const { entry, propComponents } = Astro.props
 const { title } = entry.data
 const { Content } = await render(entry)
+const propsData = await getPropsData(propComponents)
 ---
 
 <MainLayout>
@@ -28,4 +49,16 @@ const { Content } = await render(entry)
     )
   }
   <Content />
+  {
+    propsData
+      .filter((comp: any) => !!comp)
+      .map((component: any) => (
+        <PropsTable
+          key={component.name}
+          componentName={component.name}
+          componentDescription={component.description}
+          componentProps={component.props}
+        />
+      ))
+  }
 </MainLayout>

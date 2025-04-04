@@ -10,22 +10,22 @@ export const config = {
     //
     // example content entry for remote content, this would fetch all markdown files matching the glob in 'pattern'
     // from the specified npm package and serve them with a content identifier of 'react-component-docs':
-    // {
-    //   packageName: "@patternfly/react-core",
-    //   pattern: "**/components/**/*.md",
-    //   name: "react-component-docs",
-    // },
+    {
+      packageName: "@patternfly/react-core",
+      pattern: "**/components/**/*.md",
+      name: "react-component-docs",
+    },
   ],
   outputDir: './dist/docs',
   propsGlobs: [
-    // {
-    //   include: ['*/@patternfly/react-core/src/**/*.tsx'],
-    //   exclude: [
-    //     '/**/examples/**',
-    //     '/**/__mocks__/**',
-    //     '/**/__tests__/**',
-    //     '/**/*.test.tsx',
-    //   ],
-    // },
+    {
+      include: ['*/@patternfly/react-core/src/**/*.tsx'],
+      exclude: [
+        '/**/examples/**',
+        '/**/__mocks__/**',
+        '/**/__tests__/**',
+        '/**/*.test.tsx',
+      ],
+    },
   ],
 }
