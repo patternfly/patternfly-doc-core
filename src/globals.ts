@@ -9,12 +9,14 @@ export const tabNames: any = {
 };
 
 export const buildTab = (entry: any, tab: string) => {
+  const tabEntry = componentTabs[entry.data.id]
+
   // if no dictionary entry exists, and tab data exists
-  if(componentTabs[entry.data.id] === undefined && tab) { 
-    componentTabs[entry.data.id] = [tab];
+  if(tabEntry === undefined && tab) { 
+    componentTabs[entry.data.id] = [tab]
   // if dictionary entry & tab data exists, and entry does not include tab
-  } else if (componentTabs[entry.data.id] && tab && !componentTabs[entry.data.id].includes(tab)) { 
-    componentTabs[entry.data.id] = [...componentTabs[entry.data.id], tab];
+  } else if (tabEntry && tab && !tabEntry.includes(tab)) { 
+    componentTabs[entry.data.id] = [...tabEntry, tab];
   }
 }
 
