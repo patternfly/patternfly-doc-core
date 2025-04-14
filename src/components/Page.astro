@@ -1,6 +1,6 @@
 ---
 import styles from '@patternfly/react-styles/css/components/Page/page'
-import { Content, PageSection } from '@patternfly/react-core'
+import { PageSection } from '@patternfly/react-core'
 ---
 
 <div class={styles.page}>
@@ -10,9 +10,7 @@ import { Content, PageSection } from '@patternfly/react-core'
   <div class={styles.pageMainContainer}>
     <main class={styles.pageMain}>
       <PageSection transition:animate="none">
-        <Content>
-          <slot />
-        </Content>
+        <slot />
       </PageSection>
     </main>
   </div>

@@ -20,6 +20,24 @@ const mockEntries: TextContentEntry[] = [
   },
 ]
 
+const dupedEntries: TextContentEntry[] = [
+  {
+    id: 'entry1',
+    data: { id: 'Entry1', section: 'components' },
+    collection: 'react',
+  },
+  {
+    id: 'entry2',
+    data: { id: 'Entry1', section: 'components' },
+    collection: 'react',
+  },
+  {
+    id: 'entry3',
+    data: { id: 'Entry2', section: 'components' },
+    collection: 'react',
+  },
+]
+
 it('renders without crashing', () => {
   render(
     <NavSection
@@ -140,4 +158,46 @@ it('matches snapshot', () => {
     />,
   )
   expect(asFragment()).toMatchSnapshot()
+})
+
+it('dedupes and renders correct number of entries for components section', () => {
+  Object.defineProperty(window, 'location', {
+    value: {
+      pathname: '/foo/components',
+    },
+    writable: true,
+  })
+
+  render(
+    <NavSection
+      entries={dupedEntries}
+      sectionId="components"
+      activeItem="entry1"
+    />,
+  )
+
+  expect(screen.getAllByRole('listitem')).toHaveLength(3)
+  expect(screen.getByRole('link', { name: 'Entry1' })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Entry2' })).toBeInTheDocument()
+})
+
+it('dedupes and renders correct number of entries for layouts section', () => {
+  Object.defineProperty(window, 'location', {
+    value: {
+      pathname: '/foo/layouts',
+    },
+    writable: true,
+  })
+
+  render(
+    <NavSection
+      entries={dupedEntries}
+      sectionId="layouts"
+      activeItem="entry1"
+    />,
+  )
+
+  expect(screen.getAllByRole('listitem')).toHaveLength(3)
+  expect(screen.getByRole('link', { name: 'Entry1' })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Entry2' })).toBeInTheDocument()
 })

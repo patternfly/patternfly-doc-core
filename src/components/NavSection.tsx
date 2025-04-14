@@ -1,6 +1,7 @@
 import { NavExpandable } from '@patternfly/react-core'
 import { sentenceCase } from 'change-case'
 import { NavEntry, type TextContentEntry } from './NavEntry'
+import { kebabCase } from 'change-case'
 
 interface NavSectionProps {
   entries: TextContentEntry[]
@@ -21,8 +22,30 @@ export const NavSection = ({
 
   const isActive = sortedNavEntries.some((entry) => entry.id === activeItem)
 
-  const items = sortedNavEntries.map((entry) => (
-    <NavEntry key={entry.id} entry={entry} isActive={activeItem === entry.id} />
+  let navItems = sortedNavEntries
+  if (sectionId === 'components' || sectionId === 'layouts') {
+    // only display unique entry.data.id in the nav list if the section is components
+    navItems = [
+      ...sortedNavEntries
+        .reduce((map, entry) => {
+          if (!map.has(entry.data.id)) {
+            map.set(entry.data.id, entry)
+          }
+          return map
+        }, new Map())
+        .values(),
+    ]
+  }
+
+  const items = navItems.map((entry) => (
+    <NavEntry
+      key={entry.id}
+      entry={entry}
+      isActive={
+        activeItem === entry.id ||
+        window.location.pathname.includes(kebabCase(entry.data.id))
+      }
+    />
   ))
 
   return (
