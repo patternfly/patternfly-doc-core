@@ -9,6 +9,7 @@ import { createConfigFile } from './createConfigFile.js'
 import { updatePackageFile } from './updatePackageFile.js'
 import { getConfig } from './getConfig.js'
 import { buildPropsData } from './buildPropsData.js'
+import { hasFile } from './hasFile.js'
 
 function updateContent(program: Command) {
   const { verbose } = program.opts()
@@ -86,7 +87,11 @@ program.command('init').action(async () => {
 
 program.command('start').action(async () => {
   updateContent(program)
-  await generateProps(program)
+  
+  // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to
+  // prevent that we're just creating a props file regardless of what they say if one doesn't exist yet
+  const hasPropsFile = await hasFile(join(astroRoot, 'dist', 'props.json'))
+  await generateProps(program, !hasPropsFile)
   dev({ mode: 'development', root: astroRoot })
 })
 

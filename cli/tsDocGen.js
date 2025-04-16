@@ -45,6 +45,7 @@ function getComponentMetadata(filename, sourceText) {
   let parsedComponents = null
   try {
     parsedComponents = parse(sourceText, { filename })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err) {
     // eslint-disable-next-line no-console
     // console.warn(`No component found in ${filename}:`, err);
@@ -96,7 +97,7 @@ const getInterfaceMetadata = (filename, sourceText) =>
   getSourceFileStatements(filename, sourceText).reduce(
     (metaDataAcc, statement) => {
       if (statement.kind === ts.SyntaxKind.InterfaceDeclaration) {
-        const _statement = statement as any
+        const _statement = statement
         metaDataAcc.push({
           displayName: _statement.name.escapedText,
           description: _statement.jsDoc?.map((doc) => doc.comment).join('\n'),
@@ -113,7 +114,7 @@ const getTypeAliasMetadata = (filename, sourceText) =>
   getSourceFileStatements(filename, sourceText).reduce(
     (metaDataAcc, statement) => {
       if (statement.kind === ts.SyntaxKind.TypeAliasDeclaration) {
-        const _statement = statement as any
+        const _statement = statement
         const props = _statement.type.types?.reduce((propAcc, type) => {
           if (type.members) {
             propAcc.push(buildJsDocProps(type.members, sourceText))
@@ -134,20 +135,11 @@ const getTypeAliasMetadata = (filename, sourceText) =>
     [],
   )
 
-interface Res {
-  name: string
-  type: string
-  description?: string
-  required?: boolean
-  defaultValue?: string
-  hide?: boolean
-}
-
 function normalizeProp([
   name,
   { required, annotatedType, type, tsType, description, defaultValue },
 ]) {
-  const res: Res = {
+  const res = {
     name,
     type:
       annotatedType ||

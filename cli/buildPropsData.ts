@@ -7,8 +7,26 @@ import { join } from 'path'
 import { tsDocgen } from './tsDocGen.js'
 import { getConfig, PropsGlobs } from './getConfig.js'
 
+interface Prop {
+  name: string
+  type: string
+  description?: string
+  required?: boolean
+  defaultValue?: string
+  hide?: boolean
+}
+interface TsDoc {
+  name: string
+  description: string
+  props: Prop[]
+}
+interface PropsData {
+  [key: string]: TsDoc
+}
+
 // Build unique names for components with a "variant" extension
-function getTsDocName(name: string, variant: string) {
+type TsDocVariants = 'next' | 'deprecated' | undefined
+function getTsDocName(name: string, variant: TsDocVariants) {
   return `${name}${variant ? `-${variant}` : ''}`
 }
 
@@ -39,12 +57,12 @@ async function getPropsData(files: string[], verbose: boolean) {
         console.log(`Parsing props from ${file}`)
       }
 
-      const props = await tsDocgen(file)
+      const props = (await tsDocgen(file)) as TsDoc[]
 
       const tsDocs = props.reduce((acc, { name, description, props }) => {
         const key = getTsDocName(name, getTsDocNameVariant(file))
         return { ...acc, [key]: { name, description, props } }
-      }, {})
+      }, {} as PropsData)
 
       return tsDocs
     }),
@@ -52,10 +70,11 @@ async function getPropsData(files: string[], verbose: boolean) {
 
   const combinedPropsData = perFilePropsData.reduce((acc, props) => {
     Object.keys(props).forEach((key) => {
+      const propsData = props[key]
       if (acc[key]) {
-        acc[key].props = [...acc[key].props, ...props[key].props]
+        acc[key].props = [...acc[key].props, ...propsData.props]
       } else {
-        acc[key] = props[key]
+        acc[key] = propsData
       }
     })
     return acc
