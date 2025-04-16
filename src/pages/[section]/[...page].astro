@@ -4,6 +4,8 @@ import { Title } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
 import { content } from '../../content'
 import { PropsTable } from '../../components/PropsTable'
+import { kebabCase } from 'change-case'
+import { componentTabs } from '../../globals'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -13,7 +15,7 @@ export async function getStaticPaths() {
   )
 
   return collections.flat().map((entry) => ({
-    params: { id: entry.id, section: entry.data.section },
+    params: { page: kebabCase(entry.data.id), section: entry.data.section },
     props: {
       entry,
       title: entry.data.title,
@@ -35,16 +37,20 @@ async function getPropsData(propComponents: string[]) {
 }
 
 const { entry, propComponents } = Astro.props
-const { title } = entry.data
+const { title, id, section } = entry.data
 const { Content } = await render(entry)
 const propsData = await getPropsData(propComponents)
+
+if(section === 'components') { // if section is components, rewrite to first tab content
+  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`);
+}
 ---
 
 <MainLayout>
   {
     title && (
       <Title headingLevel="h1" size="4xl">
-        {title}
+        {title} 
       </Title>
     )
   }

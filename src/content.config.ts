@@ -14,13 +14,21 @@ function defineContent(contentObj: CollectionDefinition) {
     return
   }
 
+  // TODO: Expand for other packages that remain under the react umbrella (Table, CodeEditor, etc)
+  const tabMap: any = {
+    'react-component-docs': 'react',
+    'core-component-docs': 'html' 
+  };
+
   return defineCollection({
     loader: glob({ base: dir, pattern }),
     schema: z.object({
       id: z.string(),
       section: z.string(),
+      subsection: z.string().optional(),
       title: z.string().optional(),
       propComponents: z.array(z.string()).optional(),
+      tab: z.string().optional().default(tabMap[name])
     }),
   })
 }
