@@ -51,7 +51,7 @@ try {
     .resolve('@patternfly/patternfly-doc-core')
     .replace('dist/cli/cli.js', '')
     .replace('file://', '')
-} catch (e) {
+} catch (e: any) {
   if (e.code === 'ERR_MODULE_NOT_FOUND') {
     astroRoot = process.cwd()
   } else {
