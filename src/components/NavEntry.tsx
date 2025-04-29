@@ -6,7 +6,9 @@ export interface TextContentEntry {
   data: {
     id: string
     section: string
+    title?: string
     tab?: string
+    sortValue?: number
   }
   collection: string
 }
@@ -18,12 +20,15 @@ interface NavEntryProps {
 
 export const NavEntry = ({ entry, isActive }: NavEntryProps) => {
   const { id } = entry
-  const { id: entryTitle, section } = entry.data
+  const { id: entryId, section, title } = entry.data
 
   const _id =
     section === 'components' || section === 'layouts'
-      ? kebabCase(entryTitle)
+      ? kebabCase(entryId)
       : id
+
+  const displayName = entryId === 'landing' ? title : entryId; // landing pages must specify a title
+
   return (
     <NavItem
       itemId={_id}
@@ -31,7 +36,7 @@ export const NavEntry = ({ entry, isActive }: NavEntryProps) => {
       isActive={isActive}
       id={`nav-entry-${_id}`}
     >
-      {entryTitle}
+      {displayName}
     </NavItem>
   )
 }
