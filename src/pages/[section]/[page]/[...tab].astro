@@ -36,28 +36,25 @@ export async function getStaticPaths() {
     ),
   )
 
-  const flatCol = collections.flat().map((entry) => {
-    // Build tabs dictionary
-    let tab = entry.data.tab
-    if (tab) {
-      // check for demos/deprecated
-      if (entry.id.includes('demos')) {
-        tab = `${tab}-demos`
-      } else if (entry.id.includes('deprecated')) {
-        tab = `${tab}-deprecated`
+  const flatCol =  collections.flat()
+    .filter((entry) => entry.data.tab) // only pages with a tab should match this route
+    .map((entry) => {
+      // Build tabs dictionary
+      let tab = entry.data.tab;
+      if(tab) { // check for demos/deprecated
+        if(entry.id.includes('demos')) {
+          tab = `${tab}-demos`;
+        } else if (entry.id.includes('deprecated')) {
+          tab = `${tab}-deprecated`;
+        }
       }
-    }
-    buildTab(entry, tab)
+      buildTab(entry, tab);
 
-    return {
-      params: {
-        page: kebabCase(entry.data.id),
-        section: entry.data.section,
-        tab,
-      },
-      props: { entry, ...entry.data },
-    }
-  })
+      return {
+        params: { page: kebabCase(entry.data.id), section: entry.data.section, tab },
+        props: { entry, ...entry.data },
+      }
+    })
 
   sortTabs()
   return flatCol

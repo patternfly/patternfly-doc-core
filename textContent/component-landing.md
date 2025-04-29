@@ -1,0 +1,15 @@
+---
+id: landing
+title: All components
+section: components
+sortValue: 1
+---
+
+import { SectionGallery } from '../src/components/section-gallery/SectionGallery'
+import componentsData from './components-data.jsx'
+
+<SectionGallery
+  section="components"
+  galleryItemsData={componentsData}
+  placeholderText="Search components by name"
+/>

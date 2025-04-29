@@ -1,0 +1,39 @@
+---
+import { getCollection, render } from 'astro:content'
+import { Title, PageSection } from '@patternfly/react-core'
+import MainLayout from '../../layouts/Main.astro'
+import { content } from "../../content"
+
+export async function getStaticPaths() {
+  const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
+
+  const flatCol =  collections.flat()
+    .filter((entry) => (
+      entry.data.id === 'landing' // only landing pages should match this route
+    ))
+    .map((entry) => ({
+      params: { section: entry.data.section },
+      props: { entry, ...entry.data },
+    }
+  ))
+
+  return flatCol;
+}
+
+const { entry } = Astro.props
+const { title } = entry.data
+const { Content } = await render(entry)
+---
+
+<MainLayout>
+  {
+    title && (
+      <Title headingLevel="h1" size="4xl">
+        {title} 
+      </Title>
+    )
+  }
+  <PageSection id="main-content" isFilled>
+    <Content />
+  </PageSection>
+</MainLayout>
