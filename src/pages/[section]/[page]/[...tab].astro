@@ -5,11 +5,7 @@ import MainLayout from '../../../layouts/Main.astro'
 import { content } from "../../../content"
 import { kebabCase } from 'change-case'
 import { componentTabs, tabNames, buildTab, sortTabs } from '../../../globals';
-import { PropsTable } from '../../../components/PropsTable'
-import { getPropsData } from "../../../utils/getPropsData"
-
-
-
+import PropsTables from '../../../components/PropsTables.astro'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
@@ -40,7 +36,6 @@ const { entry, propComponents } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 const currentPath = Astro.url.pathname;
-const propsData = await getPropsData(propComponents, Astro.url)
 
 ---
 
@@ -73,18 +68,7 @@ const propsData = await getPropsData(propComponents, Astro.url)
   <PageSection id="main-content" isFilled>
     <PFContent>
       <Content />
-      {
-        propsData
-          .filter((comp: any) => !!comp)
-          .map((component: any) => (
-            <PropsTable
-              key={component.name}
-              componentName={component.name}
-              componentDescription={component.description}
-              componentProps={component.props}
-            />
-          ))
-      }
+      <PropsTables propComponents={propComponents} server:defer />
     </PFContent>
   </PageSection>
 </MainLayout>

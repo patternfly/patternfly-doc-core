@@ -1,0 +1,38 @@
+---
+import { PropsTable } from './PropsTable'
+
+async function getPropsData(propComponents?: string[]) {
+  if (!propComponents || propComponents.length === 0) {
+    return []
+  }
+
+  const url = new URL(`/props?components=${propComponents}`, Astro.url)
+
+  try {
+    const response = await fetch(url)
+    const propsData = await response.json()
+    return propsData
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e)
+    return []
+  }
+}
+
+const { propComponents } = Astro.props
+
+const propsData = await getPropsData(propComponents)
+---
+
+{
+  propsData
+    .filter((comp: any) => !!comp)
+    .map((component: any) => (
+      <PropsTable
+        key={component.name}
+        componentName={component.name}
+        componentDescription={component.description}
+        componentProps={component.props}
+      />
+    ))
+}
