@@ -27,6 +27,7 @@ function defineContent(contentObj: CollectionDefinition) {
       section: z.string(),
       subsection: z.string().optional(),
       title: z.string().optional(),
+      propComponents: z.array(z.string()).optional(),
       tab: z.string().optional().default(tabMap[name])
     }),
   })

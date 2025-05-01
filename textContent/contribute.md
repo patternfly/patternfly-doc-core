@@ -2,6 +2,7 @@
 id: Contribute
 title: Contribute to PatternFly
 section: get-started
+propComponents: ['Button', 'BadgeCountObject']
 ---
 
 ## Community contributions 

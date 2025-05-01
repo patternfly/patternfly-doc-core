@@ -6,9 +6,15 @@ export interface CollectionDefinition {
   name: string
 }
 
+export interface PropsGlobs {
+  include: string[]
+  exclude: string[]
+}
+
 export interface DocsConfig {
   content: CollectionDefinition[];
   outputDir: string;
+  propsGlobs: PropsGlobs[];
 }
 
 export async function getConfig(fileLocation: string): Promise<DocsConfig | undefined> {

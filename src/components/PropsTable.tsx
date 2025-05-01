@@ -23,7 +23,7 @@ export type ComponentProp = {
   description?: string
 }
 
-type PropsTableProps = {
+interface PropsTableProps extends React.HTMLProps<HTMLDivElement> {
   componentName: string
   headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   componentDescription?: string
@@ -76,7 +76,7 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
   }
 
   return (
-    <>
+    <div>
       <SectionHeading>{componentName}</SectionHeading>
       <Stack hasGutter>
         {componentDescription && (
@@ -141,6 +141,6 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
           </>
         )}
       </Stack>
-    </>
+    </div>
   )
 }
