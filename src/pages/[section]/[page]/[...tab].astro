@@ -1,11 +1,13 @@
 ---
 import { getCollection, render } from 'astro:content'
-import { Title, PageSection, Content as PFContent } from '@patternfly/react-core'
+import { Title, PageSection } from '@patternfly/react-core'
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from "../../../content"
 import { kebabCase } from 'change-case'
 import { componentTabs, tabNames, buildTab, sortTabs } from '../../../globals';
 import PropsTables from '../../../components/PropsTables.astro'
+import { h1, h2, h3, h4, h5, h6 } from '../../../components/Content'
+import LiveExample from '../../../components/LiveExample.astro'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
@@ -66,9 +68,7 @@ const currentPath = Astro.url.pathname;
     </PageSection>
   )}
   <PageSection id="main-content" isFilled>
-    <PFContent>
-      <Content />
-      <PropsTables propComponents={propComponents} server:defer />
-    </PFContent>
+    <Content components={{ h1, h2, h3, h4, h5, h6, LiveExample }} />
+    <PropsTables propComponents={propComponents} server:defer />
   </PageSection>
 </MainLayout>
