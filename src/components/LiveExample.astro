@@ -1,0 +1,7 @@
+---
+import { LiveExample as LiveExampleBase } from './LiveExample'
+
+const { src } = Astro.props
+---
+
+<LiveExampleBase src={src} client:only="react" />
