@@ -16,9 +16,16 @@ export const NavSection = ({
 }: NavSectionProps) => {
   const isExpanded = window.location.pathname.includes(sectionId)
 
-  const sortedNavEntries = entries.sort((a, b) =>
-    a.data.id.localeCompare(b.data.id),
-  )
+  // Sort alphabetically, unless a sort value is specified in the frontmatter
+  const sortedNavEntries = entries.sort((a, b) => {
+    if (a.data.sortValue || b.data.sortValue) {
+      const aSortOrder = a.data.sortValue || 50
+      const bSortOrder = b.data.sortValue || 50
+
+      return aSortOrder - bSortOrder
+    }
+    return a.data.id.localeCompare(b.data.id)
+  })
 
   const isActive = sortedNavEntries.some((entry) => entry.id === activeItem)
 
