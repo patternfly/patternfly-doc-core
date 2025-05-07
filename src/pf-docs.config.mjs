@@ -16,17 +16,6 @@ export const config = {
     //   name: "react-component-docs",
     // },
   ],
-  navSectionOrder: ["get-started", "design-foundations"],
-  outputDir: './dist/docs',
-  propsGlobs: [
-    // {
-    //   include: ['*/@patternfly/react-core/src/**/*.tsx'],
-    //   exclude: [
-    //     '/**/examples/**',
-    //     '/**/__mocks__/**',
-    //     '/**/__tests__/**',
-    //     '/**/*.test.tsx',
-    //   ],
-    // },
-  ],
-}
+  outputDir: "./dist/docs",
+  navSectionOrder: ["get-started", "design-foundations"]
+};
