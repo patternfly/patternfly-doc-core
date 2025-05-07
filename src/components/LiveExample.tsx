@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { ExampleToolbar } from '@patternfly/documentation-framework/components/example/exampleToolbar'
 import { convertToReactComponent } from '@patternfly/ast-helpers'
 import * as reactCoreModule from '@patternfly/react-core'
+import { ExampleToolbar } from './ExampleToolbar'
 interface LiveExampleProps {
   src: string
 }
@@ -31,6 +31,7 @@ export const LiveExample = ({ src }: LiveExampleProps) => {
     <>
       {livePreview}
       <ExampleToolbar
+        originalCode={src}
         code={code}
         setCode={setCode}
         lang="ts"
