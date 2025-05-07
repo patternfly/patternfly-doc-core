@@ -1,12 +1,24 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "command": "./node_modules/.bin/astro dev",
-      "name": "Development server",
-      "request": "launch",
-      "type": "node-terminal"
-    },
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"command": "./node_modules/.bin/astro dev",
+			"name": "Launch Astro dev server",
+			"request": "launch",
+			"type": "node-terminal",
+			"skipFiles": ["**/node_modules/**"]
+		},
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Launch Chrome for site",
+			"url": "http://localhost:4321",
+			"webRoot": "${workspaceFolder}/src",
+			"sourceMapPathOverrides": {
+				"vite:///src/*": "${webRoot}/*"
+			},
+			"skipFiles": ["**/node_modules/**"]
+		},
     {
       "type": "node",
       "request": "launch",
@@ -29,5 +41,14 @@
       },
       "stopOnEntry": true
     }
-  ]
+	],
+	"compounds": [
+		{
+			"name": "Launch Astro dev server and Chrome",
+			"configurations": [
+				"Launch Astro dev server",
+				"Launch Chrome for site"
+			]
+		}
+	]
 }
