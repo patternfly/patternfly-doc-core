@@ -15,7 +15,8 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
   const [activeItem, setActiveItem] = useState('')
 
   useEffect(() => {
-    setActiveItem(window.location.pathname.split('/').reverse()[0])
+    // TODO: Needs an alternate solution because of /tab in the path
+    setActiveItem(window.location.pathname.split('/').reverse()[0]) 
   }, [])
 
   const onNavSelect = (

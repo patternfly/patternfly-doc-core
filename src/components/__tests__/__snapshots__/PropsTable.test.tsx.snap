@@ -1,0 +1,178 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Matches snapshot 1`] = `
+<DocumentFragment>
+  <div>
+    <h3>
+      TestComponent
+    </h3>
+    <div
+      class="pf-v6-l-stack pf-m-gutter"
+    >
+      <div
+        id="TestComponent-required-description"
+      >
+        <span
+          class="pf-v6-u-text-color-required"
+        >
+          *
+        </span>
+         
+        <span
+          class="pf-v6-u-text-color-subtle"
+        >
+          indicates a required prop
+        </span>
+      </div>
+      <table
+        aria-describedby="TestComponent-required-description"
+        aria-label="Props for TestComponent"
+        class="pf-v6-c-table pf-m-grid-lg pf-m-compact"
+        data-ouia-component-id="OUIA-Generated-Table-16"
+        data-ouia-component-type="PF6/Table"
+        data-ouia-safe="true"
+        role="grid"
+      >
+        <thead
+          class="pf-v6-c-table__thead"
+        >
+          <tr
+            class="pf-v6-c-table__tr"
+            data-ouia-component-id="OUIA-Generated-TableRow-31"
+            data-ouia-component-type="PF6/TableRow"
+            data-ouia-safe="true"
+          >
+            <th
+              class="pf-v6-c-table__th pf-m-width-20"
+              scope="col"
+              tabindex="-1"
+            >
+              Name
+            </th>
+            <th
+              class="pf-v6-c-table__th pf-m-width-20"
+              scope="col"
+              tabindex="-1"
+            >
+              Type
+            </th>
+            <th
+              class="pf-v6-c-table__th pf-m-width-10"
+              scope="col"
+              tabindex="-1"
+            >
+              Default
+            </th>
+            <th
+              class="pf-v6-c-table__th"
+              scope="col"
+              tabindex="-1"
+            >
+              Description
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="pf-v6-c-table__tbody"
+          role="rowgroup"
+        >
+          <tr
+            class="pf-v6-c-table__tr"
+            data-ouia-component-id="OUIA-Generated-TableRow-32"
+            data-ouia-component-type="PF6/TableRow"
+            data-ouia-safe="true"
+          >
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                propWithAllTableColumns 
+              </span>
+            </td>
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                string | () =&gt; void
+              </span>
+            </td>
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                foobarbaz
+              </span>
+            </td>
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                This prop has data for all table fields.
+              </span>
+            </td>
+          </tr>
+          <tr
+            class="pf-v6-c-table__tr"
+            data-ouia-component-id="OUIA-Generated-TableRow-33"
+            data-ouia-component-type="PF6/TableRow"
+            data-ouia-safe="true"
+          >
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                propWithNameOnly 
+              </span>
+            </td>
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                No type info available
+              </span>
+            </td>
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                -
+              </span>
+            </td>
+            <td
+              class="pf-v6-c-table__td"
+              tabindex="-1"
+            >
+              <span
+                class="pf-m-break-word pf-v6-c-table__text"
+              >
+                No description available.
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</DocumentFragment>
+`;
