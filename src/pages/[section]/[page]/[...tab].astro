@@ -1,6 +1,10 @@
 ---
 import { getCollection, render } from 'astro:content'
-import { Title, PageSection } from '@patternfly/react-core'
+import {
+  Title,
+  PageSection,
+  Content as PFContent,
+} from '@patternfly/react-core'
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from '../../../content'
 import { kebabCase } from 'change-case'
@@ -27,6 +31,7 @@ import {
   dd,
 } from '../../../components/Content'
 import LiveExample from '../../../components/LiveExample.astro'
+import CSSTable from '../../../components/CSSTable.astro'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -62,7 +67,8 @@ export async function getStaticPaths() {
   return flatCol
 }
 
-const { entry, propComponents } = Astro.props
+const { entry, propComponents, cssPrefix } = Astro.props
+
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 const currentPath = Astro.url.pathname
@@ -128,5 +134,6 @@ const currentPath = Astro.url.pathname
       }}
     />
     <PropsTables propComponents={propComponents} server:defer />
+    <CSSTable cssPrefix={cssPrefix} server:defer />
   </PageSection>
 </MainLayout>

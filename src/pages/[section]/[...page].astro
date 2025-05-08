@@ -6,6 +6,7 @@ import { content } from '../../content'
 import { kebabCase } from 'change-case'
 import { componentTabs } from '../../globals'
 import PropsTables from '../../components/PropsTables.astro'
+import CSSTable from '../../components/CSSTable.astro'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -20,16 +21,18 @@ export async function getStaticPaths() {
       entry,
       title: entry.data.title,
       propComponents: entry.data.propComponents,
+      cssPrefix: entry.data.cssPrefix,
     },
   }))
 }
 
-const { entry, propComponents } = Astro.props
+const { entry, propComponents, cssPrefix } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 
-if(section === 'components') { // if section is components, rewrite to first tab content
-  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`);
+if (section === 'components') {
+  // if section is components, rewrite to first tab content
+  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`)
 }
 ---
 
@@ -37,10 +40,11 @@ if(section === 'components') { // if section is components, rewrite to first tab
   {
     title && (
       <Title headingLevel="h1" size="4xl">
-        {title} 
+        {title}
       </Title>
     )
   }
   <Content />
   <PropsTables propComponents={propComponents} server:defer />
+  <CSSTable cssPrefix={cssPrefix} server:defer />
 </MainLayout>

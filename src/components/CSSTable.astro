@@ -1,0 +1,11 @@
+---
+import { CSSTable as CSSTableComponent } from './CSSTable'
+
+const { cssPrefix } = Astro.props
+---
+
+{
+  cssPrefix?.map((prefix: string, index: number) => (
+    <CSSTableComponent key={index} cssPrefix={prefix} client:only="react" />
+  ))
+}
