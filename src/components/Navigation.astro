@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content'
 
 import { Navigation as ReactNav } from './Navigation.tsx'
+import { TextContentEntry } from './NavEntry.tsx'
 
 import { content } from '../content'
 
@@ -13,12 +14,18 @@ const collections = await Promise.all(
   ),
 )
 
-const navEntries = collections.flat()
+const navEntries = collections.flat();
+const sections = new Set(navEntries.map((entry) => entry.data.section));
+
+const navSectionData: Record<string, TextContentEntry[]> = {};
+Array.from(sections).map((section) => {
+  const entries = navEntries.filter((entry) => entry.data.section === section).map(entry => ({id: entry.id, data: {id: entry.data.id, section }} as TextContentEntry))
+
+  navSectionData[section] = entries;
+})
+
 ---
 
-<ReactNav
-  client:only="react"
-  navEntries={navEntries}
-  navSectionOrder={config.navSectionOrder}
-  transition:animate="fade"
+<ReactNav client:only="react" navData={navSectionData} navSectionOrder={config.navSectionOrder}
+transition:animate="fade"
 />
