@@ -4,26 +4,40 @@ import { Navigation } from '../Navigation'
 import { TextContentEntry } from '../NavEntry'
 
 const mockEntries: Record<string, TextContentEntry[]> = {
-  section1: [
+  'section one': [
     {
       id: 'entry1',
       data: { id: 'Entry1', section: 'section-one' },
     },
     {
       id: 'entry2',
-      data: { id: 'Entry2', section: 'section-two' },
+      data: { id: 'Entry2', section: 'section-one' },
     },
     {
       id: 'entry3',
-      data: { id: 'Entry3', section: 'section-two' },
+      data: { id: 'Entry3', section: 'section-one' },
     },
     {
       id: 'entry4',
-      data: { id: 'Entry4', section: 'section-three' },
+      data: { id: 'Entry4', section: 'section-one' },
     },
     {
       id: 'entry5',
-      data: { id: 'Entry5', section: 'section-four' },
+      data: { id: 'Entry5', section: 'section-one' },
+    },
+  ],
+  'section two': [
+    {
+      id: 'entry6',
+      data: { id: 'Entry6', section: 'section-two' },
+    },
+    {
+      id: 'entry7',
+      data: { id: 'Entry7', section: 'section-two' },
+    },
+    {
+      id: 'entry8',
+      data: { id: 'Entry8', section: 'section-two' },
     },
   ],
 }
@@ -36,7 +50,7 @@ it('renders without crashing', () => {
 
 it('renders the correct number of sections', () => {
   render(<Navigation navData={mockEntries} />)
-  expect(screen.getAllByRole('listitem')).toHaveLength(4)
+  expect(screen.getAllByRole('listitem')).toHaveLength(2)
 })
 
 it('sets the active item based on the current pathname', () => {
@@ -66,7 +80,7 @@ it('updates the active item on selection', async () => {
 
   await user.click(sectionTwo)
 
-  const entryLink = screen.getByRole('link', { name: 'Entry2' })
+  const entryLink = screen.getByRole('link', { name: 'Entry6' })
 
   await user.click(entryLink)
 

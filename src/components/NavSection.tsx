@@ -14,7 +14,7 @@ export const NavSection = ({
   sectionId,
   activeItem,
 }: NavSectionProps) => {
-  const isExpanded = window.location.pathname.includes(sectionId)
+  const isExpanded = window.location.pathname.includes(kebabCase(sectionId))
   const isActive = entries.some((entry) => entry.id === activeItem)
 
   const items = entries.map((entry) => (
