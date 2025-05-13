@@ -4,6 +4,8 @@ import {
   Title,
   PageSection,
   Content as PFContent,
+  Stack,
+  StackItem,
 } from '@patternfly/react-core'
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from '../../../content'
@@ -133,7 +135,13 @@ const currentPath = Astro.url.pathname
         LiveExample,
       }}
     />
-    <PropsTables propComponents={propComponents} server:defer />
-    <CSSTable cssPrefix={cssPrefix} server:defer />
+    <Stack hasGutter>
+      <StackItem>
+        <PropsTables propComponents={propComponents} server:defer />
+      </StackItem>
+      <StackItem>
+        <CSSTable cssPrefix={cssPrefix} server:defer />
+      </StackItem>
+    </Stack>
   </PageSection>
 </MainLayout>

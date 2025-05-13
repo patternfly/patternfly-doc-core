@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content'
-import { Title } from '@patternfly/react-core'
+import { Title, Stack, StackItem } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
 import { content } from '../../content'
 import { kebabCase } from 'change-case'
@@ -45,6 +45,12 @@ if (section === 'components') {
     )
   }
   <Content />
-  <PropsTables propComponents={propComponents} server:defer />
-  <CSSTable cssPrefix={cssPrefix} server:defer />
+  <Stack hasGutter>
+    <StackItem>
+      <PropsTables propComponents={propComponents} server:defer />
+    </StackItem>
+    <StackItem>
+      <CSSTable cssPrefix={cssPrefix} server:defer />
+    </StackItem>
+  </Stack>
 </MainLayout>

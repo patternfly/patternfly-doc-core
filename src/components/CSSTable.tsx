@@ -5,24 +5,7 @@ import LevelUpAltIcon from '@patternfly/react-icons/dist/esm/icons/level-up-alt-
 import * as tokensModule from '@patternfly/react-tokens/dist/esm/componentIndex'
 import React from 'react'
 import { CSSSearch } from './CSSSearch'
-
-export type ComponentProp = {
-  isOpen: boolean
-  cells: [
-    string,
-    {
-      type: string
-      key: string
-      ref: any
-      props: any
-    },
-  ]
-  details: {
-    parent: number
-    fullWidth: boolean
-    data: any
-  }
-}
+import { AutoLinkHeader } from './AutoLinkHeader'
 
 type Value = {
   name: string
@@ -47,16 +30,17 @@ type List = {
 }
 
 type FilteredRows = {
-  cells: (React.ReactNode | string | string[])[]
+  cells: React.ReactNode[]
   isOpen?: boolean
   details?: { parent: number; fullWidth: boolean; data: React.ReactNode }
 }
 
 interface CSSTableProps extends React.HTMLProps<HTMLDivElement> {
   cssPrefix: string
-  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   hideSelectorColumn?: boolean
   selector?: string
+  debounceLength?: number
+  autoLinkHeader?: boolean
 }
 
 const isColorRegex = /^(#|rgb)/
@@ -96,9 +80,10 @@ const flattenList = (files: FileList[]) => {
 
 export const CSSTable: React.FunctionComponent<CSSTableProps> = ({
   cssPrefix,
-  headingLevel = 'h3',
   hideSelectorColumn = false,
   selector,
+  debounceLength = 500,
+  autoLinkHeader,
 }) => {
   const prefixToken = cssPrefix.replace('pf-v6-', '').replace(/-+/g, '_')
 
@@ -182,9 +167,7 @@ export const CSSTable: React.FunctionComponent<CSSTableProps> = ({
   const [searchRE, setSearchRE] = useState<RegExp>(INITIAL_REGEX)
   const [rows, setRows] = useState(getFilteredRows(searchRE))
 
-  const SectionHeading = headingLevel
-  //const publicProps = componentProps?.filter((prop) => !prop.isHidden)
-  const hasPropsToRender = !(typeof cssPrefix === 'undefined')
+  const hasPrefixToRender = !(typeof cssPrefix === 'undefined')
 
   const onCollapse = (
     _event: React.MouseEvent,
@@ -208,75 +191,78 @@ export const CSSTable: React.FunctionComponent<CSSTableProps> = ({
     const newSearchRE = new RegExp(value, 'i')
     setSearchRE(newSearchRE)
     setRows(getFilteredRows(newSearchRE))
-  }, 500)
+  }, debounceLength)
 
   return (
-    <div>
-      <SectionHeading>CSS variables</SectionHeading>
-      <Stack hasGutter>
-        {hasPropsToRender && (
-          <>
-            <CSSSearch getDebouncedFilteredRows={getDebouncedFilteredRows} />
-            <Table
-              variant="compact"
-              aria-label={`CSS Variables prefixed with ${cssPrefix}`}
-            >
-              <Thead>
-                <Tr>
-                  {!hideSelectorColumn && (
-                    <React.Fragment>
-                      <Th screenReaderText="Expand or collapse column" />
-                      <Th>Selector</Th>
-                    </React.Fragment>
-                  )}
-                  <Th>Variable</Th>
-                  <Th>Value</Th>
-                </Tr>
-              </Thead>
-              {!hideSelectorColumn ? (
-                rows.map((row, rowIndex: number) => (
-                  <Tbody key={rowIndex} isExpanded={row.isOpen}>
-                    <Tr>
-                      <Td
-                        expand={
-                          row.details
-                            ? {
-                                rowIndex,
-                                isExpanded: row.isOpen || false,
-                                onToggle: onCollapse,
-                                expandId: `css-vars-expandable-toggle-${cssPrefix}`,
-                              }
-                            : undefined
-                        }
-                      />
-                      <Td dataLabel="Selector">{row.cells[0]}</Td>
-                      <Td dataLabel="Variable">{row.cells[1]}</Td>
-                      <Td dataLabel="Value">{row.cells[2]}</Td>
+    <Stack hasGutter>
+      {hasPrefixToRender && (
+        <>
+          {autoLinkHeader && (
+            <AutoLinkHeader
+              headingLevel="h3"
+              className="pf-v6-u-mt-lg pf-v6-u-mb-md"
+            >{`Prefixed with '${cssPrefix}'`}</AutoLinkHeader>
+          )}
+          <CSSSearch getDebouncedFilteredRows={getDebouncedFilteredRows} />
+          <Table
+            variant="compact"
+            aria-label={`CSS Variables prefixed with ${cssPrefix}`}
+          >
+            <Thead>
+              <Tr>
+                {!hideSelectorColumn && (
+                  <React.Fragment>
+                    <Th screenReaderText="Expand or collapse column" />
+                    <Th>Selector</Th>
+                  </React.Fragment>
+                )}
+                <Th>Variable</Th>
+                <Th>Value</Th>
+              </Tr>
+            </Thead>
+            {!hideSelectorColumn ? (
+              rows.map((row, rowIndex: number) => (
+                <Tbody key={rowIndex} isExpanded={row.isOpen}>
+                  <Tr>
+                    <Td
+                      expand={
+                        row.details
+                          ? {
+                              rowIndex,
+                              isExpanded: row.isOpen || false,
+                              onToggle: onCollapse,
+                              expandId: `css-vars-expandable-toggle-${cssPrefix}`,
+                            }
+                          : undefined
+                      }
+                    />
+                    <Td dataLabel="Selector">{row.cells[0]}</Td>
+                    <Td dataLabel="Variable">{row.cells[1]}</Td>
+                    <Td dataLabel="Value">{row.cells[2]}</Td>
+                  </Tr>
+                  {row.details ? (
+                    <Tr isExpanded={row.isOpen}>
+                      {!row.details.fullWidth ? <Td /> : null}
+                      <Td dataLabel="Selector" colSpan={5}>
+                        {row.details.data}
+                      </Td>
                     </Tr>
-                    {row.details ? (
-                      <Tr isExpanded={row.isOpen}>
-                        {!row.details.fullWidth ? <Td /> : null}
-                        <Td dataLabel="Selector" colSpan={5}>
-                          {row.details.data}
-                        </Td>
-                      </Tr>
-                    ) : null}
-                  </Tbody>
-                ))
-              ) : (
-                <Tbody>
-                  {rows.map((row, rowIndex: number) => (
-                    <Tr key={rowIndex}>
-                      <Td dataLabel="Variable">{row.cells[0]}</Td>
-                      <Td dataLabel="Value">{row.cells[1]}</Td>
-                    </Tr>
-                  ))}
+                  ) : null}
                 </Tbody>
-              )}
-            </Table>
-          </>
-        )}
-      </Stack>
-    </div>
+              ))
+            ) : (
+              <Tbody>
+                {rows.map((row, rowIndex: number) => (
+                  <Tr key={rowIndex}>
+                    <Td dataLabel="Variable">{row.cells[0]}</Td>
+                    <Td dataLabel="Value">{row.cells[1]}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            )}
+          </Table>
+        </>
+      )}
+    </Stack>
   )
 }
