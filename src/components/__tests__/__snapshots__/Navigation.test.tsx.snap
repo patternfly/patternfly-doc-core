@@ -9,7 +9,7 @@ exports[`matches snapshot 1`] = `
     <nav
       aria-label="Global"
       class="pf-v6-c-nav"
-      data-ouia-component-id="OUIA-Generated-Nav-6"
+      data-ouia-component-id="OUIA-Generated-Nav-4"
       data-ouia-component-type="PF6/Nav"
       data-ouia-safe="true"
     >
@@ -18,17 +18,17 @@ exports[`matches snapshot 1`] = `
         role="list"
       >
         <li
-          class="pf-v6-c-nav__item"
-          data-ouia-component-id="OUIA-Generated-NavExpandable-21"
+          class="pf-v6-c-nav__item pf-m-current"
+          data-ouia-component-id="OUIA-Generated-NavExpandable-4"
           data-ouia-component-type="PF6/NavExpandable"
           data-ouia-safe="true"
         >
           <button
             aria-expanded="false"
             class="pf-v6-c-nav__link"
-            id="nav-section-section-four"
+            id="nav-section-section1"
           >
-            Section four
+            Section1
             <span
               class="pf-v6-c-nav__toggle"
             >
@@ -52,7 +52,7 @@ exports[`matches snapshot 1`] = `
             </span>
           </button>
           <section
-            aria-labelledby="nav-section-section-four"
+            aria-labelledby="nav-section-section1"
             class="pf-v6-c-nav__subnav"
             hidden=""
           >
@@ -62,70 +62,7 @@ exports[`matches snapshot 1`] = `
             >
               <li
                 class="pf-v6-c-nav__item"
-                data-ouia-component-id="OUIA-Generated-NavItem-26"
-                data-ouia-component-type="PF6/NavItem"
-                data-ouia-safe="true"
-              >
-                <a
-                  class="pf-v6-c-nav__link"
-                  href="/section-four/entry5"
-                  id="nav-entry-entry5"
-                >
-                  <span
-                    class="pf-v6-c-nav__link-text"
-                  >
-                    Entry5
-                  </span>
-                </a>
-              </li>
-            </ul>
-          </section>
-        </li>
-        <li
-          class="pf-v6-c-nav__item pf-m-expanded pf-m-current"
-          data-ouia-component-id="OUIA-Generated-NavExpandable-22"
-          data-ouia-component-type="PF6/NavExpandable"
-          data-ouia-safe="true"
-        >
-          <button
-            aria-expanded="true"
-            class="pf-v6-c-nav__link"
-            id="nav-section-section-one"
-          >
-            Section one
-            <span
-              class="pf-v6-c-nav__toggle"
-            >
-              <span
-                class="pf-v6-c-nav__toggle-icon"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="pf-v6-svg"
-                  fill="currentColor"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 256 512"
-                  width="1em"
-                >
-                  <path
-                    d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"
-                  />
-                </svg>
-              </span>
-            </span>
-          </button>
-          <section
-            aria-labelledby="nav-section-section-one"
-            class="pf-v6-c-nav__subnav"
-          >
-            <ul
-              class="pf-v6-c-nav__list"
-              role="list"
-            >
-              <li
-                class="pf-v6-c-nav__item"
-                data-ouia-component-id="OUIA-Generated-NavItem-27"
+                data-ouia-component-id="OUIA-Generated-NavItem-16"
                 data-ouia-component-type="PF6/NavItem"
                 data-ouia-safe="true"
               >
@@ -142,119 +79,9 @@ exports[`matches snapshot 1`] = `
                   </span>
                 </a>
               </li>
-            </ul>
-          </section>
-        </li>
-        <li
-          class="pf-v6-c-nav__item"
-          data-ouia-component-id="OUIA-Generated-NavExpandable-23"
-          data-ouia-component-type="PF6/NavExpandable"
-          data-ouia-safe="true"
-        >
-          <button
-            aria-expanded="false"
-            class="pf-v6-c-nav__link"
-            id="nav-section-section-three"
-          >
-            Section three
-            <span
-              class="pf-v6-c-nav__toggle"
-            >
-              <span
-                class="pf-v6-c-nav__toggle-icon"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="pf-v6-svg"
-                  fill="currentColor"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 256 512"
-                  width="1em"
-                >
-                  <path
-                    d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"
-                  />
-                </svg>
-              </span>
-            </span>
-          </button>
-          <section
-            aria-labelledby="nav-section-section-three"
-            class="pf-v6-c-nav__subnav"
-            hidden=""
-          >
-            <ul
-              class="pf-v6-c-nav__list"
-              role="list"
-            >
               <li
                 class="pf-v6-c-nav__item"
-                data-ouia-component-id="OUIA-Generated-NavItem-28"
-                data-ouia-component-type="PF6/NavItem"
-                data-ouia-safe="true"
-              >
-                <a
-                  class="pf-v6-c-nav__link"
-                  href="/section-three/entry4"
-                  id="nav-entry-entry4"
-                >
-                  <span
-                    class="pf-v6-c-nav__link-text"
-                  >
-                    Entry4
-                  </span>
-                </a>
-              </li>
-            </ul>
-          </section>
-        </li>
-        <li
-          class="pf-v6-c-nav__item"
-          data-ouia-component-id="OUIA-Generated-NavExpandable-24"
-          data-ouia-component-type="PF6/NavExpandable"
-          data-ouia-safe="true"
-        >
-          <button
-            aria-expanded="false"
-            class="pf-v6-c-nav__link"
-            id="nav-section-section-two"
-          >
-            Section two
-            <span
-              class="pf-v6-c-nav__toggle"
-            >
-              <span
-                class="pf-v6-c-nav__toggle-icon"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="pf-v6-svg"
-                  fill="currentColor"
-                  height="1em"
-                  role="img"
-                  viewBox="0 0 256 512"
-                  width="1em"
-                >
-                  <path
-                    d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"
-                  />
-                </svg>
-              </span>
-            </span>
-          </button>
-          <section
-            aria-labelledby="nav-section-section-two"
-            class="pf-v6-c-nav__subnav"
-            hidden=""
-          >
-            <ul
-              class="pf-v6-c-nav__list"
-              role="list"
-            >
-              <li
-                class="pf-v6-c-nav__item"
-                data-ouia-component-id="OUIA-Generated-NavItem-29"
+                data-ouia-component-id="OUIA-Generated-NavItem-17"
                 data-ouia-component-type="PF6/NavItem"
                 data-ouia-safe="true"
               >
@@ -272,7 +99,7 @@ exports[`matches snapshot 1`] = `
               </li>
               <li
                 class="pf-v6-c-nav__item"
-                data-ouia-component-id="OUIA-Generated-NavItem-30"
+                data-ouia-component-id="OUIA-Generated-NavItem-18"
                 data-ouia-component-type="PF6/NavItem"
                 data-ouia-safe="true"
               >
@@ -285,6 +112,42 @@ exports[`matches snapshot 1`] = `
                     class="pf-v6-c-nav__link-text"
                   >
                     Entry3
+                  </span>
+                </a>
+              </li>
+              <li
+                class="pf-v6-c-nav__item"
+                data-ouia-component-id="OUIA-Generated-NavItem-19"
+                data-ouia-component-type="PF6/NavItem"
+                data-ouia-safe="true"
+              >
+                <a
+                  class="pf-v6-c-nav__link"
+                  href="/section-three/entry4"
+                  id="nav-entry-entry4"
+                >
+                  <span
+                    class="pf-v6-c-nav__link-text"
+                  >
+                    Entry4
+                  </span>
+                </a>
+              </li>
+              <li
+                class="pf-v6-c-nav__item"
+                data-ouia-component-id="OUIA-Generated-NavItem-20"
+                data-ouia-component-type="PF6/NavItem"
+                data-ouia-safe="true"
+              >
+                <a
+                  class="pf-v6-c-nav__link"
+                  href="/section-four/entry5"
+                  id="nav-entry-entry5"
+                >
+                  <span
+                    class="pf-v6-c-nav__link-text"
+                  >
+                    Entry5
                   </span>
                 </a>
               </li>
