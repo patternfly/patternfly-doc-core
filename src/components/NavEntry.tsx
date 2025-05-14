@@ -6,9 +6,7 @@ export interface TextContentEntry {
   data: {
     id: string
     section: string
-    tab?: string
   }
-  collection: string
 }
 
 interface NavEntryProps {

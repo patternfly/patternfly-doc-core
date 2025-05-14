@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content'
 
 import { Navigation as ReactNav } from './Navigation.tsx'
+import { TextContentEntry } from './NavEntry.tsx'
 
 import { content } from '../content'
 
@@ -13,12 +14,56 @@ const collections = await Promise.all(
   ),
 )
 
-const navEntries = collections.flat()
+const navDataRaw = collections.flat();
+const uniqueSections = new Set(navDataRaw.map((entry) => entry.data.section));
+const navData: Record<string, TextContentEntry[]> = {};
+
+const [orderedSections, unorderedSections] = Array.from(uniqueSections).reduce(
+    (acc, section) => {
+      if (!config.navSectionOrder) {
+        acc[1].push(section)
+        return acc
+      }
+
+      const index = config.navSectionOrder.indexOf(section)
+      if (index > -1) {
+        acc[0][index] = section
+      } else {
+        acc[1].push(section)
+      }
+      return acc
+    },
+    [[], []] as [string[], string[]],
+  )
+
+const sortedSections = [...orderedSections, ...unorderedSections.sort()]
+sortedSections.map((section) => {
+  const entries = navDataRaw
+    .filter((entry) => entry.data.section === section)
+    .map(entry => ({ id: entry.id, data: { id: entry.data.id, section }} as TextContentEntry))
+
+  const sortedEntries = entries.sort((a, b) =>
+    a.data.id.localeCompare(b.data.id),
+  )
+
+  let navEntries = sortedEntries
+  if (section === 'components' || section === 'layouts') {
+    // only display unique entry.data.id in the nav list if the section is components
+    navEntries = [
+      ...sortedEntries
+        .reduce((map, entry) => {
+          if (!map.has(entry.data.id)) {
+            map.set(entry.data.id, entry)
+          }
+          return map
+        }, new Map())
+        .values(),
+    ]
+  }
+
+  navData[section] = navEntries;
+})
+
 ---
 
-<ReactNav
-  client:only="react"
-  navEntries={navEntries}
-  navSectionOrder={config.navSectionOrder}
-  transition:animate="fade"
-/>
+<ReactNav client:only="react" navData={navData} transition:animate="fade" />

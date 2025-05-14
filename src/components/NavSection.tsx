@@ -14,30 +14,10 @@ export const NavSection = ({
   sectionId,
   activeItem,
 }: NavSectionProps) => {
-  const isExpanded = window.location.pathname.includes(sectionId)
+  const isExpanded = window.location.pathname.includes(kebabCase(sectionId))
+  const isActive = entries.some((entry) => entry.id === activeItem)
 
-  const sortedNavEntries = entries.sort((a, b) =>
-    a.data.id.localeCompare(b.data.id),
-  )
-
-  const isActive = sortedNavEntries.some((entry) => entry.id === activeItem)
-
-  let navItems = sortedNavEntries
-  if (sectionId === 'components' || sectionId === 'layouts') {
-    // only display unique entry.data.id in the nav list if the section is components
-    navItems = [
-      ...sortedNavEntries
-        .reduce((map, entry) => {
-          if (!map.has(entry.data.id)) {
-            map.set(entry.data.id, entry)
-          }
-          return map
-        }, new Map())
-        .values(),
-    ]
-  }
-
-  const items = navItems.map((entry) => (
+  const items = entries.map((entry) => (
     <NavEntry
       key={entry.id}
       entry={entry}
