@@ -30,15 +30,11 @@ function defineContent(contentObj: CollectionDefinition) {
       propComponents: z.array(z.string()).optional(),
       tab: z.string().optional().default(tabMap[name]),
       cssPrefix: z
-        .preprocess((val) => {
-          if (typeof val === 'string') {
-            return [val]
-          }
-          if (Array.isArray(val)) {
-            return val
-          }
-          return undefined
-        }, z.array(z.string()))
+        .union([
+          z.string().transform((val) => [val]),
+          z.array(z.string()),
+          z.null().transform(() => undefined),
+        ])
         .optional(),
     }),
   })
