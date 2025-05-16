@@ -51,7 +51,9 @@ export const SectionGalleryListLayout = ({
                     </DataListCell>
                   ),
                   <DataListCell width={5} key="text-description">
-                    <Split className={hasListText ? "pf-v6-u-mb-md" : undefined}>
+                    <Split
+                      className={hasListText ? 'pf-v6-u-mb-md' : undefined}
+                    >
                       <SplitItem isFilled>
                         <Content isEditorial>
                           <Content component={ContentVariants.h2}>
@@ -75,7 +77,6 @@ export const SectionGalleryListLayout = ({
                             Demo
                           </Label>
                         )}
-                        {typeof data.label !== 'string' && <>{data.label}</>}
                       </SplitItem>
                     </Split>
                     {hasListText && (
@@ -89,6 +90,7 @@ export const SectionGalleryListLayout = ({
             </DataListItemRow>
           </DataListItem>
         </a>
-      )})}
+      )
+    })}
   </DataList>
 )

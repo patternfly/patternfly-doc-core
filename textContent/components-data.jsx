@@ -10,7 +10,6 @@ export const componentsData = {
         product version numbers and any appropriate legal text.
       </>
     ),
-    label: <p>testing custom content</p>,
   },
   'accordion': {
     illustration: './images/component-illustrations/accordion.png',

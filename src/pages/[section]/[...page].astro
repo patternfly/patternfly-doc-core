@@ -6,6 +6,7 @@ import { content } from '../../content'
 import { kebabCase } from 'change-case'
 import { componentTabs } from '../../globals'
 import PropsTables from '../../components/PropsTables.astro'
+import SectionGallery from '../../components/section-gallery/SectionGallery.astro'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -40,12 +41,14 @@ if(section === 'components' && componentTabs[id]) { // if section is components 
   {
     title && (
       <Title headingLevel="h1" size="4xl">
-        {title} 
+        {title}
       </Title>
     )
   }
     <PageSection id="main-content" isFilled>
-      <Content />
+      <Content components={{
+        SectionGallery
+      }}/>
       <PropsTables propComponents={propComponents} server:defer />
     </PageSection>
 </MainLayout>
