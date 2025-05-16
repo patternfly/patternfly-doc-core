@@ -6,8 +6,8 @@ import { css } from '@patternfly/react-styles'
 interface AutoLinkHeaderProps extends React.HTMLProps<HTMLDivElement> {
   id?: string
   headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-  children: React.ReactNode | string
-  metaText?: React.ReactNode | string
+  children: React.ReactNode
+  metaText?: React.ReactNode
   className?: string
 }
 

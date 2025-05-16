@@ -8,6 +8,10 @@
   box-shadow: var(--pf-t--global--box-shadow--sm);
 }
 
+.rotate-90-deg {
+  transform: rotate(90deg);
+}
+
 .ws-heading {
   position: relative;
 }

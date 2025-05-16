@@ -19,7 +19,7 @@ const { cssPrefix } = Astro.props
         </AutoLinkHeader>
       </StackItem>
 
-      {cssPrefix?.map((prefix: string, index: number) => (
+      {cssPrefix.map((prefix: string, index: number) => (
         <StackItem key={index}>
           <CSSTableComponent
             autoLinkHeader={cssPrefix.length > 1}
