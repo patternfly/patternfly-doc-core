@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content'
-import { Title, PageSection, Content as PFContent } from '@patternfly/react-core'
+import { Title, PageSection } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
 import { content } from '../../content'
 import { kebabCase } from 'change-case'
@@ -16,7 +16,6 @@ export async function getStaticPaths() {
 
   return collections
     .flat()
-    .filter((entry) => entry.data.id !== 'landing') // pages other than landing should match this route
     .map((entry) => ({
       params: { page: kebabCase(entry.data.id), section: entry.data.section },
       props: {
@@ -32,7 +31,7 @@ const { entry, propComponents } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 
-if(section === 'components') { // if section is components, rewrite to first tab content
+if(section === 'components' && componentTabs[id]) { // if section is components & tab exists, rewrite to first tab content
   return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`);
 }
 ---
@@ -46,9 +45,7 @@ if(section === 'components') { // if section is components, rewrite to first tab
     )
   }
     <PageSection id="main-content" isFilled>
-      <PFContent>
-        <Content />
-        <PropsTables propComponents={propComponents} server:defer />
-      </PFContent>
+      <Content />
+      <PropsTables propComponents={propComponents} server:defer />
     </PageSection>
 </MainLayout>
