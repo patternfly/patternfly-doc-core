@@ -1,11 +1,11 @@
 ---
 import '@patternfly/patternfly/patternfly.css'
+import '../styles/global.scss'
 import { ClientRouter } from 'astro:transitions'
 
 import Page from '../components/Page.astro'
 import Masthead from '../components/Masthead.astro'
 import Navigation from '../components/Navigation.astro'
-
 ---
 
 <html lang="en" transition:animate="none">
@@ -27,11 +27,15 @@ import Navigation from '../components/Navigation.astro'
 </html>
 
 <script>
-  const themePreference = window.localStorage.getItem ('theme-preference');
-  document?.querySelector('html')?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark' ); 
-  
-  document.addEventListener("astro:after-swap", () => {
-      const themePreference = window.localStorage.getItem ('theme-preference');
-      document?.querySelector('html')?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark' ); 
-  });
+  const themePreference = window.localStorage.getItem('theme-preference')
+  document
+    ?.querySelector('html')
+    ?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark')
+
+  document.addEventListener('astro:after-swap', () => {
+    const themePreference = window.localStorage.getItem('theme-preference')
+    document
+      ?.querySelector('html')
+      ?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark')
+  })
 </script>

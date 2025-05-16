@@ -1,0 +1,33 @@
+---
+import { CSSTable as CSSTableComponent } from './CSSTable'
+import { AutoLinkHeader } from './AutoLinkHeader'
+import { Stack, StackItem } from '@patternfly/react-core'
+
+const { cssPrefix } = Astro.props
+---
+
+{
+  cssPrefix?.length > 0 && (
+    <Stack hasGutter>
+      <StackItem>
+        <AutoLinkHeader
+          headingLevel="h2"
+          className="pf-v6-c-content--h2"
+          id="css-variables"
+        >
+          CSS variables
+        </AutoLinkHeader>
+      </StackItem>
+
+      {cssPrefix.map((prefix: string, index: number) => (
+        <StackItem key={index}>
+          <CSSTableComponent
+            autoLinkHeader={cssPrefix.length > 1}
+            cssPrefix={prefix}
+            client:only="react"
+          />
+        </StackItem>
+      ))}
+    </Stack>
+  )
+}
