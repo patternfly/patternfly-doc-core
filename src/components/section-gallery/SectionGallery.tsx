@@ -22,7 +22,7 @@ export interface SectionGalleryItemData {
   /** Summary text of the item */
   summary: JSX.Element
   /** Label included in the item footer. Choose from a preset or pass a custom label. */
-  label?: 'beta' | 'demo' | 'deprecated' | JSX.Element
+  label?: 'beta' | 'demo' | 'deprecated'
   /** Link to the item, relative to the section, e.g. "/{section}/{page}" */
   link?: string
 }
@@ -58,9 +58,9 @@ export const SectionGallery = ({
   countText,
   initialLayout = 'grid',
   hasGridText = false,
-  hasGridImages = true,
-  hasListText = true,
-  hasListImages = true,
+  hasGridImages = false,
+  hasListText = false,
+  hasListImages = false,
 }: SectionGalleryProps) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [layoutView, setLayoutView] = useState(initialLayout)
@@ -68,7 +68,7 @@ export const SectionGallery = ({
   const galleryItems: SectionGalleryItem[] = Object.entries(galleryItemsData)
     .map(([galleryItem, galleryItemData]) => ({
       name: galleryItem,
-      img: illustrations[snakeCase(galleryItem)],
+      img: illustrations ? illustrations[snakeCase(galleryItem)] : undefined,
       data: galleryItemData,
     }))
     .sort((item1, item2) => item1.name.localeCompare(item2.name))

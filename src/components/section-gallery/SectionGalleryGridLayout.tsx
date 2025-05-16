@@ -75,11 +75,11 @@ export const SectionGalleryGridLayout = ({
                     Demo
                   </Label>
                 )}
-                {typeof data.label !== 'string' && <>{data.label}</>}
               </CardFooter>
             )}
           </Card>
         </GalleryItem>
-      )})}
+      )
+    })}
   </Gallery>
 )
