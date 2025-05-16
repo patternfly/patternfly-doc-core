@@ -30,9 +30,8 @@ const { entry, propComponents, cssPrefix } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 
-if (section === 'components') {
-  // if section is components, rewrite to first tab content
-  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`)
+if(section === 'components' && componentTabs[id]) { // if section is components & tab exists, rewrite to first tab content
+  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`);
 }
 ---
 

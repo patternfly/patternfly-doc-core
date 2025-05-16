@@ -80,7 +80,7 @@ export const SectionGallery = ({
   )
 
   return (
-    <div className='ws-section-gallery'>
+    <div className="ws-section-gallery">
       <SectionGalleryToolbar
         galleryItemCount={galleryItems.length}
         searchTerm={searchTerm}

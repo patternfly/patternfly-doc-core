@@ -40,17 +40,13 @@ const sortedSections = [...orderedSections, ...unorderedSections.sort()]
 sortedSections.map((section) => {
   const entries = navDataRaw
     .filter((entry) => entry.data.section === section)
-    .map(entry => ({ id: entry.id, data: { id: entry.data.id, section }} as TextContentEntry))
+    .map(entry => ({ id: entry.id, data: { id: entry.data.id, section, sortValue: entry.data.sortValue }} as TextContentEntry))
 
-  const sortedEntries = entries.sort((a, b) =>
-    a.data.id.localeCompare(b.data.id),
-  )
-
-  let navEntries = sortedEntries
+  let uniqueEntries = entries
   if (section === 'components' || section === 'layouts') {
     // only display unique entry.data.id in the nav list if the section is components
-    navEntries = [
-      ...sortedEntries
+    uniqueEntries = [
+      ...entries
         .reduce((map, entry) => {
           if (!map.has(entry.data.id)) {
             map.set(entry.data.id, entry)
@@ -61,7 +57,18 @@ sortedSections.map((section) => {
     ]
   }
 
-  navData[section] = navEntries;
+    // Sort alphabetically, unless a sort value is specified in the frontmatter
+  const sortedUniqueEntries = uniqueEntries.sort((a, b) => {
+    if (a.data.sortValue || b.data.sortValue) {
+      const aSortOrder = a.data.sortValue || 50
+      const bSortOrder = b.data.sortValue || 50
+
+      return aSortOrder - bSortOrder
+    }
+    return a.data.id.localeCompare(b.data.id)
+  })
+
+  navData[section] = sortedUniqueEntries;
 })
 
 ---
