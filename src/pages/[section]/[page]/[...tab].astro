@@ -1,74 +1,132 @@
 ---
 import { getCollection, render } from 'astro:content'
-import { Title, PageSection, Content as PFContent } from '@patternfly/react-core'
+import { Title, PageSection } from '@patternfly/react-core'
 import MainLayout from '../../../layouts/Main.astro'
-import { content } from "../../../content"
+import { content } from '../../../content'
 import { kebabCase } from 'change-case'
-import { componentTabs, tabNames, buildTab, sortTabs } from '../../../globals';
+import { componentTabs, tabNames, buildTab, sortTabs } from '../../../globals'
 import PropsTables from '../../../components/PropsTables.astro'
+import {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  a,
+  small,
+  blockquote,
+  pre,
+  hr,
+  ul,
+  ol,
+  dl,
+  li,
+  dt,
+  dd,
+} from '../../../components/Content'
+import LiveExample from '../../../components/LiveExample.astro'
 
 export async function getStaticPaths() {
-  const collections = await Promise.all(content.map(async (entry) => await getCollection(entry.name as 'textContent')))
+  const collections = await Promise.all(
+    content.map(
+      async (entry) => await getCollection(entry.name as 'textContent'),
+    ),
+  )
 
-  const flatCol =  collections.flat().map((entry) => {
+  const flatCol = collections.flat().map((entry) => {
     // Build tabs dictionary
-    let tab = entry.data.tab;
-    if(tab) { // check for demos/deprecated
-      if(entry.id.includes('demos')) {
-        tab = `${tab}-demos`;
+    let tab = entry.data.tab
+    if (tab) {
+      // check for demos/deprecated
+      if (entry.id.includes('demos')) {
+        tab = `${tab}-demos`
       } else if (entry.id.includes('deprecated')) {
-        tab = `${tab}-deprecated`;
+        tab = `${tab}-deprecated`
       }
     }
-    buildTab(entry, tab);
+    buildTab(entry, tab)
 
     return {
-      params: { page: kebabCase(entry.data.id), section: entry.data.section, tab },
+      params: {
+        page: kebabCase(entry.data.id),
+        section: entry.data.section,
+        tab,
+      },
       props: { entry, ...entry.data },
     }
   })
 
-  sortTabs() 
-  return flatCol;
+  sortTabs()
+  return flatCol
 }
 
 const { entry, propComponents } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
-const currentPath = Astro.url.pathname;
-
+const currentPath = Astro.url.pathname
 ---
 
 <MainLayout>
   {
     title && (
       <Title headingLevel="h1" size="4xl">
-        {title} 
+        {title}
       </Title>
     )
   }
-  {componentTabs[id] && (
-    <PageSection id="ws-sticky-nav-tabs" stickyOnBreakpoint={{ default: 'top' }} type="tabs">
-      <div class="pf-v6-c-tabs pf-m-page-insets pf-m-no-border-bottom">
-        <ul class="pf-v6-c-tabs__list">
-          {componentTabs[id].map((tab: string) => (
-            // eslint-disable-next-line react/jsx-key
-            <li
-              class={`pf-v6-c-tabs__item${currentPath === `/${section}/${kebabCase(id)}/${tab}` ? ' pf-m-current' : ''}`}
-            >
-              <a class="pf-v6-c-tabs__link" href={`/${section}/${kebabCase(id)}/${tab}`}>
-                {tabNames[tab]}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </PageSection>
-  )}
+  {
+    componentTabs[id] && (
+      <PageSection
+        id="ws-sticky-nav-tabs"
+        stickyOnBreakpoint={{ default: 'top' }}
+        type="tabs"
+      >
+        <div class="pf-v6-c-tabs pf-m-page-insets pf-m-no-border-bottom">
+          <ul class="pf-v6-c-tabs__list">
+            {componentTabs[id].map((tab: string) => (
+              // eslint-disable-next-line react/jsx-key
+              <li
+                class={`pf-v6-c-tabs__item${currentPath === `/${section}/${kebabCase(id)}/${tab}` ? ' pf-m-current' : ''}`}
+              >
+                <a
+                  class="pf-v6-c-tabs__link"
+                  href={`/${section}/${kebabCase(id)}/${tab}`}
+                >
+                  {tabNames[tab]}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </PageSection>
+    )
+  }
   <PageSection id="main-content" isFilled>
-    <PFContent>
-      <Content />
-      <PropsTables propComponents={propComponents} server:defer />
-    </PFContent>
+    <Content
+      components={{
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        a,
+        small,
+        blockquote,
+        pre,
+        hr,
+        ul,
+        ol,
+        dl,
+        li,
+        dt,
+        dd,
+        LiveExample,
+      }}
+    />
+    <PropsTables propComponents={propComponents} server:defer />
   </PageSection>
 </MainLayout>
