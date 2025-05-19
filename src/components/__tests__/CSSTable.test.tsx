@@ -88,6 +88,7 @@ it('does not render the "Prefixed with" header when autoLinkHeader is false (def
 })
 
 it('filters rows based on search input', async () => {
+  userEvent.setup()
   render(<CSSTable cssPrefix="pf-v6-test" debounceLength={0} />)
   const searchInput = screen.getByPlaceholderText('Filter CSS Variables')
 
