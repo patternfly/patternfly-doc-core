@@ -43,7 +43,6 @@ export const SectionGalleryGridLayout = ({
       const { code } = convertToReactComponent(`<>${summaryNoLinks}</>`)
       const getSummaryComponent = new Function('React', code)
 
-      console.log(img)
       return (
         <GalleryItem span={4} key={idx}>
           <Card id={name} key={idx} isClickable>
