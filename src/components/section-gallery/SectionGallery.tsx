@@ -73,7 +73,6 @@ export const SectionGallery = ({
     }))
     .sort((item1, item2) => item1.name.localeCompare(item2.name))
 
-  console.log(galleryItems)
   const nonCharsRegex = /[^A-Z0-9]+/gi
   const filteringTerm = searchTerm.replace(nonCharsRegex, '')
   const filteredItems: SectionGalleryItem[] = galleryItems.filter((item) =>
