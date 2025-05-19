@@ -88,7 +88,7 @@ it('does not render the "Prefixed with" header when autoLinkHeader is false (def
 })
 
 it('filters rows based on search input', async () => {
-  userEvent.setup()
+  const user = userEvent.setup()
   render(<CSSTable cssPrefix="pf-v6-test" debounceLength={0} />)
   const searchInput = screen.getByPlaceholderText('Filter CSS Variables')
 
@@ -103,7 +103,7 @@ it('filters rows based on search input', async () => {
     }),
   ).toBeInTheDocument()
 
-  await userEvent.type(searchInput, 'test')
+  await user.type(searchInput, 'test')
   await waitFor(() => {
     // row doesn't seem to work here for whatever reason
     expect(screen.getAllByText('.test-selector')).toHaveLength(2)
@@ -112,8 +112,8 @@ it('filters rows based on search input', async () => {
     expect(screen.queryByText('list-property')).not.toBeInTheDocument()
   })
 
-  await userEvent.clear(searchInput)
-  await userEvent.type(searchInput, 'list')
+  await user.clear(searchInput)
+  await user.type(searchInput, 'list')
   await waitFor(() => {
     expect(screen.queryByText('.test-selector')).not.toBeInTheDocument()
     expect(screen.queryByText('test-property')).not.toBeInTheDocument()
