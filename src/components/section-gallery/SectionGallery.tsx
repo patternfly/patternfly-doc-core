@@ -20,7 +20,7 @@ export interface SectionGalleryItemData {
   /** Path to the item illustration */ // TODO: remove if img method is fine
   illustration: string
   /** Summary text of the item */
-  summary: JSX.Element
+  summary: string
   /** Label included in the item footer. Choose from a preset or pass a custom label. */
   label?: 'beta' | 'demo' | 'deprecated'
   /** Link to the item, relative to the section, e.g. "/{section}/{page}" */
@@ -73,6 +73,7 @@ export const SectionGallery = ({
     }))
     .sort((item1, item2) => item1.name.localeCompare(item2.name))
 
+  console.log(galleryItems)
   const nonCharsRegex = /[^A-Z0-9]+/gi
   const filteringTerm = searchTerm.replace(nonCharsRegex, '')
   const filteredItems: SectionGalleryItem[] = galleryItems.filter((item) =>

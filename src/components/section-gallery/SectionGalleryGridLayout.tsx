@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   Gallery,
   GalleryItem,
@@ -11,6 +12,7 @@ import {
 } from '@patternfly/react-core'
 import { SectionGalleryItem } from './SectionGallery'
 import { sentenceCase } from 'change-case'
+import { convertToReactComponent } from '@patternfly/ast-helpers'
 
 interface SectionGalleryGridLayoutProps {
   /** Section where the gallery is located */
@@ -33,6 +35,15 @@ export const SectionGalleryGridLayout = ({
     {galleryItems.map(({ name, img, data }, idx) => {
       const itemLink = data.link || `/${section}/${name}`
 
+      //TODO: rethink how JSX / enriched content is passed to framework
+      const summaryNoLinks = data.summary.replace(
+        /<a[^>]*>([^<]+)<\/a>/gm,
+        '$1',
+      )
+      const { code } = convertToReactComponent(`<>${summaryNoLinks}</>`)
+      const getSummaryComponent = new Function('React', code)
+
+      console.log(img)
       return (
         <GalleryItem span={4} key={idx}>
           <Card id={name} key={idx} isClickable>
@@ -48,12 +59,14 @@ export const SectionGalleryGridLayout = ({
             </CardHeader>
             {(hasGridImages || hasGridText) && (
               <CardBody>
-                {hasGridImages && data.illustration && (
+                {hasGridImages && img && (
                   <img src={img.src} alt={`${name} illustration`} /> // verify whether this img.src approach is correct
                 )}
                 {hasGridText && (
                   <Content isEditorial>
-                    <Content component="p">{data.summary}</Content>
+                    <Content component="p">
+                      {getSummaryComponent(React)}
+                    </Content>
                   </Content>
                 )}
               </CardBody>

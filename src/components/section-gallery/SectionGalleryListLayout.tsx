@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   DataList,
   DataListItem,
@@ -12,6 +13,7 @@ import {
 } from '@patternfly/react-core'
 import { SectionGalleryItem } from './SectionGallery'
 import { sentenceCase } from 'change-case'
+import { convertToReactComponent } from '@patternfly/ast-helpers'
 
 interface SectionGalleryListLayoutProps {
   /** Section where the gallery is located */
@@ -33,6 +35,14 @@ export const SectionGalleryListLayout = ({
   <DataList onSelectDataListItem={() => {}} aria-label="gallery-list">
     {galleryItems.map(({ name, img, data }, idx) => {
       const itemLink = data.link || `/${section}/${name}`
+
+      //TODO: rethink how JSX / enriched content is passed to framework
+      const summaryNoLinks = data.summary.replace(
+        /<a[^>]*>([^<]+)<\/a>/gm,
+        '$1',
+      )
+      const { code } = convertToReactComponent(`<>${summaryNoLinks}</>`)
+      const getSummaryComponent = new Function('React', code)
 
       return (
         <a href={itemLink} key={idx} className="ws-section-gallery-item">
@@ -81,7 +91,9 @@ export const SectionGalleryListLayout = ({
                     </Split>
                     {hasListText && (
                       <Content isEditorial>
-                        <Content component="p">{data.summary}</Content>
+                        <Content component="p">
+                          {getSummaryComponent(React)}
+                        </Content>
                       </Content>
                     )}
                   </DataListCell>,
