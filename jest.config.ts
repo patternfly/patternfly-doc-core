@@ -20,7 +20,7 @@ const config: Config = {
   },
   setupFilesAfterEnv: ['<rootDir>/test.setup.ts'],
   transformIgnorePatterns: [
-    '/node_modules/(?!(change-case|@?nanostores|react-docgen|strip-indent)/)',
+    '/node_modules/(?!(change-case|@?nanostores|react-docgen|strip-indent|@patternfly/react-icons)/)',
   ],
 }
 
