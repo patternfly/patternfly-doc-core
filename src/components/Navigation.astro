@@ -15,8 +15,7 @@ const collections = await Promise.all(
 )
 
 const navDataRaw = collections.flat();
-const uniqueSections = new Set(navDataRaw.map((entry) => entry.data.section));
-const navData: Record<string, TextContentEntry[]> = {};
+const uniqueSections = new Set(navDataRaw.map((entry) => entry.data.section as string));
 
 const [orderedSections, unorderedSections] = Array.from(uniqueSections).reduce(
     (acc, section) => {
@@ -37,7 +36,7 @@ const [orderedSections, unorderedSections] = Array.from(uniqueSections).reduce(
   )
 
 const sortedSections = [...orderedSections, ...unorderedSections.sort()]
-sortedSections.map((section) => {
+const navData = sortedSections.map((section) => {
   const entries = navDataRaw
     .filter((entry) => entry.data.section === section)
     .map(entry => ({ id: entry.id, data: { id: entry.data.id, section }} as TextContentEntry))
@@ -61,7 +60,7 @@ sortedSections.map((section) => {
     ]
   }
 
-  navData[section] = navEntries;
+  return { section, navEntries}
 })
 
 ---
