@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react'
 import { Nav, NavList, PageSidebarBody } from '@patternfly/react-core'
 import { NavSection } from './NavSection'
 import { type TextContentEntry } from './NavEntry'
-
 interface NavigationProps {
-  navData: Record<string, TextContentEntry[]>
+  navData: TextContentEntry[][]
 }
 
 export const Navigation: React.FunctionComponent<NavigationProps> = ({
@@ -29,14 +28,17 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
     <PageSidebarBody id="page-sidebar-body">
       <Nav onSelect={onNavSelect}>
         <NavList>
-          {Object.entries(navData).map(([key, value], index) => (
-            <NavSection
-              key={index}
-              entries={value}
-              sectionId={key}
-              activeItem={activeItem}
-            />
-          ))}
+          {navData.map((navEntries) => {
+            const { section } = navEntries[0].data
+            return (
+              <NavSection
+                key={section}
+                entries={navEntries}
+                sectionId={section}
+                activeItem={activeItem}
+              />
+            )
+          })}
         </NavList>
       </Nav>
     </PageSidebarBody>

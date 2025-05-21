@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Navigation } from '../Navigation'
-import { TextContentEntry } from '../NavEntry'
+import { type TextContentEntry } from '../NavEntry'
 
-const mockEntries: Record<string, TextContentEntry[]> = {
-  'section one': [
+const mockEntries: TextContentEntry[][] = [
+  [
     {
       id: 'entry1',
       data: { id: 'Entry1', section: 'section-one' },
@@ -26,7 +26,7 @@ const mockEntries: Record<string, TextContentEntry[]> = {
       data: { id: 'Entry5', section: 'section-one' },
     },
   ],
-  'section two': [
+  [
     {
       id: 'entry6',
       data: { id: 'Entry6', section: 'section-two' },
@@ -40,7 +40,7 @@ const mockEntries: Record<string, TextContentEntry[]> = {
       data: { id: 'Entry8', section: 'section-two' },
     },
   ],
-}
+]
 
 it('renders without crashing', () => {
   render(<Navigation navData={mockEntries} />)
