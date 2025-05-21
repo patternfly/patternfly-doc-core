@@ -1,12 +1,13 @@
 ---
 import { getCollection, render } from 'astro:content'
-import { Title, Stack, StackItem } from '@patternfly/react-core'
+import { Title, PageSection, Stack, StackItem } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
 import { content } from '../../content'
 import { kebabCase } from 'change-case'
 import { componentTabs } from '../../globals'
 import PropsTables from '../../components/PropsTables.astro'
 import CSSTable from '../../components/CSSTable.astro'
+import SectionGallery from '../../components/section-gallery/SectionGallery.astro'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -30,9 +31,8 @@ const { entry, propComponents, cssPrefix } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 
-if (section === 'components') {
-  // if section is components, rewrite to first tab content
-  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`)
+if(section === 'components' && componentTabs[id]) { // if section is components & tab exists, rewrite to first tab content
+  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`);
 }
 ---
 
@@ -44,13 +44,17 @@ if (section === 'components') {
       </Title>
     )
   }
-  <Content />
-  <Stack hasGutter>
-    <StackItem>
-      <PropsTables propComponents={propComponents} server:defer />
-    </StackItem>
-    <StackItem>
-      <CSSTable cssPrefix={cssPrefix} server:defer />
-    </StackItem>
-  </Stack>
+    <PageSection id="main-content" isFilled>
+        <Content components={{
+          SectionGallery
+        }}/>
+        <Stack hasGutter>
+          <StackItem>
+            <PropsTables propComponents={propComponents} server:defer />
+          </StackItem>
+          <StackItem>
+            <CSSTable cssPrefix={cssPrefix} server:defer />
+          </StackItem>
+        </Stack>
+  </PageSection>
 </MainLayout>

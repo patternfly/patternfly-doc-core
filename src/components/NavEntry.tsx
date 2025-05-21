@@ -6,6 +6,8 @@ export interface TextContentEntry {
   data: {
     id: string
     section: string
+    tab?: string
+    sortValue?: number
   }
 }
 
@@ -22,6 +24,7 @@ export const NavEntry = ({ entry, isActive }: NavEntryProps) => {
     section === 'components' || section === 'layouts'
       ? kebabCase(entryTitle)
       : id
+
   return (
     <NavItem
       itemId={_id}
