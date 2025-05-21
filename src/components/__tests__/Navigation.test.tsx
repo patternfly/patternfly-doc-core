@@ -1,51 +1,45 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Navigation } from '../Navigation'
-import type { NavData } from '../Navigation'
+import { type TextContentEntry } from '../NavEntry'
 
-const mockEntries: NavData[] = [
-  {
-    section: 'section one',
-    navEntries: [
-      {
-        id: 'entry1',
-        data: { id: 'Entry1', section: 'section-one' },
-      },
-      {
-        id: 'entry2',
-        data: { id: 'Entry2', section: 'section-one' },
-      },
-      {
-        id: 'entry3',
-        data: { id: 'Entry3', section: 'section-one' },
-      },
-      {
-        id: 'entry4',
-        data: { id: 'Entry4', section: 'section-one' },
-      },
-      {
-        id: 'entry5',
-        data: { id: 'Entry5', section: 'section-one' },
-      },
-    ],
-  },
-  {
-    section: 'section two',
-    navEntries: [
-      {
-        id: 'entry6',
-        data: { id: 'Entry6', section: 'section-two' },
-      },
-      {
-        id: 'entry7',
-        data: { id: 'Entry7', section: 'section-two' },
-      },
-      {
-        id: 'entry8',
-        data: { id: 'Entry8', section: 'section-two' },
-      },
-    ],
-  },
+const mockEntries: TextContentEntry[][] = [
+  [
+    {
+      id: 'entry1',
+      data: { id: 'Entry1', section: 'section-one' },
+    },
+    {
+      id: 'entry2',
+      data: { id: 'Entry2', section: 'section-one' },
+    },
+    {
+      id: 'entry3',
+      data: { id: 'Entry3', section: 'section-one' },
+    },
+    {
+      id: 'entry4',
+      data: { id: 'Entry4', section: 'section-one' },
+    },
+    {
+      id: 'entry5',
+      data: { id: 'Entry5', section: 'section-one' },
+    },
+  ],
+  [
+    {
+      id: 'entry6',
+      data: { id: 'Entry6', section: 'section-two' },
+    },
+    {
+      id: 'entry7',
+      data: { id: 'Entry7', section: 'section-two' },
+    },
+    {
+      id: 'entry8',
+      data: { id: 'Entry8', section: 'section-two' },
+    },
+  ],
 ]
 
 it('renders without crashing', () => {

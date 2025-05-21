@@ -26,7 +26,7 @@ exports[`matches snapshot 1`] = `
           <button
             aria-expanded="true"
             class="pf-v6-c-nav__link"
-            id="nav-section-section one"
+            id="nav-section-section-one"
           >
             Section one
             <span
@@ -52,7 +52,7 @@ exports[`matches snapshot 1`] = `
             </span>
           </button>
           <section
-            aria-labelledby="nav-section-section one"
+            aria-labelledby="nav-section-section-one"
             class="pf-v6-c-nav__subnav"
           >
             <ul
@@ -162,7 +162,7 @@ exports[`matches snapshot 1`] = `
           <button
             aria-expanded="false"
             class="pf-v6-c-nav__link"
-            id="nav-section-section two"
+            id="nav-section-section-two"
           >
             Section two
             <span
@@ -188,7 +188,7 @@ exports[`matches snapshot 1`] = `
             </span>
           </button>
           <section
-            aria-labelledby="nav-section-section two"
+            aria-labelledby="nav-section-section-two"
             class="pf-v6-c-nav__subnav"
             hidden=""
           >
