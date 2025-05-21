@@ -38,4 +38,32 @@ import Navigation from '../components/Navigation.astro'
       ?.querySelector('html')
       ?.classList.toggle('pf-v6-theme-dark', themePreference === 'dark')
   })
+
+  const scrollToHash = (hash: string) => {
+    const targetElement = document.querySelector(hash)
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.hash) {
+      const hash = window.location.hash
+
+      // Without this, page would focus on anchor link without scrolling to it
+      history.replaceState(null, '', ' ')
+
+      setTimeout(() => {
+        scrollToHash(hash)
+        history.replaceState(null, '', hash)
+      }, 500)
+    }
+  })
+
+  // Handle changes that happen after the initial page load
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash) {
+      scrollToHash(window.location.hash)
+    }
+  })
 </script>
