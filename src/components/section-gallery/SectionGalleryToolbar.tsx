@@ -25,9 +25,9 @@ interface SectionGalleryToolbarProps {
   /** Setter for layout */
   setLayoutView: Dispatch<SetStateAction<'grid' | 'list'>>
   /** Placeholder text for the gallery search input */
-  placeholderText: string
+  placeholderText?: string
   /** Text for the amount of gallery items */
-  countText: string
+  countText?: string
 }
 
 export const SectionGalleryToolbar = ({

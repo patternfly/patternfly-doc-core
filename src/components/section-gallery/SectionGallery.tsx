@@ -29,25 +29,25 @@ export interface SectionGalleryItemData {
 
 interface SectionGalleryProps {
   /** Collection of illustations for the gallery */
-  illustrations: any
+  illustrations?: any
   /** Section where the gallery is located */
   section: string
   /** Data of all gallery items */
   galleryItemsData: Record<string, SectionGalleryItemData>
   /** Placeholder text for the gallery search input */
-  placeholderText: string
+  placeholderText?: string
   /** Text for the amount of gallery items */
-  countText: string
+  countText?: string
   /** Starting layout for the gallery */
-  initialLayout: 'grid' | 'list'
+  initialLayout?: 'grid' | 'list'
   /** Indicates the grid layout has item summary text */
-  hasGridText: boolean
+  hasGridText?: boolean
   /** Indicates the grid layout has item images */
-  hasGridImages: boolean
+  hasGridImages?: boolean
   /** Indicates the list layout has item summary text */
-  hasListText: boolean
+  hasListText?: boolean
   /** Indicates the list layout has item images */
-  hasListImages: boolean
+  hasListImages?: boolean
 }
 
 export const SectionGallery = ({
