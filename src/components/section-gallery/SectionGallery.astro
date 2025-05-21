@@ -1,0 +1,19 @@
+---
+import { SectionGallery as SectionGalleryBase } from './SectionGallery'
+
+const { illustrations, section, galleryItemsData, placeholderText, countText, initialLayout, hasGridText, hasGridImages, hasListText, hasListImages } = Astro.props
+---
+
+<SectionGalleryBase 
+  illustrations={illustrations} 
+  section={section} 
+  galleryItemsData={galleryItemsData} 
+  placeholderText={placeholderText} 
+  countText={countText} 
+  initialLayout={initialLayout} 
+  hasGridText={hasGridText} 
+  hasGridImages={hasGridImages} 
+  hasListText={hasListText} 
+  hasListImages={hasListImages}
+  client:only="react"
+/>
