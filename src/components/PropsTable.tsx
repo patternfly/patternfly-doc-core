@@ -37,7 +37,6 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
   componentDescription,
   componentProps,
 }) => {
-  const SectionHeading = headingLevel
   const publicProps = componentProps?.filter((prop) => !prop.isHidden)
   const hasPropsToRender = !!publicProps?.length
 
