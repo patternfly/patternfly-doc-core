@@ -1,6 +1,7 @@
 export const content = [
   { base: 'textContent', pattern: '*.{md,mdx}', name: 'textContent' },
   { base: 'textContent', pattern: 'examples/*/*.mdx', name: 'examples' },
+  { base: 'testContent', pattern: '**/*.mdx', name: 'testContent'}
   // TODO: Remove. Uncomment for local testing.
   // {
   //   "packageName":"@patternfly/react-core",

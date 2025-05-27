@@ -1,0 +1,54 @@
+---
+id: Switch
+section: components
+cssPrefix: pf-v6-c-switch
+propComponents: ['Switch']
+ouia: true
+---
+
+
+## Examples
+
+To keep inline with accessibility guidelines, the label for a switch must never dynamically change. A dynamically changing label (such as one label for an "on" state and another label for an "off" state) can be confusing as the contexts for each label changes as the switch state does. This applies to both visible text labels as well as labels provided via `aria-label`.
+
+### Basic
+
+
+import SwitchBasic from "./SwitchBasic.tsx?raw"
+
+<LiveExample src={SwitchBasic} />
+
+### Reversed Layout
+
+
+import SwitchReversed from "./SwitchReversed.tsx?raw"
+
+<LiveExample src={SwitchReversed} />
+
+### Without label
+
+
+import SwitchWithoutLabel from "./SwitchWithoutLabel.tsx?raw"
+
+<LiveExample src={SwitchWithoutLabel} />
+
+### Checked with label
+
+
+import SwitchCheckedWithLabel from "./SwitchCheckedWithLabel.tsx?raw"
+
+<LiveExample src={SwitchCheckedWithLabel} />
+
+### Disabled
+
+
+import SwitchDisabled from "./SwitchDisabled.tsx?raw"
+
+<LiveExample src={SwitchDisabled} />
+
+### Uncontrolled
+
+
+import SwitchUncontrolled from "./SwitchUncontrolled.tsx?raw"
+
+<LiveExample src={SwitchUncontrolled} />

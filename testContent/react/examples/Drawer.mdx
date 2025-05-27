@@ -1,0 +1,152 @@
+---
+id: Drawer
+cssPrefix: pf-v6-c-drawer
+propComponents:
+  [
+    Drawer,
+    DrawerSection,
+    DrawerContent,
+    DrawerContentBody,
+    DrawerPanelContent,
+    DrawerHead,
+    DrawerActions,
+    DrawerCloseButton,
+    DrawerPanelDescription,
+    DrawerPanelBody,
+    DrawerPanelFocusTrapObject
+  ]
+section: components
+---
+
+## Examples
+
+### Basic
+
+
+import DrawerBasic from "./DrawerBasic.tsx?raw"
+
+<LiveExample src={DrawerBasic} />
+
+### Panel at end
+
+
+import DrawerPanelEnd from "./DrawerPanelEnd.tsx?raw"
+
+<LiveExample src={DrawerPanelEnd} />
+
+### Panel at start
+
+
+import DrawerPanelStart from "./DrawerPanelStart.tsx?raw"
+
+<LiveExample src={DrawerPanelStart} />
+
+### Panel on bottom
+
+
+import DrawerPanelBottom from "./DrawerPanelBottom.tsx?raw"
+
+<LiveExample src={DrawerPanelBottom} />
+
+### Basic inline
+
+
+import DrawerBasicInline from "./DrawerBasicInline.tsx?raw"
+
+<LiveExample src={DrawerBasicInline} />
+
+### Inline panel at end
+
+
+import DrawerInlinePanelEnd from "./DrawerInlinePanelEnd.tsx?raw"
+
+<LiveExample src={DrawerInlinePanelEnd} />
+
+### Inline panel at start
+
+
+import DrawerInlinePanelStart from "./DrawerInlinePanelStart.tsx?raw"
+
+<LiveExample src={DrawerInlinePanelStart} />
+
+### Stacked content body elements
+
+
+import DrawerStackedContentBodyElements from "./DrawerStackedContentBodyElements.tsx?raw"
+
+<LiveExample src={DrawerStackedContentBodyElements} />
+
+### Modified content padding
+
+```ts file="DrawerModifiedContentPadding.tsx"
+
+```
+
+### Modified panel padding
+
+```ts file="DrawerModifiedPanelPadding.tsx"
+
+```
+
+### Additional section above drawer content
+
+```ts file="DrawerAdditionalSectionAboveContent.tsx"
+
+```
+
+### Static drawer
+
+**Note:** For mobile viewports, all drawer variants behave the same way. At the `md` breakpoint, or where `.pf-m-static{-on-[lg, xl, 2xl]}` is applied, the `static drawer` variant’s `close button` is automatically hidden because the drawer panel doesn’t close by design.
+
+```ts file="DrawerStatic.tsx"
+
+```
+
+### Breakpoint
+
+```ts file="DrawerBreakpoint.tsx"
+
+```
+
+### Resizable at end
+
+```ts file="DrawerResizableAtEnd.tsx"
+
+```
+
+### Resizable at start
+
+```ts file="DrawerResizableAtStart.tsx"
+
+```
+
+### Resizable on bottom
+
+```ts file="DrawerResizableOnBottom.tsx"
+
+```
+
+### Resizable on inline
+
+```ts file="DrawerResizableOnInline.tsx"
+
+```
+
+### Panel with secondary background
+
+```ts file="DrawerSecondaryBackground.tsx"
+
+```
+
+### With focus trap
+
+When a [focus trap](/accessibility/product-development-guide#trapping-focus) is enabled on an element, a user will only be able to interact with the contents of that element until the focus trap is closed or deactivated.
+
+To enable and customize a focus trap on a drawer panel, apply the `focusTrap` property to the `<DrawerPanelContent>` component. Enabling a focus trap with `focusTrap.enabled` will also automatically place focus on the first focusable element when the drawer panel expands, and return focus to the previously focused element when it collapses.
+
+To customize which element receives focus when the drawer panel expands, use the `focusTrap.elementToFocusOnExpand` property.
+
+
+import DrawerFocusTrap from "./DrawerFocusTrap.tsx?raw"
+
+<LiveExample src={DrawerFocusTrap} />

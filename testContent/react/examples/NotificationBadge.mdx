@@ -1,0 +1,42 @@
+---
+id: Notification badge
+section: components
+cssPrefix: pf-v6-c-notification-badge
+propComponents: ['NotificationBadge']
+---
+
+
+## Examples
+
+### Basic
+
+The following example demonstrates the three variants of notification badge that are available: "read", "unread", and "attention".
+
+The `isExpanded` property is also passed in to:
+
+- set the `aria-expanded` attribute on the notification badge,
+- apply visual styling on the notification badge, and
+- to indicate that a notification drawer is expanded, for use-cases as seen in our [notification drawer react demos](/components/notification-drawer/react-demos).
+
+
+import NotificationBadgeBasic from "./NotificationBadgeBasic.tsx?raw"
+
+<LiveExample src={NotificationBadgeBasic} />
+
+### With count
+
+You can display a number within the notification badge by passing in the `count` property, to indicate how many read, unread, or attention notifications there are. The `isExpanded` property is also passed in, similar to the [notification badge basic example](/components/notification-badge#basic).
+
+
+import NotificationBadgeWithCount from "./NotificationBadgeWithCount.tsx?raw"
+
+<LiveExample src={NotificationBadgeWithCount} />
+
+### With animation
+
+To animate the icon within the notification badge, use the `shouldNotify` property. In this example, the notification badge icon will only animate if the notification count is greater than 0.
+
+
+import NotificationBadgeWithAnimation from "./NotificationBadgeWithAnimation.tsx?raw"
+
+<LiveExample src={NotificationBadgeWithAnimation} />

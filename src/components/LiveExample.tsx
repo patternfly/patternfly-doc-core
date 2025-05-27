@@ -1,13 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, Fragment, useRef } from 'react'
 import { convertToReactComponent } from '@patternfly/ast-helpers'
+import { ErrorBoundary } from "react-error-boundary"
 import * as reactCoreModule from '@patternfly/react-core'
+import * as reactIconsModule from "@patternfly/react-icons"
 import { ExampleToolbar } from './ExampleToolbar'
 interface LiveExampleProps {
   src: string
 }
 
+function fallbackRender({ error }: any) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.message}</pre>
+    </div>
+  );
+}
+
+
 function getLivePreview(editorCode: string) {
-  const scope = { ...reactCoreModule, ...{ useState } }
+  const scope = { ...reactCoreModule, ...reactIconsModule, ...{ useState, Fragment, useRef } }
   const { code: transformedCode } = convertToReactComponent(editorCode)
 
   const componentNames = Object.keys(scope)
@@ -28,7 +40,7 @@ export const LiveExample = ({ src }: LiveExampleProps) => {
   const livePreview = getLivePreview(code)
 
   return (
-    <>
+    <ErrorBoundary fallbackRender={fallbackRender}>
       {livePreview}
       <ExampleToolbar
         originalCode={src}
@@ -37,6 +49,6 @@ export const LiveExample = ({ src }: LiveExampleProps) => {
         lang="ts"
         isFullscreen={false}
       />
-    </>
+    </ErrorBoundary>
   )
 }

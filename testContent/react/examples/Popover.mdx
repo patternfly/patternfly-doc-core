@@ -1,0 +1,105 @@
+---
+id: Popover
+section: components
+cssPrefix: pf-v6-c-popover
+propComponents: ['Popover']
+---
+
+
+## Examples
+
+By default, the `appendTo` prop of the popover will append to the document body in order to avoid the popover content not being fully visible. Another option is to increase the z-index of the element the popover is appended to to be higher than the z-index of the element that is hiding the popover.
+
+### Basic
+
+
+import PopoverBasic from "./PopoverBasic.tsx?raw"
+
+<LiveExample src={PopoverBasic} />
+
+### Hoverable
+
+
+import PopoverHover from "./PopoverHover.tsx?raw"
+
+<LiveExample src={PopoverHover} />
+
+### Close popover from content (controlled)
+
+
+import PopoverCloseControlled from "./PopoverCloseControlled.tsx?raw"
+
+<LiveExample src={PopoverCloseControlled} />
+
+### Close popover from content (uncontrolled)
+
+Note: If you use the isVisible prop, either refer to the example above or if you want to use the hide callback from the content then be sure to keep isVisible in-sync.
+
+
+import PopoverCloseUncontrolled from "./PopoverCloseUncontrolled.tsx?raw"
+
+<LiveExample src={PopoverCloseUncontrolled} />
+
+### Without header/footer/close and no padding
+
+
+import PopoverWithoutHeaderFooterCloseNoPadding from "./PopoverWithoutHeaderFooterCloseNoPadding.tsx?raw"
+
+<LiveExample src={PopoverWithoutHeaderFooterCloseNoPadding} />
+
+### Width auto
+
+Here the popover goes over the navigation, so the prop `appendTo` is set to the documents body.
+
+
+import PopoverWidthAuto from "./PopoverWidthAuto.tsx?raw"
+
+<LiveExample src={PopoverWidthAuto} />
+
+### Popover react ref
+
+
+import PopoverReactRef from "./PopoverReactRef.tsx?raw"
+
+<LiveExample src={PopoverReactRef} />
+
+### Popover selector ref
+
+
+import PopoverSelectorRef from "./PopoverSelectorRef.tsx?raw"
+
+<LiveExample src={PopoverSelectorRef} />
+
+### Advanced
+
+
+import PopoverAdvanced from "./PopoverAdvanced.tsx?raw"
+
+<LiveExample src={PopoverAdvanced} />
+
+### Popover with icon in the title
+
+Here the popover goes over the navigation, so the prop `appendTo` is set to the documents body.
+
+
+import PopoverWithIconInTheTitle from "./PopoverWithIconInTheTitle.tsx?raw"
+
+<LiveExample src={PopoverWithIconInTheTitle} />
+
+### Alert popover
+
+Here the popover goes over the navigation, so the prop `appendTo` is set to the documents body.
+
+
+import PopoverAlert from "./PopoverAlert.tsx?raw"
+
+<LiveExample src={PopoverAlert} />
+
+### Custom focus
+
+Use the `elementToFocus` property to customize which element inside the Popover receives focus when opened.
+
+
+import PopoverCustomFocus from "./PopoverCustomFocus.tsx?raw"
+
+<LiveExample src={PopoverCustomFocus} />

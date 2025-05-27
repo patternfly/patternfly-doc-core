@@ -1,0 +1,97 @@
+---
+id: Dual list selector
+section: components
+cssPrefix: 'pf-v6-c-dual-list-selector'
+propComponents:
+  [
+    'DualListSelector',
+    'DualListSelectorPane',
+    'DualListSelectorList',
+    'DualListSelectorListItem',
+    'DualListSelectorControlsWrapper',
+    'DualListSelectorControl',
+    'DualListSelectorTree',
+    'DualListSelectorTreeItemData'
+  ]
+---
+
+
+## Examples
+
+The dual list selector is built in a composable manner to make customization easier. The standard sub-component relationships are arranged as follows:
+
+```
+<DualListSelector>
+  <DualListSelectorPane>
+    <DualListSelectorList>
+      <DualListSelectorListItem />
+    </DualListSelectorList>
+  </DualListSelectorPane>
+
+  <DualListSelectorControlsWrapper>
+    <DualListSelectorControl /> /* A standard Dual list selector has 4 controls */
+  </DualListSelectorControlsWrapper>
+
+  <DualListSelectorPane isChosen>
+    <DualListSelectorList>
+      <DualListSelectorListItem />
+    </DualListSelectorList>
+  </DualListSelectorPane>
+</DualListSelector>
+```
+
+### Basic
+
+
+import DualListSelectorBasic from "./DualListSelectorBasic.tsx?raw"
+
+<LiveExample src={DualListSelectorBasic} />
+
+### Basic with tooltips
+
+
+import DualListSelectorBasicTooltips from "./DualListSelectorBasicTooltips.tsx?raw"
+
+<LiveExample src={DualListSelectorBasicTooltips} />
+
+### Basic with search
+
+
+import DualListSelectorBasicSearch from "./DualListSelectorBasicSearch.tsx?raw"
+
+<LiveExample src={DualListSelectorBasicSearch} />
+
+### Using more complex options with actions
+
+
+import DualListSelectorComplexOptionsActions from "./DualListSelectorComplexOptionsActions.tsx?raw"
+
+<LiveExample src={DualListSelectorComplexOptionsActions} />
+
+### With tree
+
+```ts file="DualListSelectorTree.tsx"
+
+```
+
+### Draggable
+
+To enable drag and drop, wrap the `<DualListSelectorList>` component with `<DragDropSort>`, define the `variant` property as "DualListSelectorList", and pass both the sortable items and `onDrop` callback to `<DragDropSort>`. `<DragDropSort>` will create the component's usual children internally based on the items property, so children inside the `<DualListSelectorList>` should not be passed to the wrapped component.
+
+Full drag and drop details can be found on the [drag and drop](/components/drag-and-drop) component page.
+
+```ts file="../../../../../react-drag-drop/src/components/DragDrop/examples/DualListSelectorDraggable.tsx"
+
+```
+
+### Draggable with multiple drop zones
+
+To enable multiple drop zones, wrap the `<DualListSelector>` component with `<DragDropContainer>`, and create the desired amount of `<Droppable>` components within `<DragDropContainer>`. `<Droppable>` components should be located where `<DualListSelectorList>` usually would go for each pane to be made draggable.
+
+Each `<Droppable>` should define the `wrapper` property as the component that acts as the drop zone, `<DualListSelectorList>`, and the `items` property of their respective draggable items as an array of `<DraggableObject>` data. `<DragDropContainer>` should be passed the `onDrop`, `onContainerMove`, and `onCancel` callbacks to handle items being dropped, items moving between droppable containers, and what happens if the drag is cancelled respectively. `<DragDropContainer>` should also be given a `Record` representing all sortable drop zones' items. Both components should define the `variant` property as "DualListSelectorList".
+
+Full drag and drop details can be found on the [drag and drop](/components/drag-and-drop) component page.
+
+```ts file="../../../../../react-drag-drop/src/components/DragDrop/examples/DragDropContainerDualListSelector.tsx"
+
+```
