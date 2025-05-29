@@ -1,0 +1,29 @@
+---
+id: Brand
+section: components
+cssPrefix: null
+propComponents: ['Brand']
+---
+
+
+## Examples
+
+The brand component does not have any built-in theme support. If a brand should be dynamically styled, you must manually set up the necessary logic on your own.
+
+These examples adjust styling when the PatternFly website is toggled between the light and dark theme.
+
+### Basic
+
+
+import BrandBasic from "./BrandBasic.tsx?raw"
+
+<LiveExample src={BrandBasic} />
+
+### Responsive
+
+Passing `<source>` elements as children to `Brand` will change the component from an `<img>` to a `<picture>` element. The `src` and `alt` properties should still be passed to populate the fallback `img` of the brand.
+
+
+import BrandResponsive from "./BrandResponsive.tsx?raw"
+
+<LiveExample src={BrandResponsive} />

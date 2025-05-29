@@ -1,0 +1,79 @@
+---
+id: Date picker
+section: components
+subsection: date-and-time
+cssPrefix: pf-v6-c-date-picker
+propComponents: ['DatePicker', 'CalendarFormat', 'DatePickerRef', 'DatePickerRequiredObject']
+---
+
+
+## Examples
+
+### Basic
+
+
+import DatePickerBasic from "./DatePickerBasic.tsx?raw"
+
+<LiveExample src={DatePickerBasic} />
+
+### Required
+
+To require users to select a date before continuing, use the `requiredDateOptions.isRequired` property.
+
+A required date picker will be invalid when the text input is empty and either the text input loses focus or the date picker popover is closed.
+
+The error message can be customized via the `requiredDateOptions.emptyDateText` property.
+
+
+import DatePickerRequired from "./DatePickerRequired.tsx?raw"
+
+<LiveExample src={DatePickerRequired} />
+
+### American format
+
+
+import DatePickerAmerican from "./DatePickerAmerican.tsx?raw"
+
+<LiveExample src={DatePickerAmerican} />
+
+### Helper text
+
+
+import DatePickerHelperText from "./DatePickerHelperText.tsx?raw"
+
+<LiveExample src={DatePickerHelperText} />
+
+### Min and max date
+
+
+import DatePickerMinMax from "./DatePickerMinMax.tsx?raw"
+
+<LiveExample src={DatePickerMinMax} />
+
+### French
+
+
+import DatePickerFrench from "./DatePickerFrench.tsx?raw"
+
+<LiveExample src={DatePickerFrench} />
+
+### Controlled
+
+
+import DatePickerControlled from "./DatePickerControlled.tsx?raw"
+
+<LiveExample src={DatePickerControlled} />
+
+### Controlled required
+
+
+import DatePickerControlledRequired from "./DatePickerControlledRequired.tsx?raw"
+
+<LiveExample src={DatePickerControlledRequired} />
+
+### Controlling the date picker calendar state
+
+
+import DatePickerControlledCalendar from "./DatePickerControlledCalendar.tsx?raw"
+
+<LiveExample src={DatePickerControlledCalendar} />

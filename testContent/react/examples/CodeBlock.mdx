@@ -1,0 +1,27 @@
+---
+id: Code block
+section: components
+cssPrefix: pf-v6-c-code-block
+propComponents: ['CodeBlock', 'CodeBlockAction', 'CodeBlockCode']
+---
+
+
+**Important note:** to format code exactly as it is, you should use String.raw\`your code here\`.
+
+Using **String.raw\`\`** will keep all the special characters like `\n` or `\t`.
+
+## Examples
+
+### Basic
+
+
+import CodeBlockBasic from "./CodeBlockBasic.tsx?raw"
+
+<LiveExample src={CodeBlockBasic} />
+
+### Expandable
+
+
+import CodeBlockExpandable from "./CodeBlockExpandable.tsx?raw"
+
+<LiveExample src={CodeBlockExpandable} />
