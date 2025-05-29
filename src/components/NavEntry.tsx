@@ -31,6 +31,7 @@ export const NavEntry = ({ entry, isActive }: NavEntryProps) => {
       to={`/${section}/${_id}`}
       isActive={isActive}
       id={`nav-entry-${_id}`}
+      data-astro-reload
     >
       {entryTitle}
     </NavItem>
