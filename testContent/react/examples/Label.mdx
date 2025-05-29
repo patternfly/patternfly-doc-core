@@ -10,29 +10,33 @@ propComponents: ['Label', 'LabelGroup']
 
 ### Filled labels
 
-```ts file="LabelFilled.tsx"
 
-```
+import LabelFilled from "./LabelFilled.tsx?raw"
+
+<LiveExample src={LabelFilled} />
 
 ### Outlined labels
 
-```ts file="LabelOutline.tsx"
 
-```
+import LabelOutline from "./LabelOutline.tsx?raw"
+
+<LiveExample src={LabelOutline} />
 
 ### Compact labels
 
-```ts file="LabelCompact.tsx"
 
-```
+import LabelCompact from "./LabelCompact.tsx?raw"
+
+<LiveExample src={LabelCompact} />
 
 ### Label with custom render
 
 Labels may be passed a custom renderer to display customized content or for use with router components. When using a custom render, `isClickable` may also be passed to remove the underline text decoration of anchors or router links.
 
-```ts file="LabelCustomRender.tsx"
 
-```
+import LabelCustomRender from "./LabelCustomRender.tsx?raw"
+
+<LiveExample src={LabelCustomRender} />
 
 ### Editable labels
 
@@ -40,61 +44,69 @@ Click or press either enter or space to begin editing a label. After editing, cl
 
 You can also customize any Label's close button aria-label as this example shows with `closeBtnAriaLabel`.
 
-```ts file="LabelEditable.tsx"
 
-```
+import LabelEditable from "./LabelEditable.tsx?raw"
+
+<LiveExample src={LabelEditable} />
 
 ### Basic label group
 
 Use a label group when you have multiple labels to display at once.
 
-```ts file="LabelGroupBasic.tsx"
 
-```
+import LabelGroupBasic from "./LabelGroupBasic.tsx?raw"
+
+<LiveExample src={LabelGroupBasic} />
 
 ### Label group with overflow
 
 An overflow label can be added to the end of a group to save space when the number of labels exceeds some threshold. Click the overflow label to expand and collapse the group.
 
-```ts file="LabelGroupOverflow.tsx"
 
-```
+import LabelGroupOverflow from "./LabelGroupOverflow.tsx?raw"
+
+<LiveExample src={LabelGroupOverflow} />
 
 ### Label group with categories
 
 Use a category name to organize a set of labels
 
-```ts file="LabelGroupCategory.tsx"
 
-```
+import LabelGroupCategory from "./LabelGroupCategory.tsx?raw"
+
+<LiveExample src={LabelGroupCategory} />
 
 ### Label group with removable categories
 
-```ts file="LabelGroupCategoryRemovable.tsx"
 
-```
+import LabelGroupCategoryRemovable from "./LabelGroupCategoryRemovable.tsx?raw"
+
+<LiveExample src={LabelGroupCategoryRemovable} />
 
 ### Vertical label group
 
 Labels in a group can also be stacked vertically. This example shows a verical label group with a category name and overflow.
 
-```ts file="LabelGroupVerticalCategoryOverflowRemovable.tsx"
 
-```
+import LabelGroupVerticalCategoryOverflowRemovable from "./LabelGroupVerticalCategoryOverflowRemovable.tsx?raw"
+
+<LiveExample src={LabelGroupVerticalCategoryOverflowRemovable} />
 
 ### Editable label group
 
-```ts file="LabelGroupEditableLabels.tsx"
 
-```
+import LabelGroupEditableLabels from "./LabelGroupEditableLabels.tsx?raw"
+
+<LiveExample src={LabelGroupEditableLabels} />
 
 ### Editable label group with add button
 
 The contents of a label group can be modified by removing labels or adding new ones using the add button. For additional documentation that showcases adding a new label, see [label demos](/components/label/react-demos).
 
-```ts file="LabelGroupEditableAdd.tsx"
 
-```
+import LabelGroupEditableAdd from "./LabelGroupEditableAdd.tsx?raw"
+
+<LiveExample src={LabelGroupEditableAdd} />
 
 ## Using router links
 

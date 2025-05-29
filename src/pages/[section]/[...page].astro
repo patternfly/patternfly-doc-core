@@ -9,6 +9,26 @@ import PropsTables from '../../components/PropsTables.astro'
 import CSSTable from '../../components/CSSTable.astro'
 import SectionGallery from '../../components/section-gallery/SectionGallery.astro'
 import LiveExample from '../../components/LiveExample.astro'
+import {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  a,
+  small,
+  blockquote,
+  pre,
+  hr,
+  ul,
+  ol,
+  dl,
+  li,
+  dt,
+  dd,
+} from '../../components/Content'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -32,8 +52,9 @@ const { entry, propComponents, cssPrefix } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 
-if(section === 'components' && componentTabs[id]) { // if section is components & tab exists, rewrite to first tab content
-  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`);
+if (section === 'components' && componentTabs[id]) {
+  // if section is components & tab exists, rewrite to first tab content
+  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`)
 }
 ---
 
@@ -45,18 +66,38 @@ if(section === 'components' && componentTabs[id]) { // if section is components 
       </Title>
     )
   }
-    <PageSection id="main-content" isFilled>
-        <Content components={{
-          SectionGallery,
-          LiveExample
-        }}/>
-        <Stack hasGutter>
-          <StackItem>
-            <PropsTables propComponents={propComponents} server:defer />
-          </StackItem>
-          <StackItem>
-            <CSSTable cssPrefix={cssPrefix} server:defer />
-          </StackItem>
-        </Stack>
+  <PageSection id="main-content" isFilled>
+    <Content
+      components={{
+        SectionGallery,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        a,
+        small,
+        blockquote,
+        pre,
+        hr,
+        ul,
+        ol,
+        dl,
+        li,
+        dt,
+        dd,
+        LiveExample,
+      }}
+    />
+    <Stack hasGutter>
+      <StackItem>
+        <PropsTables propComponents={propComponents} server:defer />
+      </StackItem>
+      <StackItem>
+        <CSSTable cssPrefix={cssPrefix} server:defer />
+      </StackItem>
+    </Stack>
   </PageSection>
 </MainLayout>

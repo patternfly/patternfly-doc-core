@@ -170,9 +170,10 @@ The following example shows a split button with a `<MenuToggleCheckbox>`.
 
 Variant styling can be applied to split button toggles to adjust their appearance for different scenarios. Both "primary" and "secondary" variants can be used with split button toggles.
 
-```ts file='MenuToggleSplitButtonCheckbox.tsx'
 
-```
+import MenuToggleSplitButtonCheckbox from "./MenuToggleSplitButtonCheckbox.tsx?raw"
+
+<LiveExample src={MenuToggleSplitButtonCheckbox} />
 
 ### Split toggle with labeled checkbox
 
@@ -180,17 +181,19 @@ You can allow users to select a toggle checkbox by clicking either the checkbox 
 
 To link a split toggle label to the toggle's checkbox, pass both the label and the `<MenuToggleCheckbox>` component to `splitButtonItems`. 
 
-```ts file='MenuToggleSplitButtonCheckboxWithText.tsx'
 
-```
+import MenuToggleSplitButtonCheckboxWithText from "./MenuToggleSplitButtonCheckboxWithText.tsx?raw"
+
+<LiveExample src={MenuToggleSplitButtonCheckboxWithText} />
 
 ### Split toggle with checkbox and toggle text 
 
 To link a split toggle label to the toggle button itself, pass the label to the `<MenuToggle>` component, instead of `splitButtonItems`.
 
-```ts file='MenuToggleSplitButtonCheckboxWithToggleText.tsx'
 
-```
+import MenuToggleSplitButtonCheckboxWithToggleText from "./MenuToggleSplitButtonCheckboxWithToggleText.tsx?raw"
+
+<LiveExample src={MenuToggleSplitButtonCheckboxWithToggleText} />
 
 ### Split toggle with action
 
@@ -198,9 +201,10 @@ To add an action to a split button, add a `<MenuToggleAction>` to the `splitButt
 
 Actions may be used with primary and secondary toggle variants.
 
-```ts file='MenuToggleSplitButtonAction.tsx'
 
-```
+import MenuToggleSplitButtonAction from "./MenuToggleSplitButtonAction.tsx?raw"
+
+<LiveExample src={MenuToggleSplitButtonAction} />
 
 ### Full height toggle
 
@@ -240,9 +244,10 @@ To create a typeahead toggle, pass in `variant="typeahead"` to the `<MenuToggle>
 
 To create a multiple typeahead toggle, pass a `<TextInputGroup>` component implemented like the [text input group's filter example](/components/text-input-group#filters) as a child of `<MenuToggle>`.
 
-```ts file='MenuToggleTypeahead.tsx'
 
-```
+import MenuToggleTypeahead from "./MenuToggleTypeahead.tsx?raw"
+
+<LiveExample src={MenuToggleTypeahead} />
 
 ### Status toggle
 
@@ -250,14 +255,16 @@ To create a toggle with a status, pass in the `status` property to the `MenuTogg
 
 When the status value is "warning" or "danger", you must include helper text that conveys what is causing the warning/error.
 
-```ts file='MenuToggleStatus.tsx'
 
-```
+import MenuToggleStatus from "./MenuToggleStatus.tsx?raw"
+
+<LiveExample src={MenuToggleStatus} />
 
 ### Placeholder text in toggle
 
 To indicate the toggle contains placeholder text, pass the `isPlaceholder` property to the `MenuToggle`.
 
-```ts file='MenuTogglePlaceholder.tsx'
 
-```
+import MenuTogglePlaceholder from "./MenuTogglePlaceholder.tsx?raw"
+
+<LiveExample src={MenuTogglePlaceholder} />

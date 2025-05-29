@@ -55,14 +55,16 @@ To display custom content, such as a relative time or prefacing text, you can pa
 
 When also rendering a default tooltip with the `tooltip` prop, you can pass in the `dateFormat` and/or `timeFormat` props to customize the tooltip content without affecting the custom timestamp content.
 
-```ts file="TimestampCustomContent.tsx"
 
-```
+import TimestampCustomContent from "./TimestampCustomContent.tsx?raw"
+
+<LiveExample src={TimestampCustomContent} />
 
 ### Custom tooltip
 
 By passing in `variant="custom"` and `content` to the `tooltip` prop, you can display custom content within the timestamp's tooltip.
 
-```ts file="TimestampCustomTooltip.tsx"
 
-```
+import TimestampCustomTooltip from "./TimestampCustomTooltip.tsx?raw"
+
+<LiveExample src={TimestampCustomTooltip} />

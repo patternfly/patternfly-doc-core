@@ -355,17 +355,19 @@ By default, `isLiveRegion`alerts are static.
 
 Alerts that are asynchronously appended into dynamic [alert groups](/components/alert/#alert-group-examples) via the `isLiveRegion` property will be announced to assistive technology the moment the change happens, following the strategy used for `aria-atomic`, which defaults to false. This means only changes of type "addition" will be announced.
 
-```ts file="AlertDynamicLiveRegion.tsx"
 
-```
+import AlertDynamicLiveRegion from "./AlertDynamicLiveRegion.tsx?raw"
+
+<LiveExample src={AlertDynamicLiveRegion} />
 
 ### Asynchronous live region alerts
 
 This example shows how an alert could be triggered by an asynchronous event in the application. Note that you can customize how the alert will be announced to assistive technology. See the [alert accessibility](/components/alert/accessibility/) for more information.
 
-```ts file="AlertAsyncLiveRegion.tsx"
 
-```
+import AlertAsyncLiveRegion from "./AlertAsyncLiveRegion.tsx?raw"
+
+<LiveExample src={AlertAsyncLiveRegion} />
 
 ## Alert group examples
 
@@ -413,9 +415,10 @@ When an overflow message appears in an `AlertGroup` using the `isLiveRegion` pro
 
 Users navigating via keyboard or another assistive technology will need a way to navigate to and reveal hidden alerts before they disappear. Alternatively, there should be a place where notifications or alerts are collected to be viewed or read later.
 
-```ts file="AlertGroupToastOverflowCapture.tsx"
 
-```
+import AlertGroupToastOverflowCapture from "./AlertGroupToastOverflowCapture.tsx?raw"
+
+<LiveExample src={AlertGroupToastOverflowCapture} />
 
 ### Asynchronous alert groups
 
@@ -441,9 +444,10 @@ import AlertGroupSingularDynamic from "./AlertGroupSingularDynamic.tsx?raw"
 
 In the following example, there can be a maximum of 4 alerts shown at once.
 
-```ts file="AlertGroupSingularDynamicOverflow.tsx"
 
-```
+import AlertGroupSingularDynamicOverflow from "./AlertGroupSingularDynamicOverflow.tsx?raw"
+
+<LiveExample src={AlertGroupSingularDynamicOverflow} />
 
 ### Multiple dynamic alert groups
 
