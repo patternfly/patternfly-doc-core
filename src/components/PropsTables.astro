@@ -40,7 +40,7 @@ const propsData = await getPropsData(propComponents)
     {propsData
       .filter((comp: any) => !!comp)
       .map((component: any) => (
-        <StackItem>
+        <StackItem key={component.name}>
           <PropsTable
           key={component.name}
           componentName={component.name}
