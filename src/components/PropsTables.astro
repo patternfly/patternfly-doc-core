@@ -42,7 +42,6 @@ const propsData = await getPropsData(propComponents)
       .map((component: any) => (
         <StackItem key={component.name}>
           <PropsTable
-          key={component.name}
           componentName={component.name}
           componentDescription={component.description}
           componentProps={component.props}

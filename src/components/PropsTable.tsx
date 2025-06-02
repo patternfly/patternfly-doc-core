@@ -11,7 +11,7 @@ import {
 import { css } from '@patternfly/react-styles'
 import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility'
 import textStyles from '@patternfly/react-styles/css/utilities/Text/text'
-import {Content} from '@patternfly/react-core';
+import { Content } from '@patternfly/react-core'
 
 export type ComponentProp = {
   name: string
