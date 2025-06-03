@@ -1,10 +1,9 @@
-#!/usr/bin/env ts-node
-
 import { readFile, writeFile } from 'fs/promises'
 import { glob } from 'glob'
 
-async function main() {
-  const files = await glob('./testContent/react/examples/*.md')
+export async function convertToMDX(globPath: string) {
+  const files = await glob(globPath)
+
   files.forEach(async (file) => {
     const fileContent = await readFile(file, 'utf-8')
 
@@ -15,7 +14,8 @@ async function main() {
     const withoutImports = fileContent.replace(importRegex, '')
 
     //regex link: https://regexr.com/8f0bu
-    const ExampleBlockRegex = /```[tj]s file=['"]\.?\/?(\w*)\.(\w*)['"]\s*\n```/g
+    const ExampleBlockRegex =
+      /```[tj]s file=['"]\.?\/?(\w*)\.(\w*)['"]\s*\n```/g
 
     //the first capture group is the example file name without the extension or path, the second is the extension
     const replacementString = `\nimport $1 from "./$1.$2?raw"\n\n<LiveExample src={$1} />`
@@ -30,5 +30,3 @@ async function main() {
     await writeFile(file + 'x', noLiveRemoved)
   })
 }
-
-main()
