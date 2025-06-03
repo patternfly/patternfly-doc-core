@@ -1,3 +1,7 @@
+/* eslint-disable no-empty */
+/* eslint-disable curly */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable prefer-const */
 import * as acorn from 'acorn';
 
 const tt = acorn.tokTypes
@@ -168,34 +172,25 @@ module.exports = Parser => class TSParser extends Parser {
   }
 
   parseParenAndDistinguishExpression(canBeArrow) {
-    const startPos = this.start, startLoc = this.startLoc;
-    let val; 
-    const allowTrailingComma = this.options.ecmaVersion >= 8
+    let startPos = this.start, startLoc = this.startLoc, val, allowTrailingComma = this.options.ecmaVersion >= 8
     if (this.options.ecmaVersion >= 6) {
       this.next()
 
-      const innerStartPos = this.start, innerStartLoc = this.startLoc
-      const exprList = [], first = true, lastIsComma = false
-      const refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
-      let spreadStart
+      let innerStartPos = this.start, innerStartLoc = this.startLoc
+      let exprList = [], first = true, lastIsComma = false
+      let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, spreadStart
       this.yieldPos = 0
       this.awaitPos = 0
       // Do not save awaitIdentPos to allow checking awaits nested in parameters
       while (this.type !== tt.parenR) {
-        if (first) {
-          first = false;
-        } else {
-          this.expect(tt.comma);
-        }
+        first ? first = false : this.expect(tt.comma)
         if (allowTrailingComma && this.afterTrailingComma(tt.parenR, true)) {
           lastIsComma = true
           break
         } else if (this.type === tt.ellipsis) {
           spreadStart = this.start
           exprList.push(this.parseParenItem(this.parseRestBinding()))
-          if (this.type === tt.comma) {
-            this.raise(this.start, "Comma is not permitted after the rest element");
-          }
+          if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")
           break
         } else {
           exprList.push(this.parseMaybeAssign(false, refDestructuringErrors, this.parseParenItem))
@@ -204,8 +199,7 @@ module.exports = Parser => class TSParser extends Parser {
           this.parseTSTypeAnnotation() // Part I added
         }
       }
-      const innerEndPos = this.start;
-      const innerEndLoc = this.startLoc
+      let innerEndPos = this.start, innerEndLoc = this.startLoc
       this.expect(tt.parenR)
 
       if (canBeArrow && !this.canInsertSemicolon()) {
@@ -214,9 +208,7 @@ module.exports = Parser => class TSParser extends Parser {
           if (branch.parseTSTypeAnnotation() && branch.eat(tt.arrow)) {
             this.parseTSTypeAnnotation() // throw away type
           }
-        } catch {
-          //empty
-          }
+        } catch {}
         if (this.eat(tt.arrow)) {
           this.checkPatternErrors(refDestructuringErrors, false)
           this.checkYieldAwaitInDefaultParams()
@@ -226,12 +218,8 @@ module.exports = Parser => class TSParser extends Parser {
         }
       }
 
-      if (!exprList.length || lastIsComma) {
-        this.unexpected(this.lastTokStart)
-      }
-      if (spreadStart) {
-        this.unexpected(spreadStart)
-      }
+      if (!exprList.length || lastIsComma) this.unexpected(this.lastTokStart)
+      if (spreadStart) this.unexpected(spreadStart)
       this.checkExpressionErrors(refDestructuringErrors, true)
       this.yieldPos = oldYieldPos || this.yieldPos
       this.awaitPos = oldAwaitPos || this.awaitPos
@@ -248,7 +236,7 @@ module.exports = Parser => class TSParser extends Parser {
     }
 
     if (this.options.preserveParens) {
-      const par = this.startNodeAt(startPos, startLoc)
+      let par = this.startNodeAt(startPos, startLoc)
       par.expression = val
       return this.finishNode(par, "ParenthesizedExpression")
     } else {
@@ -267,9 +255,7 @@ module.exports = Parser => class TSParser extends Parser {
           // Update parser to match branch
           base.typeParameters = this.parseTSTypeParameterInstantiation()
         }
-      } catch {
-        //empty
-      }
+      } catch {}
     }
 
     return super.parseSubscript.apply(this, arguments)
@@ -318,9 +304,7 @@ module.exports = Parser => class TSParser extends Parser {
       if (element) {
         classBody.body.push(element)
         if (element.type === "MethodDefinition" && element.kind === "constructor") {
-          if (hadConstructor) {
-            this.raise(element.start, "Duplicate constructor in the same class")
-          }
+          if (hadConstructor) this.raise(element.start, "Duplicate constructor in the same class")
           hadConstructor = true
         } else if (element.key.type === "PrivateIdentifier" && isPrivateNameConflicted(privateNameMap, element)) {
           this.raiseRecoverable(element.key.start, `Identifier '#${element.key.name}' has already been declared`)
@@ -335,9 +319,7 @@ module.exports = Parser => class TSParser extends Parser {
   }
 
   parseTSTypeAnnotation(eatColon = true) {
-    if (eatColon) {
-      this.expect(tt.colon);
-    }
+    eatColon && this.expect(tt.colon)
     const node = this.startNodeAt(this.lastTokStart, this.lastTokStartLoc)
     this._parseTSTypeAnnotation(node)
     return this.finishNode(node, 'TSTypeAnnotation')
@@ -494,11 +476,7 @@ module.exports = Parser => class TSParser extends Parser {
     this.eat(tt.bracketL)
     let first = true
     while (!this.eat(tt.bracketR)) {
-      if (first) {
-        first = false;
-      } else {
-        this.expect(tt.comma);
-      }
+      first ? (first = false) : this.expect(tt.comma)
       switch (this.type) {
         case tt.name:
           const elem = this.parseTSTypeReference()
@@ -581,11 +559,9 @@ module.exports = Parser => class TSParser extends Parser {
         }
       case tt.braceL:
       case tt.bracketL:
-        if (this.type === tt.braceL) {
-          this.parseObj(/* isPattern */ true)
-        } else {
-          this.parseBindingAtom()
-        }
+        this.type === tt.braceL
+          ? this.parseObj(/* isPattern */ true)
+          : this.parseBindingAtom()
         switch (this.type) {
           case tt.colon:
           case tt.comma:
@@ -629,9 +605,7 @@ module.exports = Parser => class TSParser extends Parser {
       ? this.startNodeAtNode(first)
       : this.startNode()
     const types = []
-    if (first) {
-      types.push(first)
-    }
+    first && types.push(first)
     while (this.eat(tt.bitwiseOR)) {
       types.push(this._parseTSIntersectionTypeOrPrimaryType())
     }
@@ -647,9 +621,7 @@ module.exports = Parser => class TSParser extends Parser {
       ? this.startNodeAtNode(first)
       : this.startNode()
     const types = []
-    if (first) {
-      types.push(first)
-    }
+    first && types.push(first)
     while (this.eat(tt.bitwiseAND)) {
       types.push(this._parsePrimaryType())
     }
@@ -852,11 +824,7 @@ module.exports = Parser => class TSParser extends Parser {
       let first = true
       this.next()
       while (!this.eat(tt.relational)) {
-        if (first) {
-          (first = false) 
-         } else {
-           this.expect(tt.comma)
-         }
+        first ? (first = false) : this.expect(tt.comma)
         if (this._isEndOfTypeParameters()) {
           break
         }
@@ -873,11 +841,7 @@ module.exports = Parser => class TSParser extends Parser {
     this.next() // <
     let first = true
     while (this.value && !this._isEndOfTypeParameters() || this.type === tt.comma) {
-      if (first) {
-        (first = false)
-      } else {
-        this.expect(tt.comma)
-      }
+      first ? (first = false) : this.expect(tt.comma)
 
       params.push(this._parseTSType())
     }
@@ -977,7 +941,6 @@ module.exports = Parser => class TSParser extends Parser {
     if (this.type === tt.colon) {
       node.typeAnnotation = this.parseTSTypeAnnotation(true)
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.eat(tt.comma) || this.eat(tt.semi)
     return this.finishNode(node, 'TSMethodSignature')
   }
@@ -1000,7 +963,6 @@ module.exports = Parser => class TSParser extends Parser {
     if (this.type === tt.colon) {
       node.typeAnnotation = this.parseTSTypeAnnotation(true)
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.eat(tt.comma) || this.eat(tt.semi)
     return this.finishNode(node, 'TSPropertySignature')
   }
@@ -1017,7 +979,6 @@ module.exports = Parser => class TSParser extends Parser {
     node.index = index
     this.expect(tt.bracketR)
     node.typeAnnotation = this.parseTSTypeAnnotation(true)
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.eat(tt.comma) || this.eat(tt.semi)
     return this.finishNode(node, 'TSIndexSignature')
   }
