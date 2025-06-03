@@ -12,7 +12,7 @@ import {
 } from '@patternfly/react-core'
 import { SectionGalleryItem } from './SectionGallery'
 import { sentenceCase } from 'change-case'
-import { convertToReactComponent } from '@patternfly/ast-helpers'
+import { convertToReactComponent } from '../../ast'
 
 interface SectionGalleryGridLayoutProps {
   /** Section where the gallery is located */

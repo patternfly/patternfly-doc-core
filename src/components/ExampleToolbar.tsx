@@ -7,7 +7,7 @@ import {
   CodeEditorControl,
   Language,
 } from '@patternfly/react-code-editor'
-import { convertToJSX } from '@patternfly/ast-helpers'
+import { convertToJSX } from '../ast'
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon'
 import CodepenIcon from '@patternfly/react-icons/dist/esm/icons/codepen-icon'
 import CopyIcon from '@patternfly/react-icons/dist/esm/icons/copy-icon'
