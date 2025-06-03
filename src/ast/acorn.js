@@ -1,10 +1,15 @@
-import { Parser } from 'acorn';
 import jsx from 'acorn-jsx';
 import staticClassFeatures from 'acorn-static-class-features';
 import classFields from 'acorn-class-fields';
-import * as typescript from './acorn-typescript';
+import {Parser} from './acorn-typescript';
 
-const jsxParser = Parser.extend(typescript, jsx(), classFields, staticClassFeatures);
+class JSXParser extends Parser {
+  constructor() {
+    super(jsx(), classFields, staticClassFeatures);
+  }
+}
+
+const jsxParser = new JSXParser();
 
 export const parse = code => jsxParser.parse(code, {
       ecmaVersion: 2020,

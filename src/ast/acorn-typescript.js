@@ -47,7 +47,7 @@ const tsExprMarkup = {
   '!': 2
 }
 
-module.exports = Parser => class TSParser extends Parser {
+export class Parser extends acorn.Parser {
   constructor(...args) {
     super(...args)
     // Allow 'interface'
@@ -1053,3 +1053,4 @@ module.exports = Parser => class TSParser extends Parser {
     return node
   }
 }
+
