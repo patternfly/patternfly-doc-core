@@ -11,6 +11,7 @@ import {
 import { css } from '@patternfly/react-styles'
 import accessibleStyles from '@patternfly/react-styles/css/utilities/Accessibility/accessibility'
 import textStyles from '@patternfly/react-styles/css/utilities/Text/text'
+import { Content } from '@patternfly/react-core'
 
 export type ComponentProp = {
   name: string
@@ -36,7 +37,6 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
   componentDescription,
   componentProps,
 }) => {
-  const SectionHeading = headingLevel
   const publicProps = componentProps?.filter((prop) => !prop.isHidden)
   const hasPropsToRender = !!publicProps?.length
 
@@ -77,7 +77,7 @@ export const PropsTable: React.FunctionComponent<PropsTableProps> = ({
 
   return (
     <div>
-      <SectionHeading>{componentName}</SectionHeading>
+      <Content component={headingLevel}>{componentName}</Content>
       <Stack hasGutter>
         {componentDescription && (
           <div

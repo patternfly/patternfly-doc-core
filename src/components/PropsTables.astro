@@ -1,5 +1,7 @@
 ---
 import { PropsTable } from './PropsTable'
+import { Stack, StackItem } from '@patternfly/react-core'
+import { AutoLinkHeader } from './AutoLinkHeader'
 
 async function getPropsData(propComponents?: string[]) {
   if (!propComponents || propComponents.length === 0) {
@@ -25,14 +27,26 @@ const propsData = await getPropsData(propComponents)
 ---
 
 {
-  propsData
-    .filter((comp: any) => !!comp)
-    .map((component: any) => (
-      <PropsTable
-        key={component.name}
-        componentName={component.name}
-        componentDescription={component.description}
-        componentProps={component.props}
-      />
-    ))
+  <Stack hasGutter>
+    <StackItem>
+      <AutoLinkHeader
+        headingLevel="h2"
+        className="pf-v6-c-content--h2"
+        id="props-table"
+      >
+        Props
+      </AutoLinkHeader>
+    </StackItem>
+    {propsData
+      .filter((comp: any) => !!comp)
+      .map((component: any) => (
+        <StackItem key={component.name}>
+          <PropsTable
+          componentName={component.name}
+          componentDescription={component.description}
+          componentProps={component.props}
+          />
+        </StackItem>
+    ))}
+  </Stack>
 }
