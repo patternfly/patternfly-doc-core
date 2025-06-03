@@ -1,4 +1,4 @@
-import acorn from 'acorn';
+import * as acorn from 'acorn';
 
 const tt = acorn.tokTypes
 function DestructuringErrors() {

@@ -328,7 +328,7 @@ function convertToJSX(code) {
   return { code, hasTS: false };
 }
 
-module.exports = {
+export {
   convertToReactComponent,
   convertToJSX
 };
