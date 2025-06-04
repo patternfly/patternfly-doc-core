@@ -53,6 +53,7 @@ exports[`matches snapshot 1`] = `
           <a
             aria-current="page"
             class="pf-v6-c-nav__link pf-m-current"
+            data-astro-reload="true"
             href="/section1/entry1"
             id="nav-entry-entry1"
           >
@@ -71,6 +72,7 @@ exports[`matches snapshot 1`] = `
         >
           <a
             class="pf-v6-c-nav__link"
+            data-astro-reload="true"
             href="/Section1/entry2"
             id="nav-entry-entry2"
           >
@@ -89,6 +91,7 @@ exports[`matches snapshot 1`] = `
         >
           <a
             class="pf-v6-c-nav__link"
+            data-astro-reload="true"
             href="/Section1/entry3"
             id="nav-entry-entry3"
           >
