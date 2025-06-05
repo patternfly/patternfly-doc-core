@@ -1,5 +1,5 @@
 import { NavItem } from '@patternfly/react-core'
-import { kebabCase } from 'change-case'
+import { kebabCase } from '../utils/case'
 
 export interface TextContentEntry {
   id: string
@@ -17,20 +17,18 @@ interface NavEntryProps {
 }
 
 export const NavEntry = ({ entry, isActive }: NavEntryProps) => {
-  const { id } = entry
+  const { id: contentLocationId } = entry
   const { id: entryTitle, section } = entry.data
 
-  const _id =
-    section === 'components' || section === 'layouts'
-      ? kebabCase(entryTitle)
-      : id
+  const kebabTitle = kebabCase(entryTitle)
+  const kebabSection = kebabCase(section)
 
   return (
     <NavItem
-      itemId={_id}
-      to={`/${section}/${_id}`}
+      itemId={contentLocationId}
+      to={`/${kebabSection}/${kebabTitle}`}
       isActive={isActive}
-      id={`nav-entry-${_id}`}
+      id={`nav-entry-${contentLocationId}`}
     >
       {entryTitle}
     </NavItem>

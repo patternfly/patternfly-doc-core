@@ -1,7 +1,6 @@
 import { NavExpandable } from '@patternfly/react-core'
-import { sentenceCase } from 'change-case'
+import { sentenceCase, kebabCase } from '../utils/case'
 import { NavEntry, type TextContentEntry } from './NavEntry'
-import { kebabCase } from 'change-case'
 
 interface NavSectionProps {
   entries: TextContentEntry[]
