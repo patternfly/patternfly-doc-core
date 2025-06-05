@@ -11,6 +11,7 @@ import { getConfig } from './getConfig.js'
 import { symLinkConfig } from './symLinkConfig.js'
 import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
+import { convertToMDX } from './convertToMDX.js'
 
 function updateContent(program: Command) {
   const { verbose } = program.opts()
@@ -89,7 +90,7 @@ program.command('init').action(async () => {
 
 program.command('start').action(async () => {
   updateContent(program)
-  
+
   // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to
   // prevent that we're just creating a props file regardless of what they say if one doesn't exist yet
   const hasPropsFile = await hasFile(join(astroRoot, 'dist', 'props.json'))
@@ -131,5 +132,12 @@ program.command('serve').action(async () => {
 program.command('sync').action(async () => {
   sync({ root: astroRoot })
 })
+
+program
+  .command('convert-to-mdx')
+  .argument('<globPath>', 'The glob path to the files to convert')
+  .action(async (globPath: string) => {
+    await convertToMDX(globPath)
+  })
 
 program.parse(process.argv)
