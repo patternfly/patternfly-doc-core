@@ -3,18 +3,42 @@ import { NavEntry, TextContentEntry } from '../NavEntry'
 
 const mockEntry: TextContentEntry = {
   id: 'entry1',
-  data: { id: 'Entry1', section: 'section1' },
+  data: { id: 'Entry 1 Title', section: 'section1' },
 }
 
 describe('NavEntry', () => {
   it('renders without crashing', () => {
     render(<NavEntry entry={mockEntry} isActive={false} />)
-    expect(screen.getByText('Entry1')).toBeInTheDocument()
+    expect(screen.getByText('Entry 1 Title')).toBeInTheDocument()
   })
 
-  it('renders the correct link', () => {
+  it('renders the correct link with kebab-cased title', () => {
     render(<NavEntry entry={mockEntry} isActive={false} />)
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/section1/entry1')
+    expect(screen.getByRole('link')).toHaveAttribute(
+      'href',
+      '/section1/entry-1-title',
+    )
+  })
+
+  it('properly transforms PatternFly text in URLs', () => {
+    const patternflyEntry: TextContentEntry = {
+      id: 'pf1',
+      data: { id: 'PatternFly Components', section: 'PatternFly' },
+    }
+    render(<NavEntry entry={patternflyEntry} isActive={false} />)
+    expect(screen.getByRole('link')).toHaveAttribute(
+      'href',
+      '/patternfly/patternfly-components',
+    )
+  })
+
+  it('preserves PatternFly text in display', () => {
+    const patternflyEntry: TextContentEntry = {
+      id: 'pf1',
+      data: { id: 'PatternFly Components', section: 'PatternFly' },
+    }
+    render(<NavEntry entry={patternflyEntry} isActive={false} />)
+    expect(screen.getByText('PatternFly Components')).toBeInTheDocument()
   })
 
   it('marks the entry as active if isActive is true', () => {
