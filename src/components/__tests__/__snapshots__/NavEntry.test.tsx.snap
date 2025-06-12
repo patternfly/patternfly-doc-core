@@ -10,6 +10,7 @@ exports[`NavEntry matches snapshot 1`] = `
   >
     <a
       class="pf-v6-c-nav__link"
+      data-astro-reload="true"
       href="/section1/entry-1-title"
       id="nav-entry-entry1"
     >
