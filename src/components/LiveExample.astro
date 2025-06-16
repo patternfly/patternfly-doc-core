@@ -1,7 +1,7 @@
 ---
 import { LiveExample as LiveExampleBase } from './LiveExample'
 
-const { src } = Astro.props
+const { src, html } = Astro.props
 ---
 
-<LiveExampleBase src={src} client:only="react" />
+<LiveExampleBase src={src} html={html} client:only="react" />

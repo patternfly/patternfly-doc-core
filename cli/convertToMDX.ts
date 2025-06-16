@@ -1,32 +1,87 @@
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, writeFile, unlink } from 'fs/promises'
 import { glob } from 'glob'
+import path from 'path'
 
-export async function convertToMDX(globPath: string) {
+function handleTsExamples(content: string): string {
+  //regex link: https://regexr.com/8f0bu
+  const ExampleBlockRegex = /```[tj]s file=['"]\.?\/?(\w*)\.(\w*)['"]\s*\n```/g
+
+  //the first capture group is the example file name without the extension or path, the second is the extension
+  const replacementString = `\nimport $1 from "./$1.$2?raw"\n\n<LiveExample src={$1} />`
+  return content.replace(ExampleBlockRegex, replacementString)
+}
+
+async function handleHTMLExamples(
+  content: string,
+  fileDir: string,
+): Promise<string> {
+  const htmlCodeFenceRegex = /```html\n([\s\S]*?)\n```/g
+  const matches = Array.from(content.matchAll(htmlCodeFenceRegex))
+
+  const replacements = await Promise.all(
+    matches.map(async (match, index) => {
+      const htmlContent = match[1]
+      const exampleName = `Example${index + 1}`
+      const htmlFilePath = path.join(fileDir, `${exampleName}.html`)
+
+      await writeFile(htmlFilePath, htmlContent)
+
+      return {
+        original: match[0],
+        replacement: `\nimport ${exampleName} from './${exampleName}.html?raw'\n\n<LiveExample html={${exampleName}} />`,
+      }
+    }),
+  )
+
+  return replacements.reduce(
+    (result, { original, replacement }) =>
+      result.replace(original, replacement),
+    content,
+  )
+}
+
+function removeNoLiveTags(content: string): string {
+  return content.replace(/```no[lL]ive/g, '```')
+}
+
+function removeExistingImports(content: string): string {
+  // Remove imports that don't end in .css
+  const importRegex = /^import {?[\w\s,\n]*}? from ['"](?!.*\.css['"])[^'"]*['"]\n/gm
+  return content.replace(importRegex, '')
+}
+
+function convertCommentsToMDX(content: string): string {
+  return content.replace(
+    /<!--([\s\S]*?)-->/g,
+    (_, comment) => `{/*${comment}*/}`,
+  )
+}
+
+async function processFile(file: string): Promise<void> {
+  const fileContent = await readFile(file, 'utf-8')
+  const fileDir = path.dirname(file)
+
+  const transformations = [
+    removeNoLiveTags,
+    removeExistingImports,
+    (content: string) => handleHTMLExamples(content, fileDir),
+    handleTsExamples,
+    convertCommentsToMDX,
+  ]
+
+  const processedContent = await transformations.reduce(
+    async (contentPromise, transform) => {
+      const content = await contentPromise
+      return transform(content)
+    },
+    Promise.resolve(fileContent),
+  )
+
+  await writeFile(file + 'x', processedContent)
+  await unlink(file)
+}
+
+export async function convertToMDX(globPath: string): Promise<void> {
   const files = await glob(globPath)
-
-  files.forEach(async (file) => {
-    const fileContent = await readFile(file, 'utf-8')
-
-    //regex link: https://regexr.com/8f0er
-    const importRegex = /(?<!```no[lL]ive\n)import {?[\w\s,\n]*}?.*\n/g
-
-    //removes all top level imports from the md file that the old docs framework used to determine what imports are needed
-    const withoutImports = fileContent.replace(importRegex, '')
-
-    //regex link: https://regexr.com/8f0bu
-    const ExampleBlockRegex =
-      /```[tj]s file=['"]\.?\/?(\w*)\.(\w*)['"]\s*\n```/g
-
-    //the first capture group is the example file name without the extension or path, the second is the extension
-    const replacementString = `\nimport $1 from "./$1.$2?raw"\n\n<LiveExample src={$1} />`
-    const examplesConvertedToMDX = withoutImports.replace(
-      ExampleBlockRegex,
-      replacementString,
-    )
-
-    //we want to strip the nolive/noLive tags from codeblocks as that was custom to the old docs framework
-    const noLiveRemoved = examplesConvertedToMDX.replace(/```no[lL]ive/g, '```')
-
-    await writeFile(file + 'x', noLiveRemoved)
-  })
+  await Promise.all(files.map(processFile))
 }

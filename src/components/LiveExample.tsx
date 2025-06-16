@@ -1,13 +1,23 @@
-import React, { useState, Fragment, useRef, useEffect, createRef, useReducer } from 'react'
+import React, {
+  useState,
+  Fragment,
+  useRef,
+  useEffect,
+  createRef,
+  useReducer,
+} from 'react'
 import { convertToReactComponent } from '@patternfly/ast-helpers'
 import { ErrorBoundary } from 'react-error-boundary'
 import * as reactCoreModule from '@patternfly/react-core'
 import * as reactIconsModule from '@patternfly/react-icons'
-import styles from "@patternfly/react-styles/css/components/_index"
-import * as reactTokensModule from "@patternfly/react-tokens"
+import styles from '@patternfly/react-styles/css/components/_index'
+import * as reactTokensModule from '@patternfly/react-tokens'
 import { ExampleToolbar } from './ExampleToolbar'
+
 interface LiveExampleProps {
-  src: string
+  src?: string
+  html?: string
+  isFullscreenPreview?: boolean
 }
 
 function fallbackRender({ error }: any) {
@@ -42,18 +52,37 @@ function getLivePreview(editorCode: string) {
   return <PreviewComponent />
 }
 
-export const LiveExample = ({ src }: LiveExampleProps) => {
-  const [code, setCode] = useState(src)
-  const livePreview = getLivePreview(code)
+export const LiveExample = ({
+  src,
+  html,
+  isFullscreenPreview,
+}: LiveExampleProps) => {
+  const inputCode = src || html || ''
+  const [code, setCode] = useState(inputCode)
+
+  let livePreview = null
+  let lang = 'ts'
+  if (html) {
+    livePreview = (
+      <div
+        className={`ws-preview-html ${isFullscreenPreview && 'pf-v6-u-h-100'}`}
+        dangerouslySetInnerHTML={{ __html: code }}
+      />
+    )
+    lang = 'html'
+  } else {
+    livePreview = getLivePreview(code)
+    lang = 'ts'
+  }
 
   return (
     <ErrorBoundary fallbackRender={fallbackRender}>
       {livePreview}
       <ExampleToolbar
-        originalCode={src}
+        originalCode={inputCode}
         code={code}
         setCode={setCode}
-        lang="ts"
+        lang={lang}
         isFullscreen={false}
       />
     </ErrorBoundary>
