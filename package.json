@@ -13,13 +13,15 @@
     "build:cli": "tsc --build ./cli/tsconfig.json",
     "build:cli:watch": "tsc --build --watch ./cli/tsconfig.json",
     "build:props": "npm run build:cli && node ./dist/cli/cli.js generate-props",
-    "preview": "astro preview",
-    "astro": "astro",
+    "preview": "astro build && wrangler pages dev",
+		"astro": "astro",
+		"deploy": "astro build && wrangler pages deploy",
     "prettier": "prettier --write ./src",
     "lint": "eslint . --cache --cache-strategy content",
     "test": "jest",
     "test:watch": "jest --watch",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "cf-typegen": "wrangler types"
   },
   "main": "dist/cli/cli.js",
   "bin": "./dist/cli/cli.js",
