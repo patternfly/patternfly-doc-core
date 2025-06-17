@@ -15,7 +15,7 @@
     "build:props": "npm run build:cli && node ./dist/cli/cli.js generate-props",
     "preview": "astro build && wrangler pages dev",
 		"astro": "astro",
-		"deploy": "astro build && wrangler pages deploy",
+		"deploy": "npm run build && wrangler pages deploy",
     "prettier": "prettier --write ./src",
     "lint": "eslint . --cache --cache-strategy content",
     "test": "jest",

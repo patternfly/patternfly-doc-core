@@ -7,7 +7,7 @@ import { createCollectionContent } from './createCollectionContent.js'
 import { setFsRootDir } from './setFsRootDir.js'
 import { createConfigFile } from './createConfigFile.js'
 import { updatePackageFile } from './updatePackageFile.js'
-import { getConfig } from './getConfig.js'
+import { DocsConfig, getConfig } from './getConfig.js'
 import { symLinkConfig } from './symLinkConfig.js'
 import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
@@ -44,6 +44,60 @@ async function generateProps(program: Command, forceProps: boolean = false) {
     `${currentDir}/pf-docs.config.mjs`,
     verbose,
   )
+}
+async function buildProject(): Promise<DocsConfig | undefined> {
+  updateContent(program)
+  await generateProps(program, true)
+  const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
+  if (!config) {
+    console.error(
+      'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
+    )
+    return config;
+  }
+
+  if (!config.outputDir) {
+    console.error(
+      "No outputDir found in config file, an output directory must be defined in your config file e.g. 'dist'",
+    )
+    return config;
+  }
+
+  build({ root: astroRoot, outDir: join(currentDir, config.outputDir) })
+  
+  return config;
+}
+
+async function deploy() {
+  const { verbose } = program.opts()
+  
+  if (verbose) {
+    console.log('Starting Cloudflare deployment...')
+  }
+
+  try {
+    // First build the project
+    const config = await buildProject();
+    if (config) {
+      if (verbose) {
+        console.log('Build complete, deploying to Cloudflare...')
+      }
+
+      // Deploy using Wrangler
+      const { execSync } = await import('child_process')
+      const outputPath = join(currentDir, config.outputDir)
+      
+      execSync(`npx wrangler pages deploy ${outputPath}`, {
+        stdio: 'inherit',
+        cwd: currentDir
+      })
+      
+      console.log('Successfully deployed to Cloudflare Pages!')
+    }
+  } catch (error) {
+    console.error('Deployment failed:', error)
+    process.exit(1)
+  }
 }
 
 let astroRoot = ''
@@ -99,24 +153,7 @@ program.command('start').action(async () => {
 })
 
 program.command('build').action(async () => {
-  updateContent(program)
-  await generateProps(program, true)
-  const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
-  if (!config) {
-    console.error(
-      'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
-    )
-    return
-  }
-
-  if (!config.outputDir) {
-    console.error(
-      "No outputDir found in config file, an output directory must be defined in your config file e.g. 'dist'",
-    )
-    return
-  }
-
-  build({ root: astroRoot, outDir: join(currentDir, config.outputDir) })
+  await buildProject();
 })
 
 program.command('generate-props').action(async () => {
@@ -139,5 +176,9 @@ program
   .action(async (globPath: string) => {
     await convertToMDX(globPath)
   })
+
+program.command('deploy').action(async () => {
+  await deploy() 
+})
 
 program.parse(process.argv)
