@@ -68,6 +68,7 @@ exports[`matches snapshot 1`] = `
                 <a
                   aria-current="page"
                   class="pf-v6-c-nav__link pf-m-current"
+                  data-astro-reload="true"
                   href="/section-one/entry1"
                   id="nav-entry-entry1"
                 >
@@ -86,6 +87,7 @@ exports[`matches snapshot 1`] = `
               >
                 <a
                   class="pf-v6-c-nav__link"
+                  data-astro-reload="true"
                   href="/section-one/entry2"
                   id="nav-entry-entry2"
                 >
@@ -104,6 +106,7 @@ exports[`matches snapshot 1`] = `
               >
                 <a
                   class="pf-v6-c-nav__link"
+                  data-astro-reload="true"
                   href="/section-one/entry3"
                   id="nav-entry-entry3"
                 >
@@ -122,6 +125,7 @@ exports[`matches snapshot 1`] = `
               >
                 <a
                   class="pf-v6-c-nav__link"
+                  data-astro-reload="true"
                   href="/section-one/entry4"
                   id="nav-entry-entry4"
                 >
@@ -140,6 +144,7 @@ exports[`matches snapshot 1`] = `
               >
                 <a
                   class="pf-v6-c-nav__link"
+                  data-astro-reload="true"
                   href="/section-one/entry5"
                   id="nav-entry-entry5"
                 >
@@ -204,6 +209,7 @@ exports[`matches snapshot 1`] = `
               >
                 <a
                   class="pf-v6-c-nav__link"
+                  data-astro-reload="true"
                   href="/section-two/entry6"
                   id="nav-entry-entry6"
                 >
@@ -222,6 +228,7 @@ exports[`matches snapshot 1`] = `
               >
                 <a
                   class="pf-v6-c-nav__link"
+                  data-astro-reload="true"
                   href="/section-two/entry7"
                   id="nav-entry-entry7"
                 >
@@ -240,6 +247,7 @@ exports[`matches snapshot 1`] = `
               >
                 <a
                   class="pf-v6-c-nav__link"
+                  data-astro-reload="true"
                   href="/section-two/entry8"
                   id="nav-entry-entry8"
                 >

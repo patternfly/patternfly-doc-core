@@ -5,23 +5,23 @@ import SunIcon from '@patternfly/react-icons/dist/esm/icons/sun-icon'
 import { getThemePreference, updateThemePreference } from '../../utils/theme'
 
 export const ToggleThemeSwitcher: React.FunctionComponent = () => {
-  const [isDarkTheme, setIsDarkTheme] = React.useState(false);
+  const [isDarkTheme, setIsDarkTheme] = React.useState(false)
+  const [isMounted, setIsMounted] = React.useState(false)
 
   React.useEffect(() => {
-    // const darkTheme = window?.localStorage?.getItem('darkMode') === 'true' ? true : false;
-    // const html = document.querySelector('html') as HTMLHtmlElement
-    // html.classList.toggle('pf-v6-theme-dark', darkTheme)
-    const darkTheme = getThemePreference() === 'dark';
-    setIsDarkTheme(darkTheme);
-  }, []);
+    setIsMounted(true)
+    const darkTheme = getThemePreference() === 'dark'
+    setIsDarkTheme(darkTheme)
+  }, [])
 
   const toggleDarkTheme = (_evt: unknown, selected: boolean) => {
     const darkThemeToggleClicked = !selected === isDarkTheme
-    updateThemePreference(darkThemeToggleClicked ? 'dark' : 'light');  
-    // const html = document.querySelector('html') as HTMLHtmlElement
-    // html.classList.toggle('pf-v6-theme-dark', darkThemeToggleClicked)
-    setIsDarkTheme(darkThemeToggleClicked); 
-    //localStorage.setItem('darkMode', JSON.stringify(darkThemeToggleClicked));
+    updateThemePreference(darkThemeToggleClicked ? 'dark' : 'light')
+    setIsDarkTheme(darkThemeToggleClicked)
+  }
+
+  if (!isMounted) {
+    return null
   }
 
   return (
