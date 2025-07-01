@@ -1,0 +1,28 @@
+---
+import { Stack, StackItem } from '@patternfly/react-core'
+import PropsTables from './PropsTables.astro'
+import CSSTable from './CSSTable.astro'
+
+const { propComponents, cssPrefix } = Astro.props
+
+const hasTables = !!propComponents || !!cssPrefix
+---
+
+<>
+  {
+    hasTables && (
+      <Stack hasGutter>
+        {propComponents && (
+          <StackItem>
+            <PropsTables propComponents={propComponents} server:defer />
+          </StackItem>
+        )}
+        {cssPrefix && (
+          <StackItem>
+            <CSSTable cssPrefix={cssPrefix} server:defer />
+          </StackItem>
+        )}
+      </Stack>
+    )
+  }
+</>
