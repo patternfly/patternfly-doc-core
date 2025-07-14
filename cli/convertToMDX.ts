@@ -58,6 +58,10 @@ function convertCommentsToMDX(content: string): string {
 }
 
 async function processFile(file: string): Promise<void> {
+  if (file.endsWith('.mdx')) {
+    return
+  }
+
   const fileContent = await readFile(file, 'utf-8')
   const fileDir = path.dirname(file)
 
