@@ -3,6 +3,7 @@ import { glob } from 'astro/loaders'
 
 import { content } from './content'
 import type { CollectionDefinition } from '../cli/getConfig'
+import { convertToMDX } from '../cli/convertToMDX'
 
 function defineContent(contentObj: CollectionDefinition) {
   const { base, packageName, pattern, name } = contentObj
@@ -20,8 +21,11 @@ function defineContent(contentObj: CollectionDefinition) {
     'core-component-docs': 'html',
   }
 
+  convertToMDX(pattern)
+  const mdxPattern = pattern.replace(/\.md$/, '.mdx')
+
   return defineCollection({
-    loader: glob({ base: dir, pattern }),
+    loader: glob({ base: dir, pattern: mdxPattern }),
     schema: z.object({
       id: z.string(),
       section: z.string(),
