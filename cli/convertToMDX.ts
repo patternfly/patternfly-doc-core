@@ -46,7 +46,7 @@ function removeNoLiveTags(content: string): string {
 
 function removeExistingImports(content: string): string {
   // Remove imports that don't end in .css
-  const importRegex = /^import {?[\w\s,\n]*}? from ['"](?!.*\.css['"])[^'"]*['"]\n/gm
+  const importRegex = /^import {?[\w\s,\n]*}? from ['"](?!.*\.css['"])[^'"]*['"];?\n/gm
   return content.replace(importRegex, '')
 }
 
