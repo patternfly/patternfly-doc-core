@@ -3,7 +3,6 @@ import { glob } from 'astro/loaders'
 
 import { content } from './content'
 import type { CollectionDefinition } from '../cli/getConfig'
-import { convertToMDX } from '../cli/convertToMDX'
 
 function defineContent(contentObj: CollectionDefinition) {
   const { base, packageName, pattern, name } = contentObj
@@ -16,12 +15,11 @@ function defineContent(contentObj: CollectionDefinition) {
   }
 
   // TODO: Expand for other packages that remain under the react umbrella (Table, CodeEditor, etc)
-  const tabMap: any = {
+  const tabMap: Record<string, string> = {
     'react-component-docs': 'react',
     'core-component-docs': 'html',
   }
 
-  convertToMDX(pattern)
   const mdxPattern = pattern.replace(/\.md$/, '.mdx')
 
   return defineCollection({
@@ -36,7 +34,7 @@ function defineContent(contentObj: CollectionDefinition) {
       sortValue: z.number().optional(), // used for sorting nav entries,
       cssPrefix: z
         .union([
-          z.string().transform((val) => [val]),
+          z.string().transform((val: string) => [val]),
           z.array(z.string()),
           z.null().transform(() => undefined),
         ])

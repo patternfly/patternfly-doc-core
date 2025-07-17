@@ -13,14 +13,14 @@ import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
 
-function updateContent(program: Command) {
+async function updateContent(program: Command) {
   const { verbose } = program.opts()
 
   if (verbose) {
     console.log('Verbose mode enabled')
   }
 
-  createCollectionContent(
+  await createCollectionContent(
     astroRoot,
     `${process.cwd()}/pf-docs.config.mjs`,
     verbose,
@@ -45,39 +45,58 @@ async function generateProps(program: Command, forceProps: boolean = false) {
     verbose,
   )
 }
+
+async function transformMDContentToMDX() {
+  const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
+  if (!config) {
+    console.error(
+      'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
+    )
+    return config
+  }
+
+  if (config.content) {
+    await Promise.all(
+      config.content.map((contentObj) => convertToMDX(contentObj.pattern)),
+    )
+  }
+}
+
 async function buildProject(): Promise<DocsConfig | undefined> {
-  updateContent(program)
+  await updateContent(program)
   await generateProps(program, true)
   const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
   if (!config) {
     console.error(
       'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
     )
-    return config;
+    return config
   }
 
   if (!config.outputDir) {
     console.error(
       "No outputDir found in config file, an output directory must be defined in your config file e.g. 'dist'",
     )
-    return config;
+    return config
   }
 
+  await transformMDContentToMDX()
+
   build({ root: astroRoot, outDir: join(currentDir, config.outputDir) })
-  
-  return config;
+
+  return config
 }
 
 async function deploy() {
   const { verbose } = program.opts()
-  
+
   if (verbose) {
     console.log('Starting Cloudflare deployment...')
   }
 
   try {
     // First build the project
-    const config = await buildProject();
+    const config = await buildProject()
     if (config) {
       if (verbose) {
         console.log('Build complete, deploying to Cloudflare...')
@@ -86,12 +105,12 @@ async function deploy() {
       // Deploy using Wrangler
       const { execSync } = await import('child_process')
       const outputPath = join(currentDir, config.outputDir)
-      
+
       execSync(`npx wrangler pages deploy ${outputPath}`, {
         stdio: 'inherit',
-        cwd: currentDir
+        cwd: currentDir,
       })
-      
+
       console.log('Successfully deployed to Cloudflare Pages!')
     }
   } catch (error) {
@@ -143,7 +162,7 @@ program.command('init').action(async () => {
 })
 
 program.command('start').action(async () => {
-  updateContent(program)
+  await updateContent(program)
 
   // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to
   // prevent that we're just creating a props file regardless of what they say if one doesn't exist yet
@@ -153,7 +172,7 @@ program.command('start').action(async () => {
 })
 
 program.command('build').action(async () => {
-  await buildProject();
+  await buildProject()
 })
 
 program.command('generate-props').action(async () => {
@@ -162,7 +181,7 @@ program.command('generate-props').action(async () => {
 })
 
 program.command('serve').action(async () => {
-  updateContent(program)
+  await updateContent(program)
   preview({ root: astroRoot })
 })
 
@@ -178,7 +197,7 @@ program
   })
 
 program.command('deploy').action(async () => {
-  await deploy() 
+  await deploy()
 })
 
 program.parse(process.argv)

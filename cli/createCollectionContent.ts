@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { writeFile } from 'fs/promises'
+import  { join } from 'path'
 import { getConfig } from './getConfig.js'
 
 export async function createCollectionContent(rootDir: string, configFile: string, verbose: boolean) {
@@ -14,7 +15,7 @@ export async function createCollectionContent(rootDir: string, configFile: strin
     return
   }
 
-  const contentFile = rootDir + 'src/content.ts'
+  const contentFile = join(rootDir, 'src', 'content.ts')
 
   try {
     await writeFile(

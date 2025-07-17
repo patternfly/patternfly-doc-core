@@ -10,6 +10,7 @@ import { convertToReactComponent } from '@patternfly/ast-helpers'
 import { ErrorBoundary } from 'react-error-boundary'
 import * as reactCoreModule from '@patternfly/react-core'
 import * as reactIconsModule from '@patternfly/react-icons'
+import * as reactDragDropModule from '@patternfly/react-drag-drop'
 import styles from '@patternfly/react-styles/css/components/_index'
 import * as reactTokensModule from '@patternfly/react-tokens'
 import { ExampleToolbar } from './ExampleToolbar'
@@ -33,6 +34,7 @@ function getLivePreview(editorCode: string) {
   const scope = {
     ...reactCoreModule,
     ...reactIconsModule,
+    ...reactDragDropModule,
     styles,
     ...reactTokensModule,
     ...{ useState, Fragment, useRef, useEffect, createRef, useReducer },

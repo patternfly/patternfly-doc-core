@@ -7,9 +7,12 @@
     "access": "public"
   },
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
+    "dev": "npm run start:cli",
+    "start": "npm run dev",
+    "start:cli": "npm run build:cli && node ./dist/cli/cli.js start",
+    "start:astro": "astro dev",
+    "build": "npm run build:cli && node ./dist/cli/cli.js build",
+    "build:astro": "astro check && astro build",
     "build:cli": "tsc --build ./cli/tsconfig.json",
     "build:cli:watch": "tsc --build --watch ./cli/tsconfig.json",
     "build:props": "npm run build:cli && node ./dist/cli/cli.js generate-props",
@@ -52,6 +55,7 @@
     "@patternfly/patternfly": "^6.0.0",
     "@patternfly/react-code-editor": "^6.2.2",
     "@patternfly/react-core": "^6.0.0",
+    "@patternfly/react-drag-drop": "^6.0.0",
     "@patternfly/react-icons": "^6.0.0",
     "@patternfly/react-styles": "^6.0.0",
     "@patternfly/react-table": "^6.0.0",
