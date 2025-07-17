@@ -48,7 +48,7 @@
     "@astrojs/node": "^9.2.2",
     "@astrojs/react": "^4.3.0",
     "@nanostores/react": "^0.8.0",
-    "@patternfly/ast-helpers": "1.4.0-alpha.190",
+    "@patternfly/ast-helpers": "1.26.2",
     "@patternfly/patternfly": "^6.0.0",
     "@patternfly/react-code-editor": "^6.2.2",
     "@patternfly/react-core": "^6.0.0",
