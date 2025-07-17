@@ -14,7 +14,7 @@ export async function createCollectionContent(rootDir: string, configFile: strin
     return
   }
 
-  const contentFile = rootDir + 'src/content.ts'
+  const contentFile = rootDir + '/src/content.ts'
 
   try {
     await writeFile(
