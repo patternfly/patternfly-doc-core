@@ -13,7 +13,7 @@ const hasTables = !!propComponents || !!cssPrefix
     hasTables && (
       <Stack hasGutter>
         {propComponents && (
-          <StackItem>
+          <StackItem className="pf-v6-u-mt-md">
             <PropsTables propComponents={propComponents} server:defer />
           </StackItem>
         )}
