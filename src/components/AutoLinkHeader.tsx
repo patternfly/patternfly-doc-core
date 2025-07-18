@@ -1,4 +1,4 @@
-import { Flex, FlexItem, Content, Button } from '@patternfly/react-core'
+import { Flex, FlexItem, Content } from '@patternfly/react-core'
 import LinkIcon from '@patternfly/react-icons/dist/esm/icons/link-icon'
 import { slugger } from '../utils/slugger'
 import { css } from '@patternfly/react-styles'
@@ -33,20 +33,12 @@ export const AutoLinkHeader = ({
           tabIndex={-1}
           isEditorial
         >
-          <Button
-            href={`#${slug}`}
-            component="a"
-            className="ws-heading-anchor"
-            tabIndex={-1}
-            aria-hidden
-            variant="plain"
-            isInline
-          >
+          <a href={`#${slug}`} className="ws-heading-anchor" tabIndex={-1}>
             <LinkIcon
               className="ws-heading-anchor-icon"
               style={{ verticalAlign: 'middle' }}
             />
-          </Button>
+          </a>
           {children}
         </Content>
       </FlexItem>
