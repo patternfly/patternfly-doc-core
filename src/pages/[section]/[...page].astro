@@ -90,10 +90,6 @@ if (section === 'components' && componentTabs[id]) {
         LiveExample,
       }}
     />
-    <DocsTables
-      propComponents={propComponents}
-      cssPrefix={cssPrefix}
-      server:defer
-    />
+    <DocsTables propComponents={propComponents} cssPrefix={cssPrefix} />
   </PageSection>
 </MainLayout>

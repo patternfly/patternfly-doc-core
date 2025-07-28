@@ -1,4 +1,4 @@
-import { readFile, writeFile, unlink } from 'fs/promises'
+import { readFile, writeFile, unlink, access } from 'fs/promises'
 import { glob } from 'glob'
 import path from 'path'
 
@@ -46,7 +46,7 @@ function removeNoLiveTags(content: string): string {
 
 function removeExistingImports(content: string): string {
   // Remove imports that don't end in .css
-  const importRegex = /^import {?[\w\s,\n]*}? from ['"](?!.*\.css['"])[^'"]*['"]\n/gm
+  const importRegex = /^import {?[\w\s,\n]*}? from ['"](?!.*\.css['"])[^'"]*['"];?\n/gm
   return content.replace(importRegex, '')
 }
 
@@ -57,8 +57,15 @@ function convertCommentsToMDX(content: string): string {
   )
 }
 
+async function fileExists(file: string): Promise<boolean> {
+  return access(file).then(() => true).catch(() => false)
+}
+
 async function processFile(file: string): Promise<void> {
-  if (file.endsWith('.mdx')) {
+  const exists = await fileExists(file)
+
+  // if the file is already an mdx file or doesn't exist we don't need to do anything
+  if (file.endsWith('.mdx') || !exists) {
     return
   }
 
