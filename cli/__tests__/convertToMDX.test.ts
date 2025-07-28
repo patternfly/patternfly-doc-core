@@ -6,6 +6,7 @@ jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
   writeFile: jest.fn(),
   unlink: jest.fn(),
+  access: jest.fn().mockResolvedValue(undefined), // Mock access to always resolve (file exists)
 }))
 
 jest.mock('glob', () => ({
