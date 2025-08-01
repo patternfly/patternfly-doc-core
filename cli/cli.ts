@@ -38,12 +38,7 @@ async function generateProps(program: Command, forceProps: boolean = false) {
     console.log('Verbose mode enabled')
   }
 
-  buildPropsData(
-    currentDir,
-    astroRoot,
-    `${currentDir}/pf-docs.config.mjs`,
-    verbose,
-  )
+  buildPropsData(currentDir, `${currentDir}/pf-docs.config.mjs`, verbose)
 }
 
 async function transformMDContentToMDX() {
