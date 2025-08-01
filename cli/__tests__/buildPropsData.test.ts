@@ -20,6 +20,7 @@ const validConfigResponse = {
     },
     { include: ['**/one/more/include/*'], exclude: [] },
   ],
+  outputDir: '/output/dir',
 }
 
 const sharedPropData = [
@@ -81,7 +82,7 @@ const propsData = {
 }
 
 it('should call getConfig with the passed config file location', async () => {
-  await buildPropsData('/root/', '/astro/', '/config', false)
+  await buildPropsData('/root/', '/config', false)
 
   expect(getConfig).toHaveBeenCalledWith('/config')
 })
@@ -89,7 +90,7 @@ it('should call getConfig with the passed config file location', async () => {
 it('should not proceed if config is not found', async () => {
   ;(getConfig as jest.Mock).mockResolvedValue(undefined)
 
-  await buildPropsData('/root/', '/astro/', '/config', false)
+  await buildPropsData('/root/', '/config', false)
 
   expect(writeFile).not.toHaveBeenCalled()
 })
@@ -100,7 +101,7 @@ it('should send an error to the console if the config file does not have a props
   const mockConsoleError = jest.fn()
   jest.spyOn(console, 'error').mockImplementation(mockConsoleError)
 
-  await buildPropsData('/root/', '/astro/', '/config', false)
+  await buildPropsData('/root/', '/config', false)
 
   expect(mockConsoleError).toHaveBeenCalledWith('No props data found in config')
   expect(writeFile).not.toHaveBeenCalled()
@@ -111,7 +112,7 @@ it('should call glob with the propGlobs in the config file and the cwd set to th
   ;(glob as unknown as jest.Mock).mockResolvedValue(['files/one', 'files/two'])
   ;(tsDocgen as jest.Mock).mockResolvedValue(validTsDocGenResponseOne)
 
-  await buildPropsData('/root/', '/astro/', '/config', false)
+  await buildPropsData('/root/', '/config', false)
 
   expect(glob).toHaveBeenNthCalledWith(
     1,
@@ -138,7 +139,7 @@ it('should call tsDocGen with each file that glob returns', async () => {
   ;(tsDocgen as jest.Mock).mockReset()
   ;(tsDocgen as jest.Mock).mockResolvedValue(validTsDocGenResponseOne)
 
-  await buildPropsData('/root/', '/astro/', '/config', false)
+  await buildPropsData('/root/', '/config', false)
 
   expect(tsDocgen).toHaveBeenNthCalledWith(1, 'files/one')
   expect(tsDocgen).toHaveBeenNthCalledWith(2, 'files/two')
@@ -155,10 +156,10 @@ it('should call writeFile with the returned prop data in JSON form', async () =>
   ;(tsDocgen as jest.Mock).mockResolvedValueOnce(validTsDocGenResponseTwo)
   ;(writeFile as jest.Mock).mockReset()
 
-  await buildPropsData('/root/', '/astro/', '/config', false)
+  await buildPropsData('/root/', '/config', false)
 
   expect(writeFile).toHaveBeenCalledWith(
-    '/astro/dist/props.json',
+    '/output/dir/props.json',
     JSON.stringify(propsData),
   )
 })

@@ -85,7 +85,6 @@ async function getPropsData(files: string[], verbose: boolean) {
 
 export async function buildPropsData(
   rootDir: string,
-  astroRoot: string,
   configFile: string,
   verbose: boolean,
 ) {
@@ -94,7 +93,7 @@ export async function buildPropsData(
     return
   }
 
-  const { propsGlobs } = config
+  const { propsGlobs, outputDir } = config
   if (!propsGlobs) {
     console.error('No props data found in config')
     return
@@ -107,7 +106,12 @@ export async function buildPropsData(
 
   const propsData = await getPropsData(files, verbose)
 
-  const propsFile = join(astroRoot, 'dist', 'props.json')
+  const propsFile = join(outputDir, 'props.json')
+
+  if (verbose) {
+    const absolutePropsFilePath = join(process.cwd(), propsFile)
+    console.log(`Writing props data to ${absolutePropsFilePath}`)
+  }
 
   await writeFile(propsFile, JSON.stringify(propsData))
 }
