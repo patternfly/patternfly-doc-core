@@ -16,7 +16,7 @@ export const config = {
       name: "react-component-docs",
     },
   ],
-  outputDir: './dist/docs',
+  outputDir: './dist',
   propsGlobs: [
     {
       include: ['*/@patternfly/react-core/src/**/*.tsx'],
