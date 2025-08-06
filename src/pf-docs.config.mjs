@@ -16,6 +16,6 @@ export const config = {
     //   name: "react-component-docs",
     // },
   ],
-  outputDir: "./dist/docs",
+  outputDir: "./dist",
   navSectionOrder: ["get-started", "design-foundations"]
 };

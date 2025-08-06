@@ -38,12 +38,7 @@ async function generateProps(program: Command, forceProps: boolean = false) {
     console.log('Verbose mode enabled')
   }
 
-  buildPropsData(
-    currentDir,
-    astroRoot,
-    `${currentDir}/pf-docs.config.mjs`,
-    verbose,
-  )
+  buildPropsData(currentDir, `${currentDir}/pf-docs.config.mjs`, verbose)
 }
 
 async function transformMDContentToMDX() {
@@ -82,7 +77,10 @@ async function buildProject(): Promise<DocsConfig | undefined> {
 
   await transformMDContentToMDX()
 
-  build({ root: astroRoot, outDir: join(currentDir, config.outputDir) })
+  build({
+    root: astroRoot,
+    outDir: join(currentDir, config.outputDir, 'docs'),
+  })
 
   return config
 }
@@ -104,7 +102,7 @@ async function deploy() {
 
       // Deploy using Wrangler
       const { execSync } = await import('child_process')
-      const outputPath = join(currentDir, config.outputDir)
+      const outputPath = join(currentDir, config.outputDir, 'docs')
 
       execSync(`npx wrangler pages deploy ${outputPath}`, {
         stdio: 'inherit',
