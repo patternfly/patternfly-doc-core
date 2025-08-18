@@ -48,7 +48,7 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/cloudflare": "^12.6.0",
     "@astrojs/mdx": "^4.3.0",
-    "@astrojs/node": "^9.2.2",
+    "@astrojs/node": "^9.4.1",
     "@astrojs/react": "^4.3.0",
     "@nanostores/react": "^0.8.4",
     "@patternfly/ast-helpers": "1.4.0-alpha.190",
