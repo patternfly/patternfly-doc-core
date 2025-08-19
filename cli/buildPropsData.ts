@@ -43,7 +43,7 @@ function getTsDocNameVariant(source: string) {
 async function getFiles(root: string, globs: PropsGlobs[]) {
   const files = await Promise.all(
     globs.map(async ({ include, exclude }) => {
-      const files = await glob(include, { cwd: root, ignore: exclude })
+      const files = await glob(include, { cwd: root, ignore: exclude, absolute: true })
       return files
     }),
   )
@@ -88,8 +88,17 @@ export async function buildPropsData(
   configFile: string,
   verbose: boolean,
 ) {
+  const verboseModeLog = (...messages: any) => {
+    if (verbose) {
+      console.log(...messages)
+    }
+  }
+
+  verboseModeLog('Begging props data build')
+
   const config = await getConfig(configFile)
   if (!config) {
+    console.error('No config found, please run the `setup` command or manually create a pf-docs.config.mjs file')
     return
   }
 
@@ -100,18 +109,14 @@ export async function buildPropsData(
   }
 
   const files = await getFiles(rootDir, propsGlobs)
-  if (verbose) {
-    console.log(`Found ${files.length} files to parse`)
-  }
+  verboseModeLog(`Found ${files.length} files to parse`)
 
   const propsData = await getPropsData(files, verbose)
 
   const propsFile = join(outputDir, 'props.json')
 
-  if (verbose) {
-    const absolutePropsFilePath = join(process.cwd(), propsFile)
-    console.log(`Writing props data to ${absolutePropsFilePath}`)
-  }
+  const absolutePropsFilePath = join(process.cwd(), propsFile)
+  verboseModeLog(`Writing props data to ${absolutePropsFilePath}`)
 
   await writeFile(propsFile, JSON.stringify(propsData))
 }

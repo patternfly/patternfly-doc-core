@@ -3,10 +3,11 @@ import { glob } from 'astro/loaders'
 
 import { content } from './content'
 import type { CollectionDefinition } from '../cli/getConfig'
+import { convertToMDX } from '../cli/convertToMDX'
 
 function defineContent(contentObj: CollectionDefinition) {
   const { base, packageName, pattern, name } = contentObj
-  const dir = `${process.cwd()}/${base || `node_modules/${packageName}`}`
+
 
   if (!base && !packageName) {
     // eslint-disable-next-line no-console
@@ -20,10 +21,11 @@ function defineContent(contentObj: CollectionDefinition) {
     'core-component-docs': 'html',
   }
 
+  convertToMDX(`${base}/${pattern}`)
   const mdxPattern = pattern.replace(/\.md$/, '.mdx')
 
   return defineCollection({
-    loader: glob({ base: dir, pattern: mdxPattern }),
+    loader: glob({ base, pattern: mdxPattern }),
     schema: z.object({
       id: z.string(),
       section: z.string(),

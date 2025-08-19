@@ -15,6 +15,7 @@ export interface DocsConfig {
   content: CollectionDefinition[];
   outputDir: string;
   propsGlobs: PropsGlobs[];
+  repoRoot?: string;
 }
 
 export async function getConfig(fileLocation: string): Promise<DocsConfig | undefined> {

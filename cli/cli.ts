@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import { Command } from 'commander'
 import { build, dev, preview, sync } from 'astro'
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { createCollectionContent } from './createCollectionContent.js'
 import { setFsRootDir } from './setFsRootDir.js'
 import { createConfigFile } from './createConfigFile.js'
@@ -12,23 +12,60 @@ import { symLinkConfig } from './symLinkConfig.js'
 import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
+import { mkdir } from 'fs/promises'
+
+const currentDir = process.cwd()
+const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
+
+if (!config) {
+  console.error(
+    'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
+  )
+  process.exit(1)
+}
+
+let astroRoot = ''
+
+try {
+  astroRoot = import.meta
+    .resolve('@patternfly/patternfly-doc-core')
+    .replace('dist/cli/cli.js', '')
+    .replace('file://', '')
+} catch (e: any) {
+  if (e.code === 'ERR_MODULE_NOT_FOUND') {
+    astroRoot = process.cwd()
+  } else {
+    console.error('Error resolving astroRoot', e)
+  }
+}
+
+const absoluteOutputDir = resolve(currentDir, config.outputDir)
+
+await mkdir(absoluteOutputDir, { recursive: true })
 
 async function updateContent(program: Command) {
   const { verbose } = program.opts()
-
+  if (!config) {
+    console.error(
+      'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
+    )
+    return config
+  }
   if (verbose) {
     console.log('Verbose mode enabled')
   }
 
   await createCollectionContent(
     astroRoot,
-    `${process.cwd()}/pf-docs.config.mjs`,
+    `${currentDir}/pf-docs.config.mjs`,
     verbose,
   )
 }
 
 async function generateProps(program: Command, forceProps: boolean = false) {
   const { verbose, props } = program.opts()
+  const { repoRoot } = config
+  const rootDir = repoRoot ? resolve(currentDir, repoRoot) : currentDir
 
   if (!props && !forceProps) {
     return
@@ -38,18 +75,10 @@ async function generateProps(program: Command, forceProps: boolean = false) {
     console.log('Verbose mode enabled')
   }
 
-  buildPropsData(currentDir, `${currentDir}/pf-docs.config.mjs`, verbose)
+  buildPropsData(rootDir, `${currentDir}/pf-docs.config.mjs`, verbose)
 }
 
 async function transformMDContentToMDX() {
-  const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
-  if (!config) {
-    console.error(
-      'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
-    )
-    return config
-  }
-
   if (config.content) {
     await Promise.all(
       config.content.map((contentObj) => convertToMDX(contentObj.pattern)),
@@ -60,7 +89,6 @@ async function transformMDContentToMDX() {
 async function buildProject(): Promise<DocsConfig | undefined> {
   await updateContent(program)
   await generateProps(program, true)
-  const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
   if (!config) {
     console.error(
       'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
@@ -79,7 +107,7 @@ async function buildProject(): Promise<DocsConfig | undefined> {
 
   build({
     root: astroRoot,
-    outDir: join(currentDir, config.outputDir, 'docs'),
+    outDir: join(absoluteOutputDir, 'docs'),
   })
 
   return config
@@ -102,7 +130,7 @@ async function deploy() {
 
       // Deploy using Wrangler
       const { execSync } = await import('child_process')
-      const outputPath = join(currentDir, config.outputDir, 'docs')
+      const outputPath = join(absoluteOutputDir, 'docs')
 
       execSync(`npx wrangler pages deploy ${outputPath}`, {
         stdio: 'inherit',
@@ -116,23 +144,6 @@ async function deploy() {
     process.exit(1)
   }
 }
-
-let astroRoot = ''
-
-try {
-  astroRoot = import.meta
-    .resolve('@patternfly/patternfly-doc-core')
-    .replace('dist/cli/cli.js', '')
-    .replace('file://', '')
-} catch (e: any) {
-  if (e.code === 'ERR_MODULE_NOT_FOUND') {
-    astroRoot = process.cwd()
-  } else {
-    console.error('Error resolving astroRoot', e)
-  }
-}
-
-const currentDir = process.cwd()
 
 const program = new Command()
 program.name('pf-doc-core')
@@ -164,7 +175,7 @@ program.command('start').action(async () => {
 
   // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to
   // prevent that we're just creating a props file regardless of what they say if one doesn't exist yet
-  const hasPropsFile = await hasFile(join(astroRoot, 'dist', 'props.json'))
+  const hasPropsFile = await hasFile(join(absoluteOutputDir, 'props.json'))
   await generateProps(program, !hasPropsFile)
   dev({ mode: 'development', root: astroRoot })
 })
