@@ -94,7 +94,7 @@ export async function buildPropsData(
     }
   }
 
-  verboseModeLog('Begging props data build')
+  verboseModeLog('Beginning props data build')
 
   const config = await getConfig(configFile)
   if (!config) {

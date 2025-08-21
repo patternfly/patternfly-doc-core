@@ -186,7 +186,7 @@ it('should log verbose messages when run in verbose mode', async () => {
   await buildPropsData('/root/', '/config', true)
 
   // Check verbose logging messages
-  expect(mockConsoleLog).toHaveBeenCalledWith('Begging props data build')
+  expect(mockConsoleLog).toHaveBeenCalledWith('Beginning props data build')
   expect(mockConsoleLog).toHaveBeenCalledWith('Found 2 files to parse')
   expect(mockConsoleLog).toHaveBeenCalledWith('Parsing props from files/one')
   expect(mockConsoleLog).toHaveBeenCalledWith('Parsing props from files/two')
