@@ -12,6 +12,10 @@ jest.mock('../tsDocGen')
 // suppress console logs so that it doesn't clutter the test output
 jest.spyOn(console, 'log').mockImplementation(() => {})
 
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
 const validConfigResponse = {
   propsGlobs: [
     {
@@ -90,8 +94,12 @@ it('should call getConfig with the passed config file location', async () => {
 it('should not proceed if config is not found', async () => {
   ;(getConfig as jest.Mock).mockResolvedValue(undefined)
 
+  const mockConsoleError = jest.fn()
+  jest.spyOn(console, 'error').mockImplementation(mockConsoleError)
+
   await buildPropsData('/root/', '/config', false)
 
+  expect(mockConsoleError).toHaveBeenCalledWith('No config found, please run the `setup` command or manually create a pf-docs.config.mjs file')
   expect(writeFile).not.toHaveBeenCalled()
 })
 
@@ -117,11 +125,12 @@ it('should call glob with the propGlobs in the config file and the cwd set to th
   expect(glob).toHaveBeenNthCalledWith(
     1,
     ['**/include/files/*', '**/include/other/files/*'],
-    { cwd: '/root/', ignore: ['**/exclude/files/*'] },
+    { cwd: '/root/', ignore: ['**/exclude/files/*'], absolute: true },
   )
   expect(glob).toHaveBeenNthCalledWith(2, ['**/one/more/include/*'], {
     cwd: '/root/',
     ignore: [],
+    absolute: true,
   })
   expect(glob).toHaveBeenCalledTimes(2)
 })
@@ -162,4 +171,40 @@ it('should call writeFile with the returned prop data in JSON form', async () =>
     '/output/dir/props.json',
     JSON.stringify(propsData),
   )
+})
+
+it('should log verbose messages when run in verbose mode', async () => {
+  ;(getConfig as jest.Mock).mockResolvedValue(validConfigResponse)
+  ;(glob as unknown as jest.Mock).mockResolvedValueOnce(['files/one'])
+  ;(glob as unknown as jest.Mock).mockResolvedValueOnce(['files/two'])
+  ;(tsDocgen as jest.Mock).mockResolvedValueOnce(validTsDocGenResponseOne)
+  ;(tsDocgen as jest.Mock).mockResolvedValueOnce(validTsDocGenResponseTwo)
+
+  const mockConsoleLog = jest.fn()
+  jest.spyOn(console, 'log').mockImplementation(mockConsoleLog)
+
+  await buildPropsData('/root/', '/config', true)
+
+  // Check verbose logging messages
+  expect(mockConsoleLog).toHaveBeenCalledWith('Beginning props data build')
+  expect(mockConsoleLog).toHaveBeenCalledWith('Found 2 files to parse')
+  expect(mockConsoleLog).toHaveBeenCalledWith('Parsing props from files/one')
+  expect(mockConsoleLog).toHaveBeenCalledWith('Parsing props from files/two')
+  expect(mockConsoleLog).toHaveBeenCalledWith(`Writing props data to ${process.cwd()}/output/dir/props.json`)
+})
+
+it('should not log verbose messages when not run in verbose mode', async () => {
+  ;(getConfig as jest.Mock).mockResolvedValue(validConfigResponse)
+  ;(glob as unknown as jest.Mock).mockResolvedValueOnce(['files/one'])
+  ;(glob as unknown as jest.Mock).mockResolvedValueOnce(['files/two'])
+  ;(tsDocgen as jest.Mock).mockResolvedValueOnce(validTsDocGenResponseOne)
+  ;(tsDocgen as jest.Mock).mockResolvedValueOnce(validTsDocGenResponseTwo)
+
+  const mockConsoleLog = jest.fn()
+  jest.spyOn(console, 'log').mockImplementation(mockConsoleLog)
+
+  await buildPropsData('/root/', '/config', false)
+
+  // Should not have any verbose logging calls
+  expect(mockConsoleLog).not.toHaveBeenCalled()
 })
