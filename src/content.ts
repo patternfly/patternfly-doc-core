@@ -13,4 +13,3 @@ export const content = [
   //   "name":"core-component-docs"
   // }
 ]
-
