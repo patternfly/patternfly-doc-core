@@ -135,20 +135,47 @@ const getTypeAliasMetadata = (filename, sourceText) =>
     [],
   )
 
+function extractEnumValues(typeString) {
+  if (!typeString || typeof typeString !== 'string') {
+    return []
+  }
+  
+  // Handle union types like 'primary' | 'secondary' | 'tertiary'
+  if (typeString.includes('|')) {
+    return typeString
+      .split('|')
+      .map(value => value.trim())
+      .filter(value => value.startsWith("'") || value.startsWith('"'))
+      .map(value => value.slice(1, -1)) // Remove quotes
+      .filter(value => value.length > 0)
+  }
+  
+  return []
+}
+
 function normalizeProp([
   name,
   { required, annotatedType, type, tsType, description, defaultValue },
 ]) {
+  const typeString = 
+    annotatedType ||
+    (type && type.name) ||
+    (type && (type.raw || type.name)) ||
+    (tsType && (tsType.raw || tsType.name)) ||
+    'No type info'
+    
   const res = {
     name,
-    type:
-      annotatedType ||
-      (type && type.name) ||
-      (type && (type.raw || type.name)) ||
-      (tsType && (tsType.raw || tsType.name)) ||
-      'No type info',
+    type: typeString,
     description,
   }
+  
+  // Extract enum values for union types
+  const enumValues = extractEnumValues(typeString)
+  if (enumValues.length > 0) {
+    res.enumValues = enumValues
+  }
+  
   if (required) {
     res.required = true
   }
