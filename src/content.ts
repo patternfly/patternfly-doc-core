@@ -1,1 +1,0 @@
-export const content = [{"packageName":"@patternfly/react-core","pattern":"**/components/**/*.md","name":"react-component-docs"}]

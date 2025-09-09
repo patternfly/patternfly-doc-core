@@ -27,3 +27,6 @@ pnpm-debug.log*
 .eslintcache
 
 .eslintcache
+
+## Ignore content.ts
+src/content.ts
