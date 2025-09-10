@@ -47,7 +47,6 @@ function getComponentMetadata(filename, sourceText) {
     parsedComponents = parse(sourceText, { filename })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err) {
-    // eslint-disable-next-line no-console
     // console.warn(`No component found in ${filename}:`, err);
   }
 
