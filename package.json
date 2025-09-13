@@ -60,7 +60,7 @@
     "@patternfly/react-styles": "^6.0.0",
     "@patternfly/react-table": "^6.0.0",
     "@patternfly/react-tokens": "^6.0.0",
-    "@types/react": "^18.3.23",
+    "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
     "astro": "5.13.3",
     "change-case": "5.4.4",
