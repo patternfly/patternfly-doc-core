@@ -25,7 +25,7 @@ export const Navigation: React.FunctionComponent<NavigationProps> = ({
 
   return (
     // Can possibly add back PageSidebar wrapper when https://github.com/patternfly/patternfly/issues/7377 goes in
-    <PageSidebarBody id="page-sidebar-body">
+    <PageSidebarBody id="page-sidebar-body" style={{ overflowY: 'auto' }}>
       <Nav onSelect={onNavSelect}>
         <NavList>
           {navData.map((navEntries) => {
