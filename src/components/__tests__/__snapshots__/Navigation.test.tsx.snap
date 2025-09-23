@@ -5,6 +5,7 @@ exports[`matches snapshot 1`] = `
   <div
     class="pf-v6-c-page__sidebar-body"
     id="page-sidebar-body"
+    style="overflow-y: auto;"
   >
     <nav
       aria-label="Global"
