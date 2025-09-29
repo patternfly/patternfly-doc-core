@@ -41,20 +41,17 @@ const navData = sortedSections.map((section) => {
     .filter((entry) => entry.data.section === section)
     .map(entry => ({ id: entry.id, data: { id: entry.data.id, section, sortValue: entry.data.sortValue }} as TextContentEntry))
 
-  let uniqueEntries = entries
-  if (section === 'components' || section === 'layouts') {
-    // only display unique entry.data.id in the nav list if the section is components
-    uniqueEntries = [
-      ...entries
-        .reduce((map, entry) => {
-          if (!map.has(entry.data.id)) {
-            map.set(entry.data.id, entry)
-          }
-          return map
-        }, new Map())
-        .values(),
-    ]
-  }
+  const uniqueEntries = [
+    ...entries
+      .reduce((map, entry) => {
+        if (!map.has(entry.data.id)) {
+          map.set(entry.data.id, entry)
+        }
+        return map
+      }, new Map())
+      .values(),
+  ]
+  
 
     // Sort alphabetically, unless a sort value is specified in the frontmatter
   const sortedUniqueEntries = uniqueEntries.sort((a, b) => {

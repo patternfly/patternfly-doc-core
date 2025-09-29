@@ -27,6 +27,7 @@ import {
 } from '../../../components/Content'
 import LiveExample from '../../../components/LiveExample.astro'
 import DocsTables from '../../../components/DocsTables.astro'
+import { addDemosOrDeprecated, getDefaultTab } from '../../../utils'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -35,33 +36,39 @@ export async function getStaticPaths() {
     ),
   )
 
-  const flatCol =  collections.flat()
+  const flatCol = collections
+    .flat()
+    .map(({ data, filePath, ...rest }) => ({
+      filePath,
+      ...rest,
+      data: {
+        ...data,
+        tab: data.tab || data.source || getDefaultTab(filePath),
+      },
+    }))
     .filter((entry) => entry.data.tab) // only pages with a tab should match this route
     .map((entry) => {
       // Build tabs dictionary
-      let tab = entry.data.tab;
-      if(tab) { // check for demos/deprecated
-        if(entry.id.includes('demos')) {
-          tab = `${tab}-demos`;
-        } else if (entry.id.includes('deprecated')) {
-          tab = `${tab}-deprecated`;
-        }
-      }
-      buildTab(entry, tab);
-
+      const tab = addDemosOrDeprecated(entry.data.tab, entry.id)
+      buildTab(entry, tab)
       return {
-        params: { page: kebabCase(entry.data.id), section: entry.data.section, tab },
+        params: {
+          page: kebabCase(entry.data.id),
+          section: entry.data.section,
+          tab,
+        },
         props: { entry, ...entry.data },
       }
     })
 
   sortTabs()
+
   return flatCol
 }
 
 const { entry, propComponents, cssPrefix } = Astro.props
+const { title, id, section, tabName } = entry.data
 
-const { title, id, section } = entry.data
 const { Content } = await render(entry)
 const currentPath = Astro.url.pathname
 ---
@@ -92,7 +99,7 @@ const currentPath = Astro.url.pathname
                   class="pf-v6-c-tabs__link"
                   href={`/${section}/${kebabCase(id)}/${tab}`}
                 >
-                  {tabNames[tab]}
+                  {tabName || tabNames[tab] || tab}
                 </a>
               </li>
             ))}

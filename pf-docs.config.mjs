@@ -15,6 +15,8 @@ export const config = {
       pattern: "**/components/**/*.md",
       name: "react-component-docs",
     },
+    { packageName: "@patternfly/patternfly", pattern: "*/**/*.md", name: "core-docs" },
+    { packageName: "@patternfly/quickstarts", pattern: "*/patternfly-docs/**/*.md", name: "quickstarts-docs" },
   ],
   outputDir: './dist',
   propsGlobs: [
