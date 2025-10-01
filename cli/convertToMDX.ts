@@ -89,7 +89,6 @@ async function processFile(file: string): Promise<void> {
   )
 
   await writeFile(file + 'x', processedContent)
-  await unlink(file)
 }
 
 export async function convertToMDX(globPath: string): Promise<void> {
