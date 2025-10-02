@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content'
 import { Title, PageSection } from '@patternfly/react-core'
+import { sentenceCase } from 'change-case'
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from '../../../content'
 import { kebabCase } from '../../../utils/case'
@@ -51,6 +52,9 @@ export async function getStaticPaths() {
       // Build tabs dictionary
       const tab = addDemosOrDeprecated(entry.data.tab, entry.id)
       buildTab(entry, tab)
+      if (entry.data.tabName) {
+        tabNames[entry.data.tab] = entry.data.tabName
+      }
       return {
         params: {
           page: kebabCase(entry.data.id),
@@ -67,7 +71,7 @@ export async function getStaticPaths() {
 }
 
 const { entry, propComponents, cssPrefix } = Astro.props
-const { title, id, section, tabName } = entry.data
+const { title, id, section } = entry.data
 
 const { Content } = await render(entry)
 const currentPath = Astro.url.pathname
@@ -99,7 +103,7 @@ const currentPath = Astro.url.pathname
                   class="pf-v6-c-tabs__link"
                   href={`/${section}/${kebabCase(id)}/${tab}`}
                 >
-                  {tabName || tabNames[tab] || tab}
+                  {tabNames[tab] || sentenceCase(tab)}
                 </a>
               </li>
             ))}
