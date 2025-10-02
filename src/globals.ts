@@ -1,4 +1,4 @@
-export const componentTabs: any = {};
+export const tabsDictionary: any = {};
 
 export const tabNames: any = {
   'react': 'React',
@@ -9,14 +9,14 @@ export const tabNames: any = {
 };
 
 export const buildTab = (entry: any, tab: string) => {
-  const tabEntry = componentTabs[entry.data.id]
+  const tabEntry = tabsDictionary[entry.data.id]
 
   // if no dictionary entry exists, and tab data exists
   if(tabEntry === undefined && tab) { 
-    componentTabs[entry.data.id] = [tab]
+    tabsDictionary[entry.data.id] = [tab]
   // if dictionary entry & tab data exists, and entry does not include tab
   } else if (tabEntry && tab && !tabEntry.includes(tab)) { 
-    componentTabs[entry.data.id] = [...tabEntry, tab];
+    tabsDictionary[entry.data.id] = [...tabEntry, tab];
   }
 }
 
@@ -47,7 +47,7 @@ export const sortTabs = () => {
   
   // Sort tabs entries based on above sort order
   // Ensures all tabs are displayed in a consistent order & which tab gets displayed for a component route without a tab 
-  Object.values(componentTabs).map((tabs: any) => {
+  Object.values(tabsDictionary).map((tabs: any) => {
     tabs.sort(sortSources)
   })
 }

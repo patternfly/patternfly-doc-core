@@ -4,7 +4,7 @@ import { Title, PageSection } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
 import { content } from '../../content'
 import { kebabCase, getDefaultTab } from '../../utils'
-import { buildTab, componentTabs } from '../../globals'
+import { buildTab, tabsDictionary } from '../../globals'
 import SectionGallery from '../../components/section-gallery/SectionGallery.astro'
 import LiveExample from '../../components/LiveExample.astro'
 import {
@@ -66,9 +66,9 @@ const { entry, propComponents, cssPrefix } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 
-if (componentTabs[id]) {
+if (tabsDictionary[id]) {
   // if tab exists, rewrite to first tab content
-  return Astro.rewrite(`/${section}/${kebabCase(id)}/${componentTabs[id][0]}`)
+  return Astro.rewrite(`/${section}/${kebabCase(id)}/${tabsDictionary[id][0]}`)
 }
 ---
 

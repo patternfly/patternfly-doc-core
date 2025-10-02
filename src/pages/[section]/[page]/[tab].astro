@@ -4,7 +4,7 @@ import { Title, PageSection } from '@patternfly/react-core'
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from '../../../content'
 import { kebabCase } from '../../../utils/case'
-import { componentTabs, tabNames, buildTab, sortTabs } from '../../../globals'
+import { tabsDictionary, tabNames, buildTab, sortTabs } from '../../../globals'
 import {
   h1,
   h2,
@@ -82,7 +82,7 @@ const currentPath = Astro.url.pathname
     )
   }
   {
-    componentTabs[id] && (
+    tabsDictionary[id] && (
       <PageSection
         id="ws-sticky-nav-tabs"
         stickyOnBreakpoint={{ default: 'top' }}
@@ -90,7 +90,7 @@ const currentPath = Astro.url.pathname
       >
         <div class="pf-v6-c-tabs pf-m-page-insets pf-m-no-border-bottom">
           <ul class="pf-v6-c-tabs__list">
-            {componentTabs[id].map((tab: string) => (
+            {tabsDictionary[id].map((tab: string) => (
               // eslint-disable-next-line react/jsx-key
               <li
                 class={`pf-v6-c-tabs__item${currentPath === `/${section}/${kebabCase(id)}/${tab}` ? ' pf-m-current' : ''}`}
