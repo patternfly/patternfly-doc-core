@@ -5,7 +5,6 @@ import { convertToMDX } from '../convertToMDX.ts'
 jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
   writeFile: jest.fn(),
-  unlink: jest.fn(),
   access: jest.fn().mockResolvedValue(undefined), // Mock access to always resolve (file exists)
 }))
 
@@ -130,17 +129,6 @@ import Example1 from './Example1.html?raw'
   await convertToMDX('test.md')
 
   expect(writeFile).toHaveBeenCalledWith('test.mdx', expectedContent)
-})
-
-it('should delete the original file after conversion', async () => {
-  const mockContent = '# Test Content\nSome text here'
-  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
-  ;(readFile as jest.Mock).mockResolvedValue(mockContent)
-
-  await convertToMDX('test.md')
-
-  expect(writeFile).toHaveBeenCalledWith('test.mdx', mockContent)
-  expect(unlink).toHaveBeenCalledWith('test.md')
 })
 
 it('should convert HTML comments in MD content to MDX format', async () => {
