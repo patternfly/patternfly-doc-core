@@ -1,4 +1,4 @@
-import { readFile, writeFile, unlink, access } from 'fs/promises'
+import { readFile, writeFile, access } from 'fs/promises'
 import { glob } from 'glob'
 import path from 'path'
 

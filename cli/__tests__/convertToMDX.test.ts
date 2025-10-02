@@ -1,4 +1,4 @@
-import { readFile, writeFile, unlink } from 'fs/promises'
+import { readFile, writeFile } from 'fs/promises'
 import { glob } from 'glob'
 import { convertToMDX } from '../convertToMDX.ts'
 
