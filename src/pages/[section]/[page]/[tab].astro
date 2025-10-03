@@ -1,10 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content'
 import { Title, PageSection } from '@patternfly/react-core'
+import { sentenceCase } from 'change-case'
 import MainLayout from '../../../layouts/Main.astro'
 import { content } from '../../../content'
 import { kebabCase } from '../../../utils/case'
-import { componentTabs, tabNames, buildTab, sortTabs } from '../../../globals'
+import { tabsDictionary, tabNames, buildTab, sortTabs } from '../../../globals'
 import {
   h1,
   h2,
@@ -27,6 +28,7 @@ import {
 } from '../../../components/Content'
 import LiveExample from '../../../components/LiveExample.astro'
 import DocsTables from '../../../components/DocsTables.astro'
+import { addDemosOrDeprecated, getDefaultTab } from '../../../utils'
 
 export async function getStaticPaths() {
   const collections = await Promise.all(
@@ -35,33 +37,42 @@ export async function getStaticPaths() {
     ),
   )
 
-  const flatCol =  collections.flat()
+  const flatCol = collections
+    .flat()
+    .map(({ data, filePath, ...rest }) => ({
+      filePath,
+      ...rest,
+      data: {
+        ...data,
+        tab: data.tab || data.source || getDefaultTab(filePath),
+      },
+    }))
     .filter((entry) => entry.data.tab) // only pages with a tab should match this route
     .map((entry) => {
       // Build tabs dictionary
-      let tab = entry.data.tab;
-      if(tab) { // check for demos/deprecated
-        if(entry.id.includes('demos')) {
-          tab = `${tab}-demos`;
-        } else if (entry.id.includes('deprecated')) {
-          tab = `${tab}-deprecated`;
-        }
+      const tab = addDemosOrDeprecated(entry.data.tab, entry.id)
+      buildTab(entry, tab)
+      if (entry.data.tabName) {
+        tabNames[entry.data.tab] = entry.data.tabName
       }
-      buildTab(entry, tab);
-
       return {
-        params: { page: kebabCase(entry.data.id), section: entry.data.section, tab },
+        params: {
+          page: kebabCase(entry.data.id),
+          section: entry.data.section,
+          tab,
+        },
         props: { entry, ...entry.data },
       }
     })
 
   sortTabs()
+
   return flatCol
 }
 
 const { entry, propComponents, cssPrefix } = Astro.props
-
 const { title, id, section } = entry.data
+
 const { Content } = await render(entry)
 const currentPath = Astro.url.pathname
 ---
@@ -75,7 +86,7 @@ const currentPath = Astro.url.pathname
     )
   }
   {
-    componentTabs[id] && (
+    tabsDictionary[id] && (
       <PageSection
         id="ws-sticky-nav-tabs"
         stickyOnBreakpoint={{ default: 'top' }}
@@ -83,7 +94,7 @@ const currentPath = Astro.url.pathname
       >
         <div class="pf-v6-c-tabs pf-m-page-insets pf-m-no-border-bottom">
           <ul class="pf-v6-c-tabs__list">
-            {componentTabs[id].map((tab: string) => (
+            {tabsDictionary[id].map((tab: string) => (
               // eslint-disable-next-line react/jsx-key
               <li
                 class={`pf-v6-c-tabs__item${currentPath === `/${section}/${kebabCase(id)}/${tab}` ? ' pf-m-current' : ''}`}
@@ -92,7 +103,7 @@ const currentPath = Astro.url.pathname
                   class="pf-v6-c-tabs__link"
                   href={`/${section}/${kebabCase(id)}/${tab}`}
                 >
-                  {tabNames[tab]}
+                  {tabNames[tab] || sentenceCase(tab)}
                 </a>
               </li>
             ))}

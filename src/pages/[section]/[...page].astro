@@ -3,8 +3,8 @@ import { getCollection, render } from 'astro:content'
 import { Title, PageSection } from '@patternfly/react-core'
 import MainLayout from '../../layouts/Main.astro'
 import { content } from '../../content'
-import { kebabCase } from '../../utils/case'
-import { componentTabs } from '../../globals'
+import { kebabCase, getDefaultTab } from '../../utils'
+import { buildTab, tabsDictionary } from '../../globals'
 import SectionGallery from '../../components/section-gallery/SectionGallery.astro'
 import LiveExample from '../../components/LiveExample.astro'
 import {
@@ -36,24 +36,39 @@ export async function getStaticPaths() {
     ),
   )
 
-  return collections.flat().map((entry) => ({
-    params: { page: kebabCase(entry.data.id), section: entry.data.section },
-    props: {
-      entry,
-      title: entry.data.title,
-      propComponents: entry.data.propComponents,
-      cssPrefix: entry.data.cssPrefix,
-    },
-  }))
+  return collections.flat().map((entry) => {
+    const { filePath } = entry
+    const { tab, source, tabName } = entry.data
+    const hasTab = !!tab || !!source || !!tabName
+
+    if (hasTab) {
+      buildTab(entry, tab)
+    }
+
+    if (!hasTab) {
+      const defaultTab = getDefaultTab(filePath)
+      buildTab(entry, defaultTab)
+    }
+
+    return {
+      params: { page: kebabCase(entry.data.id), section: entry.data.section },
+      props: {
+        entry,
+        title: entry.data.title,
+        propComponents: entry.data.propComponents,
+        cssPrefix: entry.data.cssPrefix,
+      },
+    }
+  })
 }
 
 const { entry, propComponents, cssPrefix } = Astro.props
 const { title, id, section } = entry.data
 const { Content } = await render(entry)
 
-if (section === 'components' && componentTabs[id]) {
-  // if section is components & tab exists, rewrite to first tab content
-  return Astro.rewrite(`/components/${kebabCase(id)}/${componentTabs[id][0]}`)
+if (tabsDictionary[id]) {
+  // if tab exists, rewrite to first tab content
+  return Astro.rewrite(`/${section}/${kebabCase(id)}/${tabsDictionary[id][0]}`)
 }
 ---
 

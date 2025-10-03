@@ -1,4 +1,4 @@
-import { readFile, writeFile, unlink, access } from 'fs/promises'
+import { readFile, writeFile, access } from 'fs/promises'
 import { glob } from 'glob'
 import path from 'path'
 
@@ -89,7 +89,6 @@ async function processFile(file: string): Promise<void> {
   )
 
   await writeFile(file + 'x', processedContent)
-  await unlink(file)
 }
 
 export async function convertToMDX(globPath: string): Promise<void> {

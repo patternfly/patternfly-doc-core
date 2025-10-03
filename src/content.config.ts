@@ -33,6 +33,8 @@ function defineContent(contentObj: CollectionDefinition) {
       title: z.string().optional(),
       propComponents: z.array(z.string()).optional(),
       tab: z.string().optional().default(tabMap[name]), // for component tabs
+      source: z.string().optional(),
+      tabName: z.string().optional(),
       sortValue: z.number().optional(), // used for sorting nav entries,
       cssPrefix: z
         .union([
