@@ -27,6 +27,9 @@ export const getPackageName = (filePath?: string): string => {
   return packageName || ''
 }
 
+// this isn't something I love, but it should be temporary along with the rest of the default tab logic,
+// once we update our docs to no longer need this feature we should remove it.
+// issue https://github.com/patternfly/patternfly-doc-core/issues/164 also tracks this.
 export const getTabBase = (packageName: string): string => {
   switch (packageName) {
     case '@patternfly/patternfly':
