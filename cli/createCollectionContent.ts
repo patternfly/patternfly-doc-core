@@ -2,7 +2,7 @@
 import { writeFile } from 'fs/promises'
 import { dirname, join, resolve } from 'path'
 import { getConfig } from './getConfig.js'
-import { existsSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 
 /**
  * Looks for the specified package in the node_modules directory in the configDir, then recursively
@@ -40,6 +40,44 @@ const findPackage = (
 
   const parentDir = dirname(dir)
   return findPackage(parentDir, packageName, repoRootDir, verbose)
+}
+
+/**
+ * Extracts the major version from a package.json file
+ */
+const getPackageVersion = (packagePath: string | null, verbose?: boolean) => {
+  if (!packagePath) {
+    return null
+  }
+
+  const packageJsonPath = join(packagePath, 'package.json')
+
+  if (!existsSync(packageJsonPath)) {
+    return null
+  }
+
+  try {
+    const packageJsonContent = readFileSync(packageJsonPath, 'utf-8')
+    const packageJson = JSON.parse(packageJsonContent)
+    const version = packageJson.version
+
+    if (version) {
+      // Extract major version (e.g., "6.2.2" -> "v6")
+      const majorVersion = `v${version.split('.')[0]}`
+      if (verbose) {
+        console.log(
+          `Extracted version ${majorVersion} from ${packageJsonPath}\n`,
+        )
+      }
+      return majorVersion
+    }
+  } catch (error) {
+    if (verbose) {
+      console.error(`Error reading package.json at ${packageJsonPath}:`, error)
+    }
+  }
+
+  return null
 }
 
 export async function createCollectionContent(
@@ -86,9 +124,12 @@ export async function createCollectionContent(
       verboseModeLog('relative path: ', contentEntry.base)
       verboseModeLog('absolute path: ', absoluteBase, '\n')
 
+      const version = getPackageVersion(absoluteBase, verbose)
+
       return {
         ...contentEntry,
         base: absoluteBase,
+        version,
       }
     }
 
@@ -103,6 +144,7 @@ export async function createCollectionContent(
       return {
         ...contentEntry,
         base: null,
+        version: null,
       }
     }
 
@@ -113,8 +155,11 @@ export async function createCollectionContent(
       verbose,
     )
 
+    const version = getPackageVersion(packagePath, verbose)
+
     return {
       base: packagePath,
+      version,
       ...contentEntry,
     }
   })

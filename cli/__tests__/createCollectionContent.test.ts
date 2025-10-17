@@ -1,7 +1,7 @@
 import { createCollectionContent } from '../createCollectionContent'
 import { getConfig } from '../getConfig'
 import { writeFile } from 'fs/promises'
-import { existsSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 
 jest.mock('../getConfig')
 jest.mock('fs/promises')
@@ -53,10 +53,11 @@ it('should call writeFile with the expected file location and content without th
   const mockContent = [
     { name: 'test', base: 'src/docs', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '.'
   })
+  ;(existsSync as jest.Mock).mockReturnValue(false) // No package.json
 
   const mockConsoleError = jest.fn()
   jest.spyOn(console, 'error').mockImplementation(mockConsoleError)
@@ -64,7 +65,7 @@ it('should call writeFile with the expected file location and content without th
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md' }
+    { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: null }
   ]
 
   expect(writeFile).toHaveBeenCalledWith(
@@ -78,10 +79,11 @@ it('should log error if writeFile throws an error', async () => {
   const mockContent = [
     { name: 'test', base: 'src/docs', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '.'
   })
+  ;(existsSync as jest.Mock).mockReturnValue(false) // No package.json
 
   const mockConsoleError = jest.fn()
   jest.spyOn(console, 'error').mockImplementation(mockConsoleError)
@@ -102,11 +104,12 @@ it('should log all verbose messages when run in verbose mode', async () => {
     { name: 'docs', base: 'src/docs', pattern: '**/*.md' },
     { name: 'components', packageName: '@patternfly/react-core', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '../'
   })
   ;(existsSync as jest.Mock).mockReturnValue(true)
+  ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '6.2.2' }))
   ;(writeFile as jest.Mock).mockResolvedValue(undefined)
 
   const mockConsoleLog = jest.fn()
@@ -118,15 +121,19 @@ it('should log all verbose messages when run in verbose mode', async () => {
   expect(mockConsoleLog).toHaveBeenCalledWith('configuration content entry: ', mockContent, '\n')
   expect(mockConsoleLog).toHaveBeenCalledWith('Creating content file', '/foo/src/content.ts', '\n')
   expect(mockConsoleLog).toHaveBeenCalledWith('repoRootDir: ', '/config', '\n')
-  
+
   // For the base entry
   expect(mockConsoleLog).toHaveBeenCalledWith('relative path: ', 'src/docs')
   expect(mockConsoleLog).toHaveBeenCalledWith('absolute path: ', '/config/dir/src/docs', '\n')
-  
+
   // For the packageName entry
   expect(mockConsoleLog).toHaveBeenCalledWith('looking for package in ', '/config/dir/node_modules', '\n')
   expect(mockConsoleLog).toHaveBeenCalledWith('found package at ', '/config/dir/node_modules/@patternfly/react-core', '\n')
-  
+
+  // Version extraction logs
+  expect(mockConsoleLog).toHaveBeenCalledWith('Extracted version v6 from /config/dir/src/docs/package.json\n')
+  expect(mockConsoleLog).toHaveBeenCalledWith('Extracted version v6 from /config/dir/node_modules/@patternfly/react-core/package.json\n')
+
   // Final log
   expect(mockConsoleLog).toHaveBeenCalledWith('Content file created')
 })
@@ -177,10 +184,11 @@ it('should not log to the console when not run in verbose mode', async () => {
   const mockContent = [
     { name: 'test', base: 'src/docs', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '.'
   })
+  ;(existsSync as jest.Mock).mockReturnValue(false)
   ;(writeFile as jest.Mock).mockResolvedValue(undefined)
 
   const mockConsoleLog = jest.fn()
@@ -195,11 +203,12 @@ it('should handle content with packageName by finding package in node_modules', 
   const mockContent = [
     { name: 'test', packageName: '@patternfly/react-core', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '.'
   })
   ;(existsSync as jest.Mock).mockReturnValue(true)
+  ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '6.2.2' }))
   ;(writeFile as jest.Mock).mockResolvedValue(undefined)
 
   const mockConsoleError = jest.fn()
@@ -208,10 +217,11 @@ it('should handle content with packageName by finding package in node_modules', 
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { 
+    {
       base: '/config/dir/node_modules/@patternfly/react-core',
-      name: 'test', 
-      packageName: '@patternfly/react-core', 
+      version: 'v6',
+      name: 'test',
+      packageName: '@patternfly/react-core',
       pattern: '**/*.md'
     }
   ]
@@ -227,13 +237,15 @@ it('should handle content with packageName when package is not found locally but
   const mockContent = [
     { name: 'test', packageName: '@patternfly/react-core', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '../../'
   })
   ;(existsSync as jest.Mock)
     .mockReturnValueOnce(false) // not found in /config/dir/node_modules
-    .mockReturnValueOnce(true)  // found in /config/node_modules
+    .mockReturnValueOnce(true)  // found in /config/node_modules/package.json
+    .mockReturnValueOnce(true)  // package.json exists for version extraction
+  ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '5.1.0' }))
   ;(writeFile as jest.Mock).mockResolvedValue(undefined)
 
   const mockConsoleError = jest.fn()
@@ -242,10 +254,11 @@ it('should handle content with packageName when package is not found locally but
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { 
+    {
       base: '/config/node_modules/@patternfly/react-core',
-      name: 'test', 
-      packageName: '@patternfly/react-core', 
+      version: 'v5',
+      name: 'test',
+      packageName: '@patternfly/react-core',
       pattern: '**/*.md'
     }
   ]
@@ -261,7 +274,7 @@ it('should handle content with packageName when package is not found anywhere', 
   const mockContent = [
     { name: 'test', packageName: '@patternfly/react-core', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '../'
   })
@@ -274,10 +287,11 @@ it('should handle content with packageName when package is not found anywhere', 
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { 
+    {
       base: null,
-      name: 'test', 
-      packageName: '@patternfly/react-core', 
+      version: null,
+      name: 'test',
+      packageName: '@patternfly/react-core',
       pattern: '**/*.md'
     }
   ]
@@ -294,11 +308,12 @@ it('should handle mixed content with both base and packageName entries', async (
     { name: 'docs', base: 'src/docs', pattern: '**/*.md' },
     { name: 'components', packageName: '@patternfly/react-core', pattern: '**/*.md' }
   ]
-  ;(getConfig as jest.Mock).mockResolvedValue({ 
+  ;(getConfig as jest.Mock).mockResolvedValue({
     content: mockContent,
     repoRoot: '../'
   })
   ;(existsSync as jest.Mock).mockReturnValue(true)
+  ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '6.2.2' }))
   ;(writeFile as jest.Mock).mockResolvedValue(undefined)
 
   const mockConsoleError = jest.fn()
@@ -307,11 +322,12 @@ it('should handle mixed content with both base and packageName entries', async (
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { name: 'docs', base: '/config/dir/src/docs', pattern: '**/*.md' },
-    { 
+    { name: 'docs', base: '/config/dir/src/docs', pattern: '**/*.md', version: 'v6' },
+    {
       base: '/config/dir/node_modules/@patternfly/react-core',
-      name: 'components', 
-      packageName: '@patternfly/react-core', 
+      version: 'v6',
+      name: 'components',
+      packageName: '@patternfly/react-core',
       pattern: '**/*.md'
     }
   ]
@@ -321,4 +337,174 @@ it('should handle mixed content with both base and packageName entries', async (
     `export const content = ${JSON.stringify(expectedContent)}`,
   )
   expect(mockConsoleError).not.toHaveBeenCalled()
+})
+
+describe('getPackageVersion function', () => {
+  it('should extract major version from valid package.json with version 6.2.2', async () => {
+    const mockContent = [
+      { name: 'test', base: 'src/docs', pattern: '**/*.md' }
+    ]
+    ;(getConfig as jest.Mock).mockResolvedValue({
+      content: mockContent,
+      repoRoot: '.'
+    })
+    ;(existsSync as jest.Mock).mockReturnValue(true)
+    ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '6.2.2' }))
+    ;(writeFile as jest.Mock).mockResolvedValue(undefined)
+
+    await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
+
+    const expectedContent = [
+      { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: 'v6' }
+    ]
+
+    expect(writeFile).toHaveBeenCalledWith(
+      '/foo/src/content.ts',
+      `export const content = ${JSON.stringify(expectedContent)}`,
+    )
+  })
+
+  it('should extract major version from valid package.json with version 5.1.0', async () => {
+    const mockContent = [
+      { name: 'test', base: 'src/docs', pattern: '**/*.md' }
+    ]
+    ;(getConfig as jest.Mock).mockResolvedValue({
+      content: mockContent,
+      repoRoot: '.'
+    })
+    ;(existsSync as jest.Mock).mockReturnValue(true)
+    ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '5.1.0' }))
+    ;(writeFile as jest.Mock).mockResolvedValue(undefined)
+
+    await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
+
+    const expectedContent = [
+      { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: 'v5' }
+    ]
+
+    expect(writeFile).toHaveBeenCalledWith(
+      '/foo/src/content.ts',
+      `export const content = ${JSON.stringify(expectedContent)}`,
+    )
+  })
+
+  it('should return null version when package.json does not exist', async () => {
+    const mockContent = [
+      { name: 'test', base: 'src/docs', pattern: '**/*.md' }
+    ]
+    ;(getConfig as jest.Mock).mockResolvedValue({
+      content: mockContent,
+      repoRoot: '.'
+    })
+    ;(existsSync as jest.Mock).mockReturnValue(false)
+    ;(writeFile as jest.Mock).mockResolvedValue(undefined)
+
+    await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
+
+    const expectedContent = [
+      { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: null }
+    ]
+
+    expect(writeFile).toHaveBeenCalledWith(
+      '/foo/src/content.ts',
+      `export const content = ${JSON.stringify(expectedContent)}`,
+    )
+  })
+
+  it('should return null version when package.json has no version field', async () => {
+    const mockContent = [
+      { name: 'test', base: 'src/docs', pattern: '**/*.md' }
+    ]
+    ;(getConfig as jest.Mock).mockResolvedValue({
+      content: mockContent,
+      repoRoot: '.'
+    })
+    ;(existsSync as jest.Mock).mockReturnValue(true)
+    ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ name: 'test-package' }))
+    ;(writeFile as jest.Mock).mockResolvedValue(undefined)
+
+    await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
+
+    const expectedContent = [
+      { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: null }
+    ]
+
+    expect(writeFile).toHaveBeenCalledWith(
+      '/foo/src/content.ts',
+      `export const content = ${JSON.stringify(expectedContent)}`,
+    )
+  })
+
+  it('should handle malformed package.json gracefully', async () => {
+    const mockContent = [
+      { name: 'test', base: 'src/docs', pattern: '**/*.md' }
+    ]
+    ;(getConfig as jest.Mock).mockResolvedValue({
+      content: mockContent,
+      repoRoot: '.'
+    })
+    ;(existsSync as jest.Mock).mockReturnValue(true)
+    ;(readFileSync as jest.Mock).mockReturnValue('{ invalid json }')
+    ;(writeFile as jest.Mock).mockResolvedValue(undefined)
+
+    const mockConsoleError = jest.fn()
+    jest.spyOn(console, 'error').mockImplementation(mockConsoleError)
+
+    await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
+
+    const expectedContent = [
+      { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: null }
+    ]
+
+    expect(writeFile).toHaveBeenCalledWith(
+      '/foo/src/content.ts',
+      `export const content = ${JSON.stringify(expectedContent)}`,
+    )
+  })
+
+  it('should handle version with pre-release tags (e.g., 6.0.0-beta.1)', async () => {
+    const mockContent = [
+      { name: 'test', base: 'src/docs', pattern: '**/*.md' }
+    ]
+    ;(getConfig as jest.Mock).mockResolvedValue({
+      content: mockContent,
+      repoRoot: '.'
+    })
+    ;(existsSync as jest.Mock).mockReturnValue(true)
+    ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '6.0.0-beta.1' }))
+    ;(writeFile as jest.Mock).mockResolvedValue(undefined)
+
+    await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
+
+    const expectedContent = [
+      { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: 'v6' }
+    ]
+
+    expect(writeFile).toHaveBeenCalledWith(
+      '/foo/src/content.ts',
+      `export const content = ${JSON.stringify(expectedContent)}`,
+    )
+  })
+
+  it('should log version extraction in verbose mode', async () => {
+    const mockContent = [
+      { name: 'test', base: 'src/docs', pattern: '**/*.md' }
+    ]
+    ;(getConfig as jest.Mock).mockResolvedValue({
+      content: mockContent,
+      repoRoot: '.'
+    })
+    ;(existsSync as jest.Mock).mockReturnValue(true)
+    ;(readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ version: '6.2.2' }))
+    ;(writeFile as jest.Mock).mockResolvedValue(undefined)
+
+    const mockConsoleLog = jest.fn()
+    jest.spyOn(console, 'log').mockImplementation(mockConsoleLog)
+
+    await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', true)
+
+    expect(mockConsoleLog).toHaveBeenCalledWith(
+      'Extracted version v6 from /config/dir/src/docs/package.json\n'
+    )
+  })
 })
