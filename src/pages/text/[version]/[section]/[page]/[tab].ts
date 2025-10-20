@@ -4,6 +4,8 @@ import { getCollection } from 'astro:content'
 import { content } from '../../../../../content'
 import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../../../../../utils'
 
+export const prerender = false
+
 type ContentEntry = CollectionEntry<
   'core-docs' | 'quickstarts-docs' | 'react-component-docs'
 >
@@ -75,41 +77,4 @@ export const GET: APIRoute = async ({ params }) => {
       'Content-Type': 'text/plain; charset=utf-8',
     },
   })
-}
-
-export async function getStaticPaths() {
-  const paths: {
-    params: { version: string; section: string; page: string; tab: string }
-  }[] = []
-
-  for (const contentEntry of content) {
-    if (contentEntry.version) {
-      const collection = await getCollection(contentEntry.name as CollectionKey)
-      const versionedEntries = collection
-        .map(({ data, filePath, ...rest }) => ({
-          filePath,
-          ...rest,
-          data: {
-            ...data,
-            tab: data.tab || data.source || getDefaultTab(filePath),
-          },
-        }))
-        .filter((entry) => entry.data.tab)
-        .map((entry) => {
-          const tab = addDemosOrDeprecated(entry.data.tab, entry.id)
-          return {
-            params: {
-              version: contentEntry.version as string,
-              page: kebabCase(entry.data.id),
-              section: entry.data.section,
-              tab,
-            },
-          }
-        })
-
-      paths.push(...versionedEntries)
-    }
-  }
-
-  return paths
 }
