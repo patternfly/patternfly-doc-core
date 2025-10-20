@@ -78,9 +78,9 @@ export const GET: APIRoute = async ({ params }) => {
 }
 
 export async function getStaticPaths() {
-  const paths: Array<{
+  const paths: {
     params: { version: string; section: string; page: string; tab: string }
-  }> = []
+  }[] = []
 
   for (const contentEntry of content) {
     if (contentEntry.version) {

@@ -2,8 +2,7 @@ import type { APIRoute } from 'astro'
 
 export const prerender = false
 
-export const GET: APIRoute = async () => {
-  return new Response(
+export const GET: APIRoute = async () => new Response(
     JSON.stringify({
       name: 'PatternFly Documentation API',
       description: 'Machine-readable documentation API for LLM agents and MCP servers',
@@ -186,4 +185,3 @@ export const GET: APIRoute = async () => {
       },
     },
   )
-}
