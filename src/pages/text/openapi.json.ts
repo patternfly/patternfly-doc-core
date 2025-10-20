@@ -222,7 +222,7 @@ export const GET: APIRoute = async () => {
         get: {
           summary: 'List tabs for a page',
           description:
-            'Returns an array of available tabs for the specified page with slug and display name',
+            'Returns an array of available tab slugs for the specified page',
           operationId: 'getTabs',
           parameters: [
             {
@@ -259,31 +259,16 @@ export const GET: APIRoute = async () => {
           ],
           responses: {
             '200': {
-              description: 'List of available tabs',
+              description: 'List of available tab slugs',
               content: {
                 'application/json': {
                   schema: {
                     type: 'array',
                     items: {
-                      type: 'object',
-                      properties: {
-                        slug: {
-                          type: 'string',
-                          description: 'Tab identifier',
-                        },
-                        name: {
-                          type: 'string',
-                          description: 'Tab display name',
-                        },
-                      },
-                      required: ['slug', 'name'],
+                      type: 'string',
                     },
                   },
-                  example: [
-                    { slug: 'react', name: 'React' },
-                    { slug: 'react-demos', name: 'React demos' },
-                    { slug: 'html', name: 'HTML' },
-                  ],
+                  example: ['react', 'react-demos', 'html'],
                 },
               },
             },

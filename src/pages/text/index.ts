@@ -112,18 +112,9 @@ export const GET: APIRoute = async () => new Response(
           ],
           returns: {
             type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                slug: 'string',
-                name: 'string',
-              },
-            },
-            example: [
-              { slug: 'react', name: 'React' },
-              { slug: 'react-demos', name: 'React demos' },
-              { slug: 'html', name: 'HTML' },
-            ],
+            items: 'string',
+            description: 'Array of tab slugs',
+            example: ['react', 'react-demos', 'html'],
           },
         },
         {
@@ -173,7 +164,7 @@ export const GET: APIRoute = async () => new Response(
           'GET /text/versions → ["v6"]',
           'GET /text/v6 → ["components", "layouts", ...]',
           'GET /text/v6/components → ["alert", "button", ...]',
-          'GET /text/v6/components/alert → [{slug: "react", name: "React"}, ...]',
+          'GET /text/v6/components/alert → ["react", "html", ...]',
           'GET /text/v6/components/alert/react → (markdown content)',
         ],
       },

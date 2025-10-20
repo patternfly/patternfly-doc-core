@@ -3,7 +3,6 @@ import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { content } from '../../../../content'
 import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../../../../utils'
-import { tabNames } from '../../../../globals'
 
 export const prerender = false
 
@@ -43,8 +42,8 @@ export const GET: APIRoute = async ({ params }) => {
   const tabsDictionary: Record<string, string[]> = {}
 
   collections.flat().forEach((entry: ContentEntry) => {
-    const { tab, source, tabName } = entry.data
-    const hasTab = !!tab || !!source || !!tabName
+    const { tab, source } = entry.data
+    const hasTab = !!tab || !!source
     let finalTab = tab
 
     if (!hasTab) {
@@ -62,10 +61,6 @@ export const GET: APIRoute = async ({ params }) => {
       } else if (!tabEntry.includes(finalTab)) {
         tabsDictionary[entry.data.id] = [...tabEntry, finalTab]
       }
-    }
-
-    if (tabName) {
-      tabNames[tab] = tabName
     }
   })
 
@@ -117,12 +112,7 @@ export const GET: APIRoute = async ({ params }) => {
   const tabs = tabsDictionary[matchingEntry.data.id] || []
 
   return new Response(
-    JSON.stringify(
-      tabs.map((tab) => ({
-        slug: tab,
-        name: tabNames[tab] || tab,
-      })),
-    ),
+    JSON.stringify(tabs),
     {
       status: 200,
       headers: {
