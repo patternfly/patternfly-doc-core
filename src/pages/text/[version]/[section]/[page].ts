@@ -2,7 +2,11 @@ import type { APIRoute } from 'astro'
 import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { content } from '../../../../content'
-import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../../../../utils'
+import {
+  kebabCase,
+  getDefaultTab,
+  addDemosOrDeprecated,
+} from '../../../../utils'
 
 export const prerender = false
 
@@ -39,30 +43,29 @@ export const GET: APIRoute = async ({ params }) => {
   )
 
   // Build tabs dictionary similar to the main page logic
-  const tabsDictionary: Record<string, string[]> = {}
+  const tabsDictionary: Record<string, string[]> = collections
+    .flat()
+    .reduce((acc: Record<string, string[]>, entry: ContentEntry) => {
+      const { tab: specifiedTab, source } = entry.data
+      const hasTab = !!specifiedTab || !!source
+      let tab = specifiedTab
 
-  collections.flat().forEach((entry: ContentEntry) => {
-    const { tab, source } = entry.data
-    const hasTab = !!tab || !!source
-    let finalTab = tab
-
-    if (!hasTab) {
-      finalTab = getDefaultTab(entry.filePath)
-    }
-
-    if (hasTab && entry.id) {
-      finalTab = addDemosOrDeprecated(entry.data.tab, entry.id)
-    }
-
-    if (finalTab) {
-      const tabEntry = tabsDictionary[entry.data.id]
-      if (tabEntry === undefined) {
-        tabsDictionary[entry.data.id] = [finalTab]
-      } else if (!tabEntry.includes(finalTab)) {
-        tabsDictionary[entry.data.id] = [...tabEntry, finalTab]
+      if (!hasTab) {
+        tab = getDefaultTab(entry.filePath)
+      } else {
+        tab = addDemosOrDeprecated(specifiedTab, entry.id)
       }
-    }
-  })
+
+      const tabEntry = acc[entry.data.id]
+      
+      if (tabEntry === undefined) {
+        acc[entry.data.id] = [tab]
+      } else if (!tabEntry.includes(tab)) {
+        acc[entry.data.id] = [...tabEntry, tab]
+      }
+
+      return acc
+    }, {})
 
   // Sort tabs
   const defaultOrder = 50
@@ -96,8 +99,7 @@ export const GET: APIRoute = async ({ params }) => {
   const flatEntries = collections.flat()
   const matchingEntry = flatEntries.find(
     (entry: ContentEntry) =>
-      entry.data.section === section &&
-      kebabCase(entry.data.id) === page,
+      entry.data.section === section && kebabCase(entry.data.id) === page,
   )
 
   if (!matchingEntry) {
@@ -111,13 +113,10 @@ export const GET: APIRoute = async ({ params }) => {
 
   const tabs = tabsDictionary[matchingEntry.data.id] || []
 
-  return new Response(
-    JSON.stringify(tabs),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  return new Response(JSON.stringify(tabs), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
     },
-  )
+  })
 }
