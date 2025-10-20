@@ -5,6 +5,8 @@ import { content } from '../../../../content'
 import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../../../../utils'
 import { tabNames } from '../../../../globals'
 
+export const prerender = false
+
 type ContentEntry = CollectionEntry<
   'core-docs' | 'quickstarts-docs' | 'react-component-docs'
 >
@@ -128,28 +130,4 @@ export const GET: APIRoute = async ({ params }) => {
       },
     },
   )
-}
-
-export async function getStaticPaths() {
-  const paths = new Set<string>()
-
-  for (const contentEntry of content) {
-    if (contentEntry.version) {
-      const collection = await getCollection(contentEntry.name as CollectionKey)
-      collection.forEach((entry: ContentEntry) => {
-        if (entry.data.section && entry.data.id) {
-          paths.add(
-            `${contentEntry.version}/${entry.data.section}/${kebabCase(entry.data.id)}`,
-          )
-        }
-      })
-    }
-  }
-
-  return Array.from(paths).map((path) => {
-    const [version, section, page] = path.split('/')
-    return {
-      params: { version, section, page },
-    }
-  })
 }

@@ -3,6 +3,8 @@ import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { content } from '../../content'
 
+export const prerender = false
+
 type ContentEntry = CollectionEntry<
   'core-docs' | 'quickstarts-docs' | 'react-component-docs'
 >
@@ -57,17 +59,4 @@ export const GET: APIRoute = async ({ params }) => {
       },
     },
   )
-}
-
-export async function getStaticPaths() {
-  const versions = new Set<string>()
-  content.forEach((entry) => {
-    if (entry.version) {
-      versions.add(entry.version)
-    }
-  })
-
-  return Array.from(versions).map((version) => ({
-    params: { version },
-  }))
 }

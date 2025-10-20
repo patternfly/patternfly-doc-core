@@ -4,6 +4,8 @@ import { getCollection } from 'astro:content'
 import { content } from '../../../content'
 import { kebabCase } from '../../../utils'
 
+export const prerender = false
+
 type ContentEntry = CollectionEntry<
   'core-docs' | 'quickstarts-docs' | 'react-component-docs'
 >
@@ -55,27 +57,5 @@ export const GET: APIRoute = async ({ params }) => {
     headers: {
       'Content-Type': 'application/json',
     },
-  })
-}
-
-export async function getStaticPaths() {
-  const versionSections = new Set<string>()
-
-  for (const contentEntry of content) {
-    if (contentEntry.version) {
-      const collection = await getCollection(contentEntry.name as CollectionKey)
-      collection.forEach((entry: ContentEntry) => {
-        if (entry.data.section) {
-          versionSections.add(`${contentEntry.version}/${entry.data.section}`)
-        }
-      })
-    }
-  }
-
-  return Array.from(versionSections).map((path) => {
-    const [version, section] = path.split('/')
-    return {
-      params: { version, section },
-    }
   })
 }

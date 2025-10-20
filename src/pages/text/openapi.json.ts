@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro'
 import { content } from '../../content'
 
+export const prerender = false
+
 export const GET: APIRoute = async () => {
   const versions = new Set<string>()
   content.forEach((entry) => {
