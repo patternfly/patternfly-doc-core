@@ -30,3 +30,5 @@ pnpm-debug.log*
 
 ## Ignore content.ts
 src/content.ts
+
+coverage/
