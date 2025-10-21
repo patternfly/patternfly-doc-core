@@ -3,6 +3,7 @@ import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { content } from '../../../content'
 import { kebabCase } from '../../../utils'
+import { createJsonResponse } from '../../../utils/apiHelpers'
 
 export const prerender = false
 
@@ -14,9 +15,9 @@ export const GET: APIRoute = async ({ params }) => {
   const { version, section } = params
 
   if (!version || !section) {
-    return new Response(
-      JSON.stringify({ error: 'Version and section parameters are required' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+    return createJsonResponse(
+      { error: 'Version and section parameters are required' },
+      400,
     )
   }
 
@@ -26,10 +27,7 @@ export const GET: APIRoute = async ({ params }) => {
     .map((entry) => entry.name as CollectionKey)
 
   if (collectionsToFetch.length === 0) {
-    return new Response(
-      JSON.stringify({ error: `Version '${version}' not found` }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } },
-    )
+    return createJsonResponse({ error: `Version '${version}' not found` }, 404)
   }
 
   const collections = await Promise.all(
@@ -44,18 +42,11 @@ export const GET: APIRoute = async ({ params }) => {
   })
 
   if (pages.size === 0) {
-    return new Response(
-      JSON.stringify({
-        error: `Section '${section}' not found for version '${version}'`,
-      }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } },
+    return createJsonResponse(
+      { error: `Section '${section}' not found for version '${version}'` },
+      404,
     )
   }
 
-  return new Response(JSON.stringify(Array.from(pages).sort()), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return createJsonResponse(Array.from(pages).sort())
 }

@@ -52,7 +52,7 @@ it('returns all pages within a section', async () => {
   const body = await response.json()
 
   expect(response.status).toBe(200)
-  expect(response.headers.get('Content-Type')).toBe('application/json')
+  expect(response.headers.get('Content-Type')).toBe('application/json; charset=utf-8')
   expect(Array.isArray(body)).toBe(true)
   expect(body).toContain('alert')
   expect(body).toContain('button')

@@ -7,6 +7,7 @@ import {
   getDefaultTab,
   addDemosOrDeprecated,
 } from '../../../../utils'
+import { createJsonResponse } from '../../../../utils/apiHelpers'
 
 export const prerender = false
 
@@ -18,11 +19,9 @@ export const GET: APIRoute = async ({ params }) => {
   const { version, section, page } = params
 
   if (!version || !section || !page) {
-    return new Response(
-      JSON.stringify({
-        error: 'Version, section, and page parameters are required',
-      }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+    return createJsonResponse(
+      { error: 'Version, section, and page parameters are required' },
+      400,
     )
   }
 
@@ -32,10 +31,7 @@ export const GET: APIRoute = async ({ params }) => {
     .map((entry) => entry.name as CollectionKey)
 
   if (collectionsToFetch.length === 0) {
-    return new Response(
-      JSON.stringify({ error: `Version '${version}' not found` }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } },
-    )
+    return createJsonResponse({ error: `Version '${version}' not found` }, 404)
   }
 
   const collections = await Promise.all(
@@ -103,20 +99,15 @@ export const GET: APIRoute = async ({ params }) => {
   )
 
   if (!matchingEntry) {
-    return new Response(
-      JSON.stringify({
+    return createJsonResponse(
+      {
         error: `Page '${page}' not found in section '${section}' for version '${version}'`,
-      }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } },
+      },
+      404,
     )
   }
 
   const tabs = tabsDictionary[matchingEntry.data.id] || []
 
-  return new Response(JSON.stringify(tabs), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return createJsonResponse(tabs)
 }

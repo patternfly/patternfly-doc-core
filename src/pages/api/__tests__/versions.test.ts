@@ -17,7 +17,7 @@ it('returns unique versions as sorted array', async () => {
   const body = await response.json()
 
   expect(response.status).toBe(200)
-  expect(response.headers.get('Content-Type')).toBe('application/json')
+  expect(response.headers.get('Content-Type')).toBe('application/json; charset=utf-8')
   expect(body).toEqual(['v5', 'v6'])
 })
 

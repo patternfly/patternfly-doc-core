@@ -25,7 +25,7 @@ export const GET: APIRoute = async () => {
     },
     servers: [
       {
-        url: '/text',
+        url: '/api',
         description: 'Documentation API base path',
       },
     ],
@@ -379,10 +379,14 @@ export const GET: APIRoute = async () => {
     ],
   }
 
-  return new Response(JSON.stringify(openApiSpec, null, 2), {
+  const body = JSON.stringify(openApiSpec, null, 2)
+  return new Response(body, {
     status: 200,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-cache',
+      Date: new Date().toUTCString(),
+      'Content-Length': body.length.toString(),
     },
   })
 }

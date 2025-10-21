@@ -3,6 +3,7 @@ import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { content } from '../../../../../content'
 import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../../../../../utils'
+import { createJsonResponse, createTextResponse } from '../../../../../utils/apiHelpers'
 
 export const prerender = false
 
@@ -14,11 +15,9 @@ export const GET: APIRoute = async ({ params }) => {
   const { version, section, page, tab } = params
 
   if (!version || !section || !page || !tab) {
-    return new Response(
-      JSON.stringify({
-        error: 'Version, section, page, and tab parameters are required',
-      }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+    return createJsonResponse(
+      { error: 'Version, section, page, and tab parameters are required' },
+      400,
     )
   }
 
@@ -28,10 +27,7 @@ export const GET: APIRoute = async ({ params }) => {
     .map((entry) => entry.name as CollectionKey)
 
   if (collectionsToFetch.length === 0) {
-    return new Response(
-      JSON.stringify({ error: `Version '${version}' not found` }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } },
-    )
+    return createJsonResponse({ error: `Version '${version}' not found` }, 404)
   }
 
   const collections = await Promise.all(
@@ -60,21 +56,16 @@ export const GET: APIRoute = async ({ params }) => {
   })
 
   if (!matchingEntry) {
-    return new Response(
-      JSON.stringify({
+    return createJsonResponse(
+      {
         error: `Tab '${tab}' not found for page '${page}' in section '${section}' for version '${version}'`,
-      }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } },
+      },
+      404,
     )
   }
 
   // Get the raw body content (markdown/mdx text)
   const textContent = matchingEntry.body || ''
 
-  return new Response(textContent, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-    },
-  })
+  return createTextResponse(textContent)
 }

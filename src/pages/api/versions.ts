@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
 import { content } from '../../content'
+import { createJsonResponse } from '../../utils/apiHelpers'
 
 export const prerender = false
 
@@ -12,13 +13,5 @@ export const GET: APIRoute = async () => {
     }
   })
 
-  return new Response(
-    JSON.stringify(Array.from(versions).sort()),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  )
+  return createJsonResponse(Array.from(versions).sort())
 }

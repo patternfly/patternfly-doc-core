@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro'
+import { createJsonResponse } from '../../utils/apiHelpers'
 
 export const prerender = false
 
-export const GET: APIRoute = async () => new Response(
-    JSON.stringify({
+export const GET: APIRoute = async () =>
+  createJsonResponse({
       name: 'PatternFly Documentation API',
       description: 'Machine-readable documentation API for LLM agents and MCP servers',
       version: '1.0.0',
@@ -168,11 +169,4 @@ export const GET: APIRoute = async () => new Response(
           'GET /text/v6/components/alert/react → (markdown content)',
         ],
       },
-    }),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  )
+    })

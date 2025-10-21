@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro'
 import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { content } from '../../content'
+import { createJsonResponse } from '../../utils/apiHelpers'
 
 export const prerender = false
 
@@ -13,9 +14,9 @@ export const GET: APIRoute = async ({ params }) => {
   const { version } = params
 
   if (!version) {
-    return new Response(
-      JSON.stringify({ error: 'Version parameter is required' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } },
+    return createJsonResponse(
+      { error: 'Version parameter is required' },
+      400,
     )
   }
 
@@ -33,10 +34,7 @@ export const GET: APIRoute = async ({ params }) => {
     .map((entry) => entry.name as CollectionKey)
 
   if (collectionsToFetch.length === 0) {
-    return new Response(
-      JSON.stringify({ error: `Version '${version}' not found` }),
-      { status: 404, headers: { 'Content-Type': 'application/json' } },
-    )
+    return createJsonResponse({ error: `Version '${version}' not found` }, 404)
   }
 
   const collections = await Promise.all(
@@ -50,13 +48,5 @@ export const GET: APIRoute = async ({ params }) => {
     }
   })
 
-  return new Response(
-    JSON.stringify(Array.from(sections).sort()),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  )
+  return createJsonResponse(Array.from(sections).sort())
 }
