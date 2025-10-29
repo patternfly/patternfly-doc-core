@@ -29,4 +29,11 @@ export const config = {
     //   ],
     // },
   ],
+  // Add custom scope items for LiveExample component
+  // These will be available in your example code blocks
+  // Example:
+  // scope: {
+  //   MyCustomComponent: () => <div>Custom</div>,
+  //   myUtilFunction: (x) => x * 2,
+  // },
 }
