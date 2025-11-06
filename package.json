@@ -72,7 +72,7 @@
     "react-docgen": "^7.1.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^6.0.0",
-    "sass": "^1.89.2",
+    "sass": "^1.90.0",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
