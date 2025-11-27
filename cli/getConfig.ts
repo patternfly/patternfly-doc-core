@@ -16,6 +16,7 @@ export interface DocsConfig {
   outputDir: string;
   propsGlobs: PropsGlobs[];
   repoRoot?: string;
+  scope?: Record<string, any>;
 }
 
 export async function getConfig(fileLocation: string): Promise<DocsConfig | undefined> {
