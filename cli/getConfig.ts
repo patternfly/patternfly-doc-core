@@ -4,7 +4,6 @@ export interface CollectionDefinition {
   packageName?: string
   pattern: string
   name: string
-  version?: string
 }
 
 export interface PropsGlobs {
