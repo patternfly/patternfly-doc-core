@@ -1,6 +1,7 @@
-import { readFile, writeFile, access } from 'fs/promises'
+import { readFile, writeFile } from 'fs/promises'
 import { glob } from 'glob'
 import path from 'path'
+import { fileExists } from './fileExists.js'
 
 function handleTsExamples(content: string): string {
   //regex link: https://regexr.com/8f0bu
@@ -55,10 +56,6 @@ function convertCommentsToMDX(content: string): string {
     /<!--([\s\S]*?)-->/g,
     (_, comment) => `{/*${comment}*/}`,
   )
-}
-
-async function fileExists(file: string): Promise<boolean> {
-  return access(file).then(() => true).catch(() => false)
 }
 
 async function processFile(file: string): Promise<void> {

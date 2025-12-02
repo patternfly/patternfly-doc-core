@@ -2,6 +2,7 @@
 export interface CollectionDefinition {
   base?: string
   packageName?: string
+  version?: string
   pattern: string
   name: string
 }

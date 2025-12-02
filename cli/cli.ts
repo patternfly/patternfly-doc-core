@@ -12,7 +12,8 @@ import { symLinkConfig } from './symLinkConfig.js'
 import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
-import { mkdir } from 'fs/promises'
+import { mkdir, copyFile } from 'fs/promises'
+import { fileExists } from './fileExists.js'
 
 const currentDir = process.cwd()
 const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
@@ -86,6 +87,26 @@ async function transformMDContentToMDX() {
   }
 }
 
+async function initializeApiIndex() {
+  const templateIndexPath = join(astroRoot, 'cli', 'templates', 'apiIndex.json')
+  const targetIndexPath = join(astroRoot, 'src', 'apiIndex.json')
+
+  const indexExists = await fileExists(targetIndexPath)
+
+  // early return if the file exists from a previous build
+  if (indexExists) {
+    console.log('apiIndex.json already exists, skipping initialization')
+    return
+  }
+
+  try {
+    await copyFile(templateIndexPath, targetIndexPath)
+    console.log('Initialized apiIndex.json')
+  } catch (e: any) {
+    console.error('Error copying apiIndex.json template:', e)
+  }
+}
+
 async function buildProject(): Promise<DocsConfig | undefined> {
   await updateContent(program)
   await generateProps(program, true)
@@ -103,6 +124,7 @@ async function buildProject(): Promise<DocsConfig | undefined> {
     return config
   }
 
+  await initializeApiIndex()
   await transformMDContentToMDX()
 
   build({
@@ -172,6 +194,7 @@ program.command('init').action(async () => {
 
 program.command('start').action(async () => {
   await updateContent(program)
+  await initializeApiIndex()
 
   // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to
   // prevent that we're just creating a props file regardless of what they say if one doesn't exist yet
