@@ -8,10 +8,10 @@ export const GET: APIRoute = async () =>
       name: 'PatternFly Documentation API',
       description: 'Machine-readable documentation API for LLM agents and MCP servers',
       version: '1.0.0',
-      baseUrl: '/text',
+      baseUrl: '/api',
       endpoints: [
         {
-          path: '/text',
+          path: '/api',
           method: 'GET',
           description: 'Get API schema and documentation',
           returns: {
@@ -20,7 +20,7 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/text/versions',
+          path: '/api/versions',
           method: 'GET',
           description: 'List available documentation versions',
           returns: {
@@ -30,7 +30,7 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/text/openapi.json',
+          path: '/api/openapi.json',
           method: 'GET',
           description: 'Get OpenAPI 3.0 specification',
           returns: {
@@ -39,7 +39,7 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/text/{version}',
+          path: '/api/{version}',
           method: 'GET',
           description: 'List available sections for a specific version',
           parameters: [
@@ -58,7 +58,7 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/text/{version}/{section}',
+          path: '/api/{version}/{section}',
           method: 'GET',
           description: 'List available pages within a section',
           parameters: [
@@ -85,7 +85,7 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/text/{version}/{section}/{page}',
+          path: '/api/{version}/{section}/{page}',
           method: 'GET',
           description: 'List available tabs for a page',
           parameters: [
@@ -119,7 +119,7 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/text/{version}/{section}/{page}/{tab}',
+          path: '/api/{version}/{section}/{page}/{tab}',
           method: 'GET',
           description: 'Get raw markdown/MDX content for a specific tab',
           parameters: [
@@ -162,11 +162,11 @@ export const GET: APIRoute = async () =>
       usage: {
         description: 'Navigate the API hierarchically to discover and retrieve documentation',
         exampleFlow: [
-          'GET /text/versions → ["v6"]',
-          'GET /text/v6 → ["components", "layouts", ...]',
-          'GET /text/v6/components → ["alert", "button", ...]',
-          'GET /text/v6/components/alert → ["react", "html", ...]',
-          'GET /text/v6/components/alert/react → (markdown content)',
+          'GET /api/versions → ["v6"]',
+          'GET /api/v6 → ["components", "layouts", ...]',
+          'GET /api/v6/components → ["alert", "button", ...]',
+          'GET /api/v6/components/alert → ["react", "html", ...]',
+          'GET /api/v6/components/alert/react → (markdown content)',
         ],
       },
     })

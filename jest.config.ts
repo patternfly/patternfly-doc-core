@@ -17,6 +17,7 @@ const config: Config = {
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/src/__mocks__/styleMock.ts',
     '(.+)\\.js': '$1',
+    '^astro:content$': '<rootDir>/src/__mocks__/astro-content.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/test.setup.ts'],
   transformIgnorePatterns: [

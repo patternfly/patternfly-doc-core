@@ -5,7 +5,7 @@ import { GET } from '../../../../[version]/[section]/[page]/[tab]'
  * to test markdown/MDX content retrieval
  */
 jest.mock('../../../../../../content', () => {
-  const { mockContentCollections } = jest.requireActual('../../../testHelpers')
+  const { mockContentCollections } = jest.requireActual('../../../../testHelpers.ts')
   return { content: mockContentCollections.v6 }
 })
 
@@ -15,7 +15,7 @@ jest.mock('../../../../../../content', () => {
  */
 jest.mock('astro:content', () => {
   const { mockEntriesWithBody, createGetCollectionMock } = jest.requireActual(
-    '../../../testHelpers',
+    '../../../../testHelpers.ts',
   )
   return {
     getCollection: createGetCollectionMock({
@@ -29,7 +29,7 @@ jest.mock('astro:content', () => {
  * Mock utilities for tab identification and transformation
  */
 jest.mock('../../../../../../utils', () => {
-  const { mockUtils } = jest.requireActual('../../../testHelpers')
+  const { mockUtils } = jest.requireActual('../../../../testHelpers.ts')
   return mockUtils
 })
 

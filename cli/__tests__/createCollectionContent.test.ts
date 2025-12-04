@@ -64,7 +64,7 @@ it('should call writeFile with the expected file location and content without th
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md' }
+    { name: 'test', base: '/config/dir/src/docs', pattern: '**/*.md', version: 'v6' }
   ]
 
   expect(writeFile).toHaveBeenCalledWith(
@@ -208,11 +208,12 @@ it('should handle content with packageName by finding package in node_modules', 
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { 
+    {
       base: '/config/dir/node_modules/@patternfly/react-core',
-      name: 'test', 
-      packageName: '@patternfly/react-core', 
-      pattern: '**/*.md'
+      name: 'test',
+      packageName: '@patternfly/react-core',
+      pattern: '**/*.md',
+      version: 'v6'
     }
   ]
 
@@ -242,11 +243,12 @@ it('should handle content with packageName when package is not found locally but
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { 
+    {
       base: '/config/node_modules/@patternfly/react-core',
-      name: 'test', 
-      packageName: '@patternfly/react-core', 
-      pattern: '**/*.md'
+      name: 'test',
+      packageName: '@patternfly/react-core',
+      pattern: '**/*.md',
+      version: 'v6'
     }
   ]
 
@@ -274,11 +276,12 @@ it('should handle content with packageName when package is not found anywhere', 
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { 
+    {
       base: null,
-      name: 'test', 
-      packageName: '@patternfly/react-core', 
-      pattern: '**/*.md'
+      name: 'test',
+      packageName: '@patternfly/react-core',
+      pattern: '**/*.md',
+      version: 'v6'
     }
   ]
 
@@ -307,12 +310,13 @@ it('should handle mixed content with both base and packageName entries', async (
   await createCollectionContent('/foo/', '/config/dir/pf-docs.config.mjs', false)
 
   const expectedContent = [
-    { name: 'docs', base: '/config/dir/src/docs', pattern: '**/*.md' },
-    { 
+    { name: 'docs', base: '/config/dir/src/docs', pattern: '**/*.md', version: 'v6' },
+    {
       base: '/config/dir/node_modules/@patternfly/react-core',
-      name: 'components', 
-      packageName: '@patternfly/react-core', 
-      pattern: '**/*.md'
+      name: 'components',
+      packageName: '@patternfly/react-core',
+      pattern: '**/*.md',
+      version: 'v6'
     }
   ]
 
