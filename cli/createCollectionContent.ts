@@ -80,6 +80,8 @@ export async function createCollectionContent(
   verboseModeLog('repoRootDir: ', repoRootDir, '\n')
 
   const contentWithAbsolutePaths = content.map((contentEntry) => {
+    const version = contentEntry.version || 'v6'
+
     if (contentEntry.base) {
       const absoluteBase = resolve(configDir, contentEntry.base)
 
@@ -89,6 +91,7 @@ export async function createCollectionContent(
       return {
         ...contentEntry,
         base: absoluteBase,
+        version
       }
     }
 
@@ -103,6 +106,7 @@ export async function createCollectionContent(
       return {
         ...contentEntry,
         base: null,
+        version
       }
     }
 
@@ -116,6 +120,7 @@ export async function createCollectionContent(
     return {
       base: packagePath,
       ...contentEntry,
+      version
     }
   })
 

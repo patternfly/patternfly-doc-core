@@ -5,11 +5,14 @@ import { convertToMDX } from '../convertToMDX.ts'
 jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
   writeFile: jest.fn(),
-  access: jest.fn().mockResolvedValue(undefined), // Mock access to always resolve (file exists)
 }))
 
 jest.mock('glob', () => ({
   glob: jest.fn(),
+}))
+
+jest.mock('../fileExists', () => ({
+  fileExists: jest.fn().mockResolvedValue(true), // Mock fileExists to always return true (file exists)
 }))
 
 beforeEach(() => {

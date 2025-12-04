@@ -13,10 +13,12 @@ const config: Config = {
     '^.+\\.m?jsx?$': 'babel-jest',
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
+  testPathIgnorePatterns: ['/node_modules/', '/__tests__/helpers/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/src/__mocks__/styleMock.ts',
     '(.+)\\.js': '$1',
+    '^astro:content$': '<rootDir>/src/__mocks__/astro-content.ts',
   },
   setupFilesAfterEnv: ['<rootDir>/test.setup.ts'],
   transformIgnorePatterns: [

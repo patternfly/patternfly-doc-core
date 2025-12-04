@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/",
+    "/_astro/*",
+    "/.assetsignore",
+    "/PF-HorizontalLogo-Color.svg",
+    "/PF-HorizontalLogo-Reverse.svg",
+    "/avatarImg.svg",
+    "/avatarImgDark.svg",
+    "/favicon.svg",
+    "/content/*",
+    "/components/*",
+    "/layouts/*",
+    "/patterns/*",
+    "/utility-classes/*",
+    "/extensions/*"
+  ]
+}

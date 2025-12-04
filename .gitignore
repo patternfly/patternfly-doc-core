@@ -28,5 +28,9 @@ pnpm-debug.log*
 
 .eslintcache
 
-## Ignore content.ts
+## Ignore generated files
 src/content.ts
+src/apiIndex.json
+textContent/*.mdx
+
+coverage/
