@@ -87,7 +87,9 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const pageTabs: Record<string, Set<string>> = {}
 
     flatEntries.forEach((entry: any) => {
-      if (!entry.data.section) return
+      if (!entry.data.section) {
+        return
+      }
 
       const section = entry.data.section
       const page = kebabCase(entry.data.id)
@@ -104,7 +106,8 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       sectionPages[sectionKey].add(page)
 
       // Collect tab
-      const entryTab = entry.data.tab || entry.data.source || getDefaultTab(entry.filePath)
+      const entryTab =
+        entry.data.tab || entry.data.source || getDefaultTab(entry.filePath)
       const tab = addDemosOrDeprecated(entryTab, entry.id)
       if (!pageTabs[pageKey]) {
         pageTabs[pageKey] = new Set()

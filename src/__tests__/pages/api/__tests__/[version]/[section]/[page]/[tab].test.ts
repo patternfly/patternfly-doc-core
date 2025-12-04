@@ -6,9 +6,19 @@ import { GET } from '../../../../../../../pages/api/[version]/[section]/[page]/[
  */
 jest.mock('../../../../../../../content', () => ({
   content: [
-    { name: 'react-component-docs', base: '/mock/path/react', pattern: '**/*.md', version: 'v6' },
-    { name: 'core-docs', base: '/mock/path/core', pattern: '**/*.md', version: 'v6' }
-  ]
+    {
+      name: 'react-component-docs',
+      base: '/mock/path/react',
+      pattern: '**/*.md',
+      version: 'v6',
+    },
+    {
+      name: 'core-docs',
+      base: '/mock/path/core',
+      pattern: '**/*.md',
+      version: 'v6',
+    },
+  ],
 }))
 
 /**
@@ -23,28 +33,43 @@ jest.mock('astro:content', () => ({
           id: 'components/alert/react',
           slug: 'components/alert/react',
           body: '# Alert Component\n\nReact Alert documentation content',
-          data: { id: 'Alert', title: 'Alert', section: 'components', tab: 'react' },
-          collection: 'react-component-docs'
+          data: {
+            id: 'Alert',
+            title: 'Alert',
+            section: 'components',
+            tab: 'react',
+          },
+          collection: 'react-component-docs',
         },
         {
           id: 'components/alert/html',
           slug: 'components/alert/html',
           body: '# Alert HTML\n\nHTML Alert documentation content',
-          data: { id: 'Alert', title: 'Alert', section: 'components', tab: 'html' },
-          collection: 'react-component-docs'
+          data: {
+            id: 'Alert',
+            title: 'Alert',
+            section: 'components',
+            tab: 'html',
+          },
+          collection: 'react-component-docs',
         },
         {
           id: 'components/alert/react-demos',
           slug: 'components/alert/react-demos',
           body: '# Alert Demos\n\nReact demos content',
-          data: { id: 'Alert', title: 'Alert Demos', section: 'components', tab: 'react-demos' },
-          collection: 'react-component-docs'
-        }
+          data: {
+            id: 'Alert',
+            title: 'Alert Demos',
+            section: 'components',
+            tab: 'react-demos',
+          },
+          collection: 'react-component-docs',
+        },
       ],
-      'core-docs': []
+      'core-docs': [],
     }
     return Promise.resolve(mockData[collectionName] || [])
-  })
+  }),
 }))
 
 /**
@@ -52,7 +77,9 @@ jest.mock('astro:content', () => ({
  */
 jest.mock('../../../../../../../utils', () => ({
   kebabCase: jest.fn((id: string) => {
-    if (!id) return ''
+    if (!id) {
+      return ''
+    }
     return id
       .replace(/PatternFly/g, 'Patternfly')
       .replace(/([a-z])([A-Z])/g, '$1-$2')
@@ -60,18 +87,30 @@ jest.mock('../../../../../../../utils', () => ({
       .toLowerCase()
   }),
   getDefaultTab: jest.fn((filePath?: string) => {
-    if (!filePath) return 'react'
-    if (filePath.includes('react')) return 'react'
-    if (filePath.includes('html')) return 'html'
+    if (!filePath) {
+      return 'react'
+    }
+    if (filePath.includes('react')) {
+      return 'react'
+    }
+    if (filePath.includes('html')) {
+      return 'html'
+    }
     return 'react'
   }),
   addDemosOrDeprecated: jest.fn((tabName: string, filePath?: string) => {
-    if (!filePath || !tabName) return ''
+    if (!filePath || !tabName) {
+      return ''
+    }
     let result = tabName
-    if (filePath.includes('demos') && !tabName.includes('-demos')) result += '-demos'
-    if (filePath.includes('deprecated') && !tabName.includes('-deprecated')) result += '-deprecated'
+    if (filePath.includes('demos') && !tabName.includes('-demos')) {
+      result += '-demos'
+    }
+    if (filePath.includes('deprecated') && !tabName.includes('-deprecated')) {
+      result += '-deprecated'
+    }
     return result
-  })
+  }),
 }))
 
 /**

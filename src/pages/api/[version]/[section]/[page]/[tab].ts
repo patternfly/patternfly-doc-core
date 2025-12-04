@@ -1,11 +1,20 @@
+/* eslint-disable no-console */
 import type { APIRoute, GetStaticPaths } from 'astro'
 import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { content } from '../../../../../content'
-import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../../../../../utils'
+import {
+  kebabCase,
+  getDefaultTab,
+  addDemosOrDeprecated,
+} from '../../../../../utils'
 import { generateAndWriteApiIndex } from '../../../../../utils/apiIndex/generate'
 import { getApiIndex } from '../../../../../utils/apiIndex/get'
-import { createJsonResponse, createTextResponse, createIndexKey } from '../../../../../utils/apiHelpers'
+import {
+  createJsonResponse,
+  createTextResponse,
+  createIndexKey,
+} from '../../../../../utils/apiHelpers'
 
 export const prerender = true
 
@@ -18,7 +27,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
   // This runs once during build when getCollection() is available
   const index = await generateAndWriteApiIndex()
 
-  const paths: { params: { version: string; section: string; page: string; tab: string } }[] = []
+  const paths: {
+    params: { version: string; section: string; page: string; tab: string }
+  }[] = []
 
   // Build paths from index structure
   for (const version of index.versions) {
@@ -67,7 +78,9 @@ export const GET: APIRoute = async ({ params }) => {
   const pageKey = createIndexKey(version, section, page)
   if (!index.pages[sectionKey]?.includes(page)) {
     return createJsonResponse(
-      { error: `Page '${page}' not found in section '${section}' for version '${version}'` },
+      {
+        error: `Page '${page}' not found in section '${section}' for version '${version}'`,
+      },
       404,
     )
   }
@@ -91,16 +104,14 @@ export const GET: APIRoute = async ({ params }) => {
     collectionsToFetch.map((name) => getCollection(name)),
   )
 
-  const flatEntries = collections
-    .flat()
-    .map(({ data, filePath, ...rest }) => ({
-      filePath,
-      ...rest,
-      data: {
-        ...data,
-        tab: data.tab || data.source || getDefaultTab(filePath),
-      },
-    }))
+  const flatEntries = collections.flat().map(({ data, filePath, ...rest }) => ({
+    filePath,
+    ...rest,
+    data: {
+      ...data,
+      tab: data.tab || data.source || getDefaultTab(filePath),
+    },
+  }))
 
   // Find the matching entry
   const matchingEntry = flatEntries.find((entry: ContentEntry) => {
@@ -117,7 +128,7 @@ export const GET: APIRoute = async ({ params }) => {
     // Log warning - indicates index/content mismatch
     console.warn(
       `[API Warning] Index exists but content not found: ${version}/${section}/${page}/${tab}. ` +
-      'This may indicate a mismatch between index generation and actual content.'
+        'This may indicate a mismatch between index generation and actual content.',
     )
     return createJsonResponse(
       {

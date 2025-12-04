@@ -8,16 +8,16 @@ export const mockContentCollections = {
       name: 'react-component-docs',
       base: '/mock/path/react',
       pattern: '**/*.md',
-      version: 'v6'
+      version: 'v6',
     },
     {
       name: 'core-docs',
       base: '/mock/path/core',
       pattern: '**/*.md',
-      version: 'v6'
-    }
-  ]
-};
+      version: 'v6',
+    },
+  ],
+}
 
 export const mockEntriesWithBody = {
   'react-component-docs': [
@@ -29,9 +29,9 @@ export const mockEntriesWithBody = {
         id: 'Alert',
         title: 'Alert',
         section: 'components',
-        tab: 'react'
+        tab: 'react',
       },
-      collection: 'react-component-docs'
+      collection: 'react-component-docs',
     },
     {
       id: 'components/alert/html',
@@ -41,9 +41,9 @@ export const mockEntriesWithBody = {
         id: 'Alert',
         title: 'Alert',
         section: 'components',
-        tab: 'html'
+        tab: 'html',
       },
-      collection: 'react-component-docs'
+      collection: 'react-component-docs',
     },
     {
       id: 'components/alert/react-demos',
@@ -53,19 +53,18 @@ export const mockEntriesWithBody = {
         id: 'Alert',
         title: 'Alert Demos',
         section: 'components',
-        tab: 'react-demos'
+        tab: 'react-demos',
       },
-      collection: 'react-component-docs'
-    }
+      collection: 'react-component-docs',
+    },
   ],
-  'core-docs': []
-};
+  'core-docs': [],
+}
 
-export const createGetCollectionMock = (collections: Record<string, any[]>) => {
-  return jest.fn((collectionName: string) => {
-    return Promise.resolve(collections[collectionName] || []);
-  });
-};
+export const createGetCollectionMock = (collections: Record<string, any[]>) =>
+  jest.fn((collectionName: string) =>
+    Promise.resolve(collections[collectionName] || []),
+  )
 
 export const mockUtils = {
   isReactTab: jest.fn((tab: string) => tab.includes('react')),
@@ -86,7 +85,9 @@ export const mockUtils = {
     return result
   }),
   kebabCase: jest.fn((id: string) => {
-    if (!id) return ''
+    if (!id) {
+      return ''
+    }
     return id
       .replace(/PatternFly/g, 'Patternfly')
       .replace(/([a-z])([A-Z])/g, '$1-$2')
@@ -94,9 +95,15 @@ export const mockUtils = {
       .toLowerCase()
   }),
   getDefaultTab: jest.fn((filePath?: string) => {
-    if (!filePath) return 'react'
-    if (filePath.includes('react')) return 'react'
-    if (filePath.includes('html')) return 'html'
+    if (!filePath) {
+      return 'react'
+    }
+    if (filePath.includes('react')) {
+      return 'react'
+    }
+    if (filePath.includes('html')) {
+      return 'html'
+    }
     return 'react'
-  })
-};
+  }),
+}
