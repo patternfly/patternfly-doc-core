@@ -1,9 +1,9 @@
-import { GET } from '../versions'
+import { GET } from '../../../../pages/api/versions'
 
 /**
  * Mock apiIndex.json with multiple versions
  */
-jest.mock('../../../apiIndex.json', () => ({
+jest.mock('../../../../apiIndex.json', () => ({
   versions: ['v5', 'v6'],
   sections: {},
   pages: {},

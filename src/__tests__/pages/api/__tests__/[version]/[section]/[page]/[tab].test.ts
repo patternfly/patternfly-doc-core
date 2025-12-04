@@ -1,42 +1,83 @@
-import { GET } from '../../../../[version]/[section]/[page]/[tab]'
+import { GET } from '../../../../../../../pages/api/[version]/[section]/[page]/[tab]'
 
 /**
  * Mock content collections with entries that have body content
  * to test markdown/MDX content retrieval
  */
-jest.mock('../../../../../../content', () => {
-  const { mockContentCollections } = jest.requireActual('../../../../testHelpers.ts')
-  return { content: mockContentCollections.v6 }
-})
+jest.mock('../../../../../../../content', () => ({
+  content: [
+    { name: 'react-component-docs', base: '/mock/path/react', pattern: '**/*.md', version: 'v6' },
+    { name: 'core-docs', base: '/mock/path/core', pattern: '**/*.md', version: 'v6' }
+  ]
+}))
 
 /**
  * Mock getCollection to return entries with body (markdown content)
  * simulating real documentation pages with content
  */
-jest.mock('astro:content', () => {
-  const { mockEntriesWithBody, createGetCollectionMock } = jest.requireActual(
-    '../../../../testHelpers.ts',
-  )
-  return {
-    getCollection: createGetCollectionMock({
-      'react-component-docs': mockEntriesWithBody['react-component-docs'],
-      'core-docs': mockEntriesWithBody['core-docs'],
-    }),
-  }
-})
+jest.mock('astro:content', () => ({
+  getCollection: jest.fn((collectionName: string) => {
+    const mockData: Record<string, any[]> = {
+      'react-component-docs': [
+        {
+          id: 'components/alert/react',
+          slug: 'components/alert/react',
+          body: '# Alert Component\n\nReact Alert documentation content',
+          data: { id: 'Alert', title: 'Alert', section: 'components', tab: 'react' },
+          collection: 'react-component-docs'
+        },
+        {
+          id: 'components/alert/html',
+          slug: 'components/alert/html',
+          body: '# Alert HTML\n\nHTML Alert documentation content',
+          data: { id: 'Alert', title: 'Alert', section: 'components', tab: 'html' },
+          collection: 'react-component-docs'
+        },
+        {
+          id: 'components/alert/react-demos',
+          slug: 'components/alert/react-demos',
+          body: '# Alert Demos\n\nReact demos content',
+          data: { id: 'Alert', title: 'Alert Demos', section: 'components', tab: 'react-demos' },
+          collection: 'react-component-docs'
+        }
+      ],
+      'core-docs': []
+    }
+    return Promise.resolve(mockData[collectionName] || [])
+  })
+}))
 
 /**
  * Mock utilities for tab identification and transformation
  */
-jest.mock('../../../../../../utils', () => {
-  const { mockUtils } = jest.requireActual('../../../../testHelpers.ts')
-  return mockUtils
-})
+jest.mock('../../../../../../../utils', () => ({
+  kebabCase: jest.fn((id: string) => {
+    if (!id) return ''
+    return id
+      .replace(/PatternFly/g, 'Patternfly')
+      .replace(/([a-z])([A-Z])/g, '$1-$2')
+      .replace(/[\s_]+/g, '-')
+      .toLowerCase()
+  }),
+  getDefaultTab: jest.fn((filePath?: string) => {
+    if (!filePath) return 'react'
+    if (filePath.includes('react')) return 'react'
+    if (filePath.includes('html')) return 'html'
+    return 'react'
+  }),
+  addDemosOrDeprecated: jest.fn((tabName: string, filePath?: string) => {
+    if (!filePath || !tabName) return ''
+    let result = tabName
+    if (filePath.includes('demos') && !tabName.includes('-demos')) result += '-demos'
+    if (filePath.includes('deprecated') && !tabName.includes('-deprecated')) result += '-deprecated'
+    return result
+  })
+}))
 
 /**
  * Mock API index to validate paths
  */
-jest.mock('../../../../../../utils/apiIndex/get', () => ({
+jest.mock('../../../../../../../utils/apiIndex/get', () => ({
   getApiIndex: jest.fn().mockResolvedValue({
     versions: ['v6'],
     sections: {
