@@ -1,4 +1,4 @@
-import { getPackageName, getTabBase, getDefaultTab, addDemosOrDeprecated } from '../packageUtils'
+import { getPackageName, getTabBase, getDefaultTab, getDefaultTabForApi, addDemosOrDeprecated } from '../packageUtils'
 
 describe('getPackageName', () => {
   it('returns empty string for empty input', () => {
@@ -190,5 +190,72 @@ describe('getDefaultTab', () => {
   it('returns empty string for unknown package with deprecated path (empty tabBase causes addDemosOrDeprecated to return empty)', () => {
     const filePath = '/path/to/node_modules/unknown-package/deprecated/Button.js'
     expect(getDefaultTab(filePath)).toBe('')
+  })
+})
+
+describe('getDefaultTabForApi', () => {
+  it('returns base tab for regular patternfly package path', () => {
+    const filePath = '/path/to/node_modules/@patternfly/patternfly/dist/index.js'
+    expect(getDefaultTabForApi(filePath)).toBe('html')
+  })
+
+  it('returns base tab for regular react-core package path', () => {
+    const filePath = '/path/to/node_modules/@patternfly/react-core/dist/index.js'
+    expect(getDefaultTabForApi(filePath)).toBe('react')
+  })
+
+  it('returns demos tab for demos path with patternfly package', () => {
+    const filePath = '/path/to/node_modules/@patternfly/patternfly/demos/Button.js'
+    expect(getDefaultTabForApi(filePath)).toBe('html-demos')
+  })
+
+  it('returns demos tab for demos path with react-core package', () => {
+    const filePath = '/path/to/node_modules/@patternfly/react-core/demos/Button.js'
+    expect(getDefaultTabForApi(filePath)).toBe('react-demos')
+  })
+
+  it('returns deprecated tab for deprecated path with patternfly package', () => {
+    const filePath = '/path/to/node_modules/@patternfly/patternfly/deprecated/OldButton.js'
+    expect(getDefaultTabForApi(filePath)).toBe('html-deprecated')
+  })
+
+  it('returns deprecated tab for deprecated path with react-core package', () => {
+    const filePath = '/path/to/node_modules/@patternfly/react-core/deprecated/OldButton.js'
+    expect(getDefaultTabForApi(filePath)).toBe('react-deprecated')
+  })
+
+  it('adds both demos and deprecated when both are in path', () => {
+    const filePath = '/path/to/node_modules/@patternfly/react-core/demos/deprecated/Button.js'
+    expect(getDefaultTabForApi(filePath)).toBe('react-demos-deprecated')
+  })
+
+  it('returns "text" fallback for unknown package', () => {
+    const filePath = '/path/to/node_modules/unknown-package/dist/index.js'
+    expect(getDefaultTabForApi(filePath)).toBe('text')
+  })
+
+  it('returns "text" fallback for path without node_modules', () => {
+    const filePath = '/path/to/some/file.js'
+    expect(getDefaultTabForApi(filePath)).toBe('text')
+  })
+
+  it('returns "text" fallback for empty input', () => {
+    expect(getDefaultTabForApi('')).toBe('text')
+  })
+
+  it('returns "text" fallback for null/undefined input', () => {
+    expect(getDefaultTabForApi(null as any)).toBe('text')
+    expect(getDefaultTabForApi(undefined)).toBe('text')
+    expect(getDefaultTabForApi()).toBe('text')
+  })
+
+  it('returns "text" fallback for unknown package with demos path', () => {
+    const filePath = '/path/to/node_modules/unknown-package/demos/Button.js'
+    expect(getDefaultTabForApi(filePath)).toBe('text')
+  })
+
+  it('returns "text" fallback for unknown package with deprecated path', () => {
+    const filePath = '/path/to/node_modules/unknown-package/deprecated/Button.js'
+    expect(getDefaultTabForApi(filePath)).toBe('text')
   })
 })
