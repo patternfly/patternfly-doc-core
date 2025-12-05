@@ -86,7 +86,7 @@ jest.mock('../../../../../../../utils', () => ({
       .replace(/[\s_]+/g, '-')
       .toLowerCase()
   }),
-  getDefaultTab: jest.fn((filePath?: string) => {
+  getDefaultTabForApi: jest.fn((filePath?: string) => {
     if (!filePath) {
       return 'react'
     }

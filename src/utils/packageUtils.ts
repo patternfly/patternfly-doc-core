@@ -61,7 +61,9 @@ export const getDefaultTab = (filePath?: string): string => {
   const packageName = getPackageName(filePath)
   const tabBase = getTabBase(packageName)
 
-  const tab = addDemosOrDeprecated(tabBase, filePath)
-
-  return tab
+  return addDemosOrDeprecated(tabBase, filePath)
 }
+
+// This function is specifically for API routes where we need a fallback tab name
+// to ensure content is always accessible even when the default tab logic doesn't apply
+export const getDefaultTabForApi = (filePath?: string): string => getDefaultTab(filePath) || 'text'

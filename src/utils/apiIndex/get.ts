@@ -1,6 +1,7 @@
 import { join } from 'path'
 import { readFile } from 'fs/promises'
 import type { ApiIndex } from './generate'
+import { getOutputDir } from '../getOutputDir'
 
 /**
  * Reads and parses the API index file
@@ -10,7 +11,8 @@ import type { ApiIndex } from './generate'
  * @throws Error if index file is not found, contains invalid JSON, or has invalid structure
  */
 export async function getApiIndex(): Promise<ApiIndex> {
-  const indexPath = join(process.cwd(), 'src', 'apiIndex.json')
+  const outputDir = await getOutputDir()
+  const indexPath = join(outputDir, 'apiIndex.json')
 
   try {
     const content = await readFile(indexPath, 'utf-8')

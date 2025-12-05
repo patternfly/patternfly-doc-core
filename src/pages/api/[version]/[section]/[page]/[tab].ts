@@ -5,8 +5,8 @@ import { getCollection } from 'astro:content'
 import { content } from '../../../../../content'
 import {
   kebabCase,
-  getDefaultTab,
   addDemosOrDeprecated,
+  getDefaultTabForApi,
 } from '../../../../../utils'
 import { generateAndWriteApiIndex } from '../../../../../utils/apiIndex/generate'
 import { getApiIndex } from '../../../../../utils/apiIndex/get'
@@ -44,7 +44,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
     }
   }
 
-  return paths
+  // This shouldn't happen since we have a fallback tab value, but if it somehow does we need to alert the user
+  paths.forEach((path) => {
+    if (!path.params.tab) {
+      console.warn(`[API Warning] Tab not found for path: ${path.params.version}/${path.params.section}/${path.params.page}`)
+    }
+  })
+
+  // Again, this shouldn't happen since we have a fallback tab value, but if it somehow does and we don't filter out tabless paths it will crash the build
+  return paths.filter((path) => !!path.params.tab)
 }
 
 export const GET: APIRoute = async ({ params }) => {
@@ -109,7 +117,7 @@ export const GET: APIRoute = async ({ params }) => {
     ...rest,
     data: {
       ...data,
-      tab: data.tab || data.source || getDefaultTab(filePath),
+      tab: data.tab || data.source || getDefaultTabForApi(filePath),
     },
   }))
 

@@ -4,7 +4,9 @@ import { writeFile } from 'fs/promises'
 import { getCollection } from 'astro:content'
 import type { CollectionKey } from 'astro:content'
 import { content } from '../../content'
-import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../index'
+import { kebabCase, addDemosOrDeprecated } from '../index'
+import { getDefaultTabForApi } from '../packageUtils'
+import { getOutputDir } from '../getOutputDir'
 
 const SOURCE_ORDER: Record<string, number> = {
   react: 1,
@@ -107,7 +109,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
 
       // Collect tab
       const entryTab =
-        entry.data.tab || entry.data.source || getDefaultTab(entry.filePath)
+        entry.data.tab || entry.data.source || getDefaultTabForApi(entry.filePath)
       const tab = addDemosOrDeprecated(entryTab, entry.id)
       if (!pageTabs[pageKey]) {
         pageTabs[pageKey] = new Set()
@@ -137,7 +139,8 @@ export async function generateApiIndex(): Promise<ApiIndex> {
  * @param index - The API index structure to write
  */
 export async function writeApiIndex(index: ApiIndex): Promise<void> {
-  const indexPath = join(process.cwd(), 'src', 'apiIndex.json')
+  const outputDir = await getOutputDir()
+  const indexPath = join(outputDir, 'apiIndex.json')
 
   try {
     await writeFile(indexPath, JSON.stringify(index, null, 2))
