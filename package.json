@@ -25,7 +25,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "semantic-release": "semantic-release",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "clean": "rm -rf dist .astro .wrangler"
   },
   "main": "dist/cli/cli.js",
   "bin": "./dist/cli/cli.js",
