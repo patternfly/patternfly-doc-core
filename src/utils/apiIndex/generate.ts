@@ -133,7 +133,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
 }
 
 /**
- * Writes API index to src/apiIndex.json
+ * Writes API index to a apiIndex.json file in the user defined output directory
  * This file is used by server-side API routes to avoid runtime getCollection() calls
  *
  * @param index - The API index structure to write

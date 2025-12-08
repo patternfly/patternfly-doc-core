@@ -4,7 +4,7 @@ import { GET } from '../../../../pages/api/[version]'
  * Mock apiIndex.json with multiple versions (v5, v6)
  * to test section retrieval for different versions
  */
-jest.mock('../../../../apiIndex.json', () => ({
+jest.mock('outputDir/apiIndex.json', () => ({
   versions: ['v5', 'v6'],
   sections: {
     v5: ['getting-started'],

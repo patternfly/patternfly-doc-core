@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { createJsonResponse } from '../../utils/apiHelpers'
-import { versions as versionsData } from '../../apiIndex.json'
+import { versions as versionsData } from 'outputDir/apiIndex.json'
 
 export const prerender = false
 

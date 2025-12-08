@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import index from '../../apiIndex.json'
+import index from 'outputDir/apiIndex.json'
 
 export const prerender = false
 

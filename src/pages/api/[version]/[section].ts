@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { createJsonResponse, createIndexKey } from '../../../utils/apiHelpers'
-import { pages as pagesData } from '../../../apiIndex.json'
+import { pages as pagesData } from 'outputDir/apiIndex.json'
 
 export const prerender = false
 

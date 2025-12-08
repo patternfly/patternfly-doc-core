@@ -12,7 +12,7 @@ import { symLinkConfig } from './symLinkConfig.js'
 import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
-import { mkdir, copyFile } from 'fs/promises'
+import { mkdir, copyFile, readFile, writeFile } from 'fs/promises'
 import { fileExists } from './fileExists.js'
 
 const currentDir = process.cwd()
@@ -87,29 +87,52 @@ async function transformMDContentToMDX() {
   }
 }
 
-async function initializeApiIndex() {
-  const templateIndexPath = join(astroRoot, 'cli', 'templates', 'apiIndex.json')
-  const targetIndexPath = join(astroRoot, 'src', 'apiIndex.json')
+async function updateTsConfigOutputDirPath(program: Command) {
+  const { verbose } = program.opts()
+  const tsConfigPath = join(astroRoot, 'tsconfig.json')
 
+  try {
+    const tsConfigFile = await readFile(tsConfigPath, 'utf-8')
+    const tsConfig = JSON.parse(tsConfigFile)
+    const formattedOutputDir = join(absoluteOutputDir, '*')
+
+    tsConfig.compilerOptions.paths["outputDir/*"] = [formattedOutputDir]
+
+    await writeFile(tsConfigPath, JSON.stringify(tsConfig, null, 2))
+
+    if (verbose) {
+      console.log(`Updated tsconfig.json with outputDir path: ${formattedOutputDir}`)
+    }
+  } catch (e: any) {
+    console.error('Error updating tsconfig.json with outputDir path:', e)
+  }
+}
+
+async function initializeApiIndex(program: Command) {
+  const { verbose } = program.opts()
+  const templateIndexPath = join(astroRoot, 'cli', 'templates', 'apiIndex.json')
+  const targetIndexPath = join(absoluteOutputDir, 'apiIndex.json')
   const indexExists = await fileExists(targetIndexPath)
 
   // early return if the file exists from a previous build
   if (indexExists) {
-    console.log('apiIndex.json already exists, skipping initialization')
+    if (verbose) {
+      console.log('apiIndex.json already exists, skipping initialization')
+    }
     return
   }
 
   try {
     await copyFile(templateIndexPath, targetIndexPath)
-    console.log('Initialized apiIndex.json')
+    if (verbose) {
+      console.log('Initialized apiIndex.json')
+    }
   } catch (e: any) {
     console.error('Error copying apiIndex.json template:', e)
   }
 }
 
 async function buildProject(): Promise<DocsConfig | undefined> {
-  await updateContent(program)
-  await generateProps(program, true)
   if (!config) {
     console.error(
       'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
@@ -123,13 +146,17 @@ async function buildProject(): Promise<DocsConfig | undefined> {
     )
     return config
   }
-
-  await initializeApiIndex()
+  await updateTsConfigOutputDirPath(program)
+  await updateContent(program)
+  await generateProps(program, true)
+  await initializeApiIndex(program)
   await transformMDContentToMDX()
 
-  build({
+  const docsOutputDir = join(absoluteOutputDir, 'docs')
+
+  await build({
     root: astroRoot,
-    outDir: join(absoluteOutputDir, 'docs'),
+    outDir: docsOutputDir,
   })
 
   return config
@@ -193,8 +220,9 @@ program.command('init').action(async () => {
 })
 
 program.command('start').action(async () => {
+  await updateTsConfigOutputDirPath(program)
   await updateContent(program)
-  await initializeApiIndex()
+  await initializeApiIndex(program)
 
   // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to
   // prevent that we're just creating a props file regardless of what they say if one doesn't exist yet

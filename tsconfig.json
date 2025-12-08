@@ -8,7 +8,17 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "verbatimModuleSyntax": false,
+    "paths": {
+      "outputDir/*": [
+        "/Users/ausulliv/repos/patternfly-doc-core/dist/*"
+      ]
+    }
   },
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }
