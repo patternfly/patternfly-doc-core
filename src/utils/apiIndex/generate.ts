@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { join } from 'path'
-import { writeFile } from 'fs/promises'
+import { writeFile, mkdir } from 'fs/promises'
 import { getCollection } from 'astro:content'
 import type { CollectionKey } from 'astro:content'
 import { content } from '../../content'
@@ -143,6 +143,7 @@ export async function writeApiIndex(index: ApiIndex): Promise<void> {
   const indexPath = join(outputDir, 'apiIndex.json')
 
   try {
+    await mkdir(outputDir, { recursive: true })
     await writeFile(indexPath, JSON.stringify(index, null, 2))
     console.log(`✓ Generated API index with ${index.versions.length} versions`)
   } catch (error) {

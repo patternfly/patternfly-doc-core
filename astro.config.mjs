@@ -13,11 +13,6 @@ export default defineConfig({
       noExternal: ["@patternfly/*", "react-dropzone"],
       external: ["node:fs", "node:path"]
     },
-    build: {
-      rollupOptions: {
-        external: [/apiIndex\.json$/]
-      }
-    },
     server: {
       fs: {
         allow: ['./']

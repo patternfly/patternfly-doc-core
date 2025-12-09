@@ -96,12 +96,14 @@ async function updateTsConfigOutputDirPath(program: Command) {
     const tsConfig = JSON.parse(tsConfigFile)
     const formattedOutputDir = join(absoluteOutputDir, '*')
 
-    tsConfig.compilerOptions.paths["outputDir/*"] = [formattedOutputDir]
+    tsConfig.compilerOptions.paths['outputDir/*'] = [formattedOutputDir]
 
     await writeFile(tsConfigPath, JSON.stringify(tsConfig, null, 2))
 
     if (verbose) {
-      console.log(`Updated tsconfig.json with outputDir path: ${formattedOutputDir}`)
+      console.log(
+        `Updated tsconfig.json with outputDir path: ${formattedOutputDir}`,
+      )
     }
   } catch (e: any) {
     console.error('Error updating tsconfig.json with outputDir path:', e)
@@ -132,7 +134,9 @@ async function initializeApiIndex(program: Command) {
   }
 }
 
-async function buildProject(): Promise<DocsConfig | undefined> {
+async function buildProject(program: Command): Promise<DocsConfig | undefined> {
+  const { verbose } = program.opts()
+
   if (!config) {
     console.error(
       'No config found, please run the `setup` command or manually create a pf-docs.config.mjs file',
@@ -159,35 +163,40 @@ async function buildProject(): Promise<DocsConfig | undefined> {
     outDir: docsOutputDir,
   })
 
+  // copy the apiIndex.json file to the docs directory so it can be served as a static asset
+  const apiIndexPath = join(absoluteOutputDir, 'apiIndex.json')
+  const docsApiIndexPath = join(absoluteOutputDir, 'docs', 'apiIndex.json')
+  await copyFile(apiIndexPath, docsApiIndexPath)
+
+  if (verbose) {
+    console.log('Copied apiIndex.json to docs directory')
+  }
+
   return config
 }
 
-async function deploy() {
-  const { verbose } = program.opts()
+async function deploy(program: Command) {
+  const { verbose, dryRun } = program.opts()
 
   if (verbose) {
     console.log('Starting Cloudflare deployment...')
   }
 
+  if (dryRun) {
+    console.log('Dry run mode enabled, skipping deployment')
+    return
+  }
+
   try {
-    // First build the project
-    const config = await buildProject()
-    if (config) {
-      if (verbose) {
-        console.log('Build complete, deploying to Cloudflare...')
-      }
+    // Deploy using Wrangler
+    const { execSync } = await import('child_process')
 
-      // Deploy using Wrangler
-      const { execSync } = await import('child_process')
-      const outputPath = join(absoluteOutputDir, 'docs')
+    execSync(`wrangler pages deploy`, {
+      stdio: 'inherit',
+      cwd: currentDir,
+    })
 
-      execSync(`npx wrangler pages deploy ${outputPath}`, {
-        stdio: 'inherit',
-        cwd: currentDir,
-      })
-
-      console.log('Successfully deployed to Cloudflare Pages!')
-    }
+    console.log('Successfully deployed to Cloudflare Pages!')
   } catch (error) {
     console.error('Deployment failed:', error)
     process.exit(1)
@@ -199,6 +208,7 @@ program.name('pf-doc-core')
 
 program.option('--verbose', 'verbose mode', false)
 program.option('--props', 'generate props data', false)
+program.option('--dry-run', 'dry run mode', false)
 
 program.command('setup').action(async () => {
   await Promise.all([
@@ -232,7 +242,7 @@ program.command('start').action(async () => {
 })
 
 program.command('build').action(async () => {
-  await buildProject()
+  await buildProject(program)
 })
 
 program.command('generate-props').action(async () => {
@@ -257,7 +267,7 @@ program
   })
 
 program.command('deploy').action(async () => {
-  await deploy()
+  await deploy(program)
 })
 
 program.parse(process.argv)

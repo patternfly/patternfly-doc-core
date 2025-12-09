@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro'
 import { createJsonResponse, createIndexKey } from '../../../utils/apiHelpers'
-import { pages as pagesData } from 'outputDir/apiIndex.json'
+import { fetchApiIndex } from '../../../utils/apiIndex/fetch'
 
 export const prerender = false
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, url }) => {
   const { version, section } = params
 
   if (!version || !section) {
@@ -14,15 +14,23 @@ export const GET: APIRoute = async ({ params }) => {
     )
   }
 
-  const key = createIndexKey(version, section)
-  const pages = pagesData[key as keyof typeof pagesData]
+  try {
+    const index = await fetchApiIndex(url)
+    const key = createIndexKey(version, section)
+    const pages = index.pages[key]
 
-  if (!pages) {
+    if (!pages) {
+      return createJsonResponse(
+        { error: `Section '${section}' not found for version '${version}'` },
+        404,
+      )
+    }
+
+    return createJsonResponse(pages)
+  } catch (error) {
     return createJsonResponse(
-      { error: `Section '${section}' not found for version '${version}'` },
-      404,
+      { error: 'Failed to load API index' },
+      500
     )
   }
-
-  return createJsonResponse(pages)
 }
