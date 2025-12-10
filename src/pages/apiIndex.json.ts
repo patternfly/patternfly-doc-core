@@ -15,7 +15,7 @@ export const GET: APIRoute = async () => {
     })
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: 'Failed to load API index' }),
+      JSON.stringify({ error: 'Failed to load API index', details: error }),
       {
         status: 500,
         headers: {

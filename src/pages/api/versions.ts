@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ url }) => {
     return createJsonResponse(index.versions)
   } catch (error) {
     return createJsonResponse(
-      { error: 'Failed to load API index' },
+      { error: 'Failed to load API index', details: error },
       500
     )
   }

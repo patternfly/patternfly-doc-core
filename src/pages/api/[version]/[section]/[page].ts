@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ params, url }) => {
     return createJsonResponse(tabs)
   } catch (error) {
     return createJsonResponse(
-      { error: 'Failed to load API index' },
+      { error: 'Failed to load API index', details: error },
       500
     )
   }

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
 import { fetchApiIndex } from '../../utils/apiIndex/fetch'
+import { createJsonResponse } from '../../utils/apiHelpers'
 
 export const prerender = false
 
@@ -9,7 +10,10 @@ export const GET: APIRoute = async ({ url }) => {
     const index = await fetchApiIndex(url)
     versions = index.versions
   } catch (error) {
-    versions = []
+    return createJsonResponse(
+      { error: 'Failed to load API index', details: error },
+      500
+    )
   }
 
   const openApiSpec = {
