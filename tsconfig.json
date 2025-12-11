@@ -7,8 +7,13 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "importHelpers": true,
-    "verbatimModuleSyntax": false,
+    "verbatimModuleSyntax": false
   },
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }

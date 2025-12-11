@@ -34,3 +34,7 @@ src/apiIndex.json
 textContent/*.mdx
 
 coverage/
+
+.wrangler/
+
+temp

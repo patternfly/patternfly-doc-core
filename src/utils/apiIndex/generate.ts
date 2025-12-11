@@ -1,10 +1,12 @@
 /* eslint-disable no-console */
 import { join } from 'path'
-import { writeFile } from 'fs/promises'
+import { writeFile, mkdir } from 'fs/promises'
 import { getCollection } from 'astro:content'
 import type { CollectionKey } from 'astro:content'
 import { content } from '../../content'
-import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../index'
+import { kebabCase, addDemosOrDeprecated } from '../index'
+import { getDefaultTabForApi } from '../packageUtils'
+import { getOutputDir } from '../getOutputDir'
 
 const SOURCE_ORDER: Record<string, number> = {
   react: 1,
@@ -107,7 +109,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
 
       // Collect tab
       const entryTab =
-        entry.data.tab || entry.data.source || getDefaultTab(entry.filePath)
+        entry.data.tab || entry.data.source || getDefaultTabForApi(entry.filePath)
       const tab = addDemosOrDeprecated(entryTab, entry.id)
       if (!pageTabs[pageKey]) {
         pageTabs[pageKey] = new Set()
@@ -131,15 +133,17 @@ export async function generateApiIndex(): Promise<ApiIndex> {
 }
 
 /**
- * Writes API index to src/apiIndex.json
+ * Writes API index to a apiIndex.json file in the user defined output directory
  * This file is used by server-side API routes to avoid runtime getCollection() calls
  *
  * @param index - The API index structure to write
  */
 export async function writeApiIndex(index: ApiIndex): Promise<void> {
-  const indexPath = join(process.cwd(), 'src', 'apiIndex.json')
+  const outputDir = await getOutputDir()
+  const indexPath = join(outputDir, 'apiIndex.json')
 
   try {
+    await mkdir(outputDir, { recursive: true })
     await writeFile(indexPath, JSON.stringify(index, null, 2))
     console.log(`✓ Generated API index with ${index.versions.length} versions`)
   } catch (error) {
