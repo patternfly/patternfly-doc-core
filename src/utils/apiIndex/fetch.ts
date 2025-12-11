@@ -15,5 +15,6 @@ export async function fetchApiIndex(url: URL): Promise<ApiIndex> {
     throw new Error(`Failed to load API index: ${response.status} ${response.statusText}`)
   }
 
-  return response.json()
+  const data = (await response.json()) as ApiIndex
+  return data
 }
