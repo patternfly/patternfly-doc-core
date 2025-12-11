@@ -28,8 +28,9 @@ export const GET: APIRoute = async ({ params, url }) => {
 
     return createJsonResponse(pages)
   } catch (error) {
+    const details = error instanceof Error ? error.message : String(error)
     return createJsonResponse(
-      { error: 'Failed to load API index', details: error },
+      { error: 'Failed to load API index', details },
       500
     )
   }

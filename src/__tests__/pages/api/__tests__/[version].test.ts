@@ -137,7 +137,7 @@ it('returns 400 error when version parameter is missing', async () => {
   jest.restoreAllMocks()
 })
 
-it('excludes content entries that have no section field', async () => {
+it('returns sections array that matches the API index', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
       ok: true,
@@ -151,8 +151,10 @@ it('excludes content entries that have no section field', async () => {
   } as any)
   const body = await response.json()
 
-  // Should only include sections from entries that have data.section
-  expect(body.length).toBeGreaterThan(0)
+  // Verify the returned sections exactly match the indexed sections
+  // The API index generation process filters out entries without section fields
+  expect(body).toEqual(mockApiIndex.sections.v6)
+  expect(body).toEqual(['components', 'layouts', 'utilities'])
 
   jest.restoreAllMocks()
 })

@@ -16,7 +16,6 @@ const config: Config = {
   testPathIgnorePatterns: ['/node_modules/', '/__tests__/helpers/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
-    '^outputDir/(.*)$': '<rootDir>/dist/$1',
     '\\.(css|less)$': '<rootDir>/src/__mocks__/styleMock.ts',
     '^astro:content$': '<rootDir>/src/__mocks__/astro-content.ts',
     '(.+)\\.js': '$1',

@@ -36,3 +36,5 @@ textContent/*.mdx
 coverage/
 
 .wrangler/
+
+temp

@@ -34,6 +34,7 @@ try {
     .replace('file://', '')
 } catch (e: any) {
   if (e.code === 'ERR_MODULE_NOT_FOUND') {
+    console.log('@patternfly/patternfly-doc-core not found, using current directory as astroRoot')
     astroRoot = process.cwd()
   } else {
     console.error('Error resolving astroRoot', e)
@@ -87,29 +88,6 @@ async function transformMDContentToMDX() {
   }
 }
 
-async function updateTsConfigOutputDirPath(program: Command) {
-  const { verbose } = program.opts()
-  const tsConfigPath = join(astroRoot, 'tsconfig.json')
-
-  try {
-    const tsConfigFile = await readFile(tsConfigPath, 'utf-8')
-    const tsConfig = JSON.parse(tsConfigFile)
-    const formattedOutputDir = join(absoluteOutputDir, '*')
-
-    tsConfig.compilerOptions.paths['outputDir/*'] = [formattedOutputDir]
-
-    await writeFile(tsConfigPath, JSON.stringify(tsConfig, null, 2))
-
-    if (verbose) {
-      console.log(
-        `Updated tsconfig.json with outputDir path: ${formattedOutputDir}`,
-      )
-    }
-  } catch (e: any) {
-    console.error('Error updating tsconfig.json with outputDir path:', e)
-  }
-}
-
 async function initializeApiIndex(program: Command) {
   const { verbose } = program.opts()
   const templateIndexPath = join(astroRoot, 'cli', 'templates', 'apiIndex.json')
@@ -150,7 +128,6 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
     )
     return config
   }
-  await updateTsConfigOutputDirPath(program)
   await updateContent(program)
   await generateProps(program, true)
   await initializeApiIndex(program)
@@ -230,7 +207,6 @@ program.command('init').action(async () => {
 })
 
 program.command('start').action(async () => {
-  await updateTsConfigOutputDirPath(program)
   await updateContent(program)
   await initializeApiIndex(program)
 

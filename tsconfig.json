@@ -7,12 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "importHelpers": true,
-    "verbatimModuleSyntax": false,
-    "paths": {
-      "outputDir/*": [
-        "/Users/ausulliv/repos/patternfly-doc-core/dist/*"
-      ]
-    }
+    "verbatimModuleSyntax": false
   },
   "include": [
     ".astro/types.d.ts",
