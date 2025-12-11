@@ -12,7 +12,7 @@ import { symLinkConfig } from './symLinkConfig.js'
 import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
-import { mkdir, copyFile, readFile, writeFile } from 'fs/promises'
+import { mkdir, copyFile } from 'fs/promises'
 import { fileExists } from './fileExists.js'
 
 const currentDir = process.cwd()
