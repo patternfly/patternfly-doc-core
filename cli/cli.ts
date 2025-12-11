@@ -141,12 +141,17 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
   })
 
   // copy the apiIndex.json file to the docs directory so it can be served as a static asset
-  const apiIndexPath = join(absoluteOutputDir, 'apiIndex.json')
-  const docsApiIndexPath = join(absoluteOutputDir, 'docs', 'apiIndex.json')
-  await copyFile(apiIndexPath, docsApiIndexPath)
+  try {
+    const apiIndexPath = join(absoluteOutputDir, 'apiIndex.json')
+    const docsApiIndexPath = join(absoluteOutputDir, 'docs', 'apiIndex.json')
+    await copyFile(apiIndexPath, docsApiIndexPath)
 
-  if (verbose) {
-    console.log('Copied apiIndex.json to docs directory')
+    if (verbose) {
+      console.log('Copied apiIndex.json to docs directory')
+    }
+  } catch (error) {
+    console.error('Failed to copy apiIndex.json to docs directory:', error)
+    throw error
   }
 
   return config
