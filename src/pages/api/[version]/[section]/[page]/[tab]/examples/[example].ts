@@ -1,10 +1,12 @@
+/* eslint-disable no-console */
 import type { APIRoute, GetStaticPaths } from 'astro'
 import type { CollectionEntry, CollectionKey } from 'astro:content'
 import { getCollection } from 'astro:content'
 import { readFile } from 'fs/promises'
 import { resolve } from 'path'
 import { content } from '../../../../../../../content'
-import { kebabCase, getDefaultTab, addDemosOrDeprecated } from '../../../../../../../utils'
+import { kebabCase } from '../../../../../../../utils'
+import { getDefaultTabForApi } from '../../../../../../../utils/packageUtils'
 import { createJsonResponse, createTextResponse, createIndexKey } from '../../../../../../../utils/apiHelpers'
 import { generateAndWriteApiIndex } from '../../../../../../../utils/apiIndex/generate'
 
@@ -54,25 +56,51 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return paths
 }
 
-function getImports(fileContent: string) {
-  const importRegex = /import.*from.*['"]\..*\/[\w\.\?]*['"]/gm
+/**
+ * Extracts import statements from file content
+ * Matches import statements with relative paths (starting with ./ or ../)
+ *
+ * @param fileContent - The file content to parse
+ * @returns Array of import statements or null if none found
+ */
+function getImports(fileContent: string): string[] | null {
+  // Match import statements with relative paths
+  // Supports: import X from './path', import X from "../path/file.tsx"
+  const importRegex = /import\s+.*\s+from\s+['"]\.{1,2}\/[^'"]+['"]/gm
   const matches = fileContent.match(importRegex)
   return matches
 }
 
-function getExampleFilePath(imports: string[], exampleName: string) {
+/**
+ * Extracts the file path for a specific example from import statements
+ * Looks for imports that reference the example name
+ *
+ * @param imports - Array of import statements
+ * @param exampleName - Name of the example to find
+ * @returns Relative file path without quotes (including query params like ?raw), or null if not found
+ */
+function getExampleFilePath(imports: string[], exampleName: string): string | null {
   const exampleImport = imports.find((imp) => imp.includes(exampleName))
   if (!exampleImport) {
     console.error('No import path found for example', exampleName)
     return null
   }
-  const match = exampleImport.match(/['"]\..*\/[\w\.]*\?/)
-  if (!match) {
+  // Extract path from import statement, handling query parameters like ?raw
+  // Matches: "./path" or "../path" with optional file extensions and query params
+  const match = exampleImport.match(/['"](\.[^'"]+)['"]/i)
+  if (!match || !match[1]) {
     return null
   }
-  return match[0].replace(/['"?]/g, '')
+  return match[1]
 }
 
+/**
+ * Fetches all content collections for a specific version
+ * Enriches entries with default tab information if not specified
+ *
+ * @param version - The documentation version (e.g., 'v6')
+ * @returns Promise resolving to array of collection entries with metadata
+ */
 async function getCollections(version: string) {
   const collectionsToFetch = content
     .filter((entry) => entry.version === version)
@@ -85,51 +113,139 @@ async function getCollections(version: string) {
     ...rest,
     data: {
       ...data,
-      tab: data.tab || data.source || getDefaultTab(filePath),
+      tab: data.tab || data.source || getDefaultTabForApi(filePath),
     },
   }))
 }
 
-async function getContentEntryFilePath(collections: CollectionEntry<'core-docs' | 'quickstarts-docs' | 'react-component-docs'>[], section: string, page: string, tab: string) {
-  const contentEntry = collections.find((entry) => entry.data.section === section && kebabCase(entry.data.id) === page && entry.data.tab === tab)
-  if (!contentEntry) {
+/**
+ * Finds the file path for a content entry matching the given parameters
+ * Prefers .mdx files over .md files when both exist, since .mdx files
+ * contain the LiveExample components and example imports
+ *
+ * @param collections - Array of collection entries to search
+ * @param section - The section name (e.g., 'components')
+ * @param page - The page slug (e.g., 'alert')
+ * @param tab - The tab name (e.g., 'react')
+ * @returns Promise resolving to the file path, or null if not found
+ */
+async function getContentEntryFilePath(
+  collections: CollectionEntry<'core-docs' | 'quickstarts-docs' | 'react-component-docs'>[],
+  section: string,
+  page: string,
+  tab: string
+): Promise<string | null> {
+  // Find all matching entries
+  const matchingEntries = collections.filter(
+    (entry) =>
+      entry.data.section === section &&
+      kebabCase(entry.data.id) === page &&
+      entry.data.tab === tab
+  )
+
+  if (matchingEntries.length === 0) {
     console.error('No content entry found for section', section, 'page', page, 'tab', tab)
     return null
   }
+
+  // Prefer .mdx files over .md files (mdx files have LiveExample components)
+  const mdxEntry = matchingEntries.find((entry) =>
+    typeof entry.filePath === 'string' && entry.filePath.endsWith('.mdx')
+  )
+  const contentEntry = mdxEntry || matchingEntries[0]
+
   if (typeof contentEntry.filePath !== 'string') {
     console.error('No file path found for content entry', contentEntry.id)
     return null
   }
+
   return contentEntry.filePath
 }
 
+/**
+ * GET handler for retrieving example source code
+ * Returns the raw source code for a specific example
+ *
+ * @param params - Route parameters: version, section, page, tab, example
+ * @returns Response with example code as text/plain or error JSON
+ */
 export const GET: APIRoute = async ({ params }) => {
   const { version, section, page, tab, example } = params
   if (!version || !section || !page || !tab || !example) {
-    return createJsonResponse({ error: 'Version, section, page, tab, and example parameters are required' }, 400)
+    return createJsonResponse(
+      { error: 'Version, section, page, tab, and example parameters are required' },
+      400
+    )
   }
 
-  const collections = await getCollections(version)
-  const contentEntryFilePath = await getContentEntryFilePath(collections, section, page, tab)
-  
-  if (!contentEntryFilePath) {
-    return createJsonResponse({ error: 'Content entry not found' }, 404)
+  try {
+    const collections = await getCollections(version)
+    const contentEntryFilePath = await getContentEntryFilePath(collections, section, page, tab)
+
+    if (!contentEntryFilePath) {
+      return createJsonResponse(
+        { error: `Content entry not found for ${version}/${section}/${page}/${tab}` },
+        404
+      )
+    }
+
+    // Read content entry file to extract imports
+    let contentEntryFileContent: string
+    try {
+      contentEntryFileContent = await readFile(contentEntryFilePath, 'utf8')
+    } catch (error) {
+      const details = error instanceof Error ? error.message : String(error)
+      return createJsonResponse(
+        { error: 'Failed to read content entry file', details },
+        500
+      )
+    }
+
+    const contentEntryImports = getImports(contentEntryFileContent)
+    if (!contentEntryImports) {
+      return createJsonResponse(
+        { error: 'No imports found in content entry' },
+        404
+      )
+    }
+
+    const relativeExampleFilePath = getExampleFilePath(contentEntryImports, example)
+    if (!relativeExampleFilePath) {
+      return createJsonResponse(
+        { error: `Example "${example}" not found in imports` },
+        404
+      )
+    }
+
+    // Strip query parameters (like ?raw) from the file path before reading
+    const cleanFilePath = relativeExampleFilePath.split('?')[0]
+
+    // Read example file
+    const absoluteExampleFilePath = resolve(contentEntryFilePath, '../', cleanFilePath)
+    let exampleFileContent: string
+    try {
+      exampleFileContent = await readFile(absoluteExampleFilePath, 'utf8')
+    } catch (error) {
+      const details = error instanceof Error ? error.message : String(error)
+      // Check if it's a file not found error
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        return createJsonResponse(
+          { error: `Example file not found at path: ${relativeExampleFilePath}` },
+          404
+        )
+      }
+      return createJsonResponse(
+        { error: 'Failed to read example file', details },
+        500
+      )
+    }
+
+    return createTextResponse(exampleFileContent)
+  } catch (error) {
+    const details = error instanceof Error ? error.message : String(error)
+    return createJsonResponse(
+      { error: 'Internal server error', details },
+      500
+    )
   }
-
-  const contentEntryFileContent = await readFile(contentEntryFilePath, 'utf8')
-
-  const contentEntryImports = getImports(contentEntryFileContent)
-  if (!contentEntryImports) {
-    return createJsonResponse({ error: 'Content entry imports not found' }, 404)
-  }
-
-  const relativeExampleFilePath = getExampleFilePath(contentEntryImports, example)
-  if (!relativeExampleFilePath) {
-    return createJsonResponse({ error: 'Example file path not found' }, 404)
-  }
-
-  const absoluteExampleFilePath = resolve(contentEntryFilePath, '../', relativeExampleFilePath)
-  const exampleFileContent = await readFile(absoluteExampleFilePath, 'utf8')
-
-  return createTextResponse(exampleFileContent)
 }

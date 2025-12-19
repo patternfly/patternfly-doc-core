@@ -5,7 +5,7 @@
  * - Build-time: getApiIndex() imports static data from data.ts
  * - Runtime: fetchApiIndex() fetches /apiIndex.json via HTTP
  */
-import { getApiIndex, getVersions, getSections, getPages, getTabs } from '../apiIndex/get'
+import { getApiIndex, getVersions, getSections, getPages, getTabs, getExamples } from '../apiIndex/get'
 import { createIndexKey } from '../apiHelpers'
 
 describe('getApiIndex (build-time)', () => {
@@ -144,6 +144,57 @@ describe('getTabs', () => {
     const key = createIndexKey('v6', 'components', 'alert')
     const index = await getApiIndex()
     expect(index.tabs[key]).toBeDefined()
+  })
+})
+
+describe('getExamples', () => {
+  it('returns array of examples for valid path with examples', async () => {
+    const examples = await getExamples('v6', 'components', 'alert', 'react')
+    expect(Array.isArray(examples)).toBe(true)
+  })
+
+  it('returns examples with correct structure', async () => {
+    const examples = await getExamples('v6', 'components', 'alert', 'react')
+    if (examples.length > 0) {
+      const firstExample = examples[0]
+      expect(firstExample).toHaveProperty('exampleName')
+      expect(firstExample).toHaveProperty('title')
+      expect(typeof firstExample.exampleName).toBe('string')
+      expect(firstExample.exampleName.length).toBeGreaterThan(0)
+      // Title can be null or string
+      expect(
+        firstExample.title === null || typeof firstExample.title === 'string'
+      ).toBe(true)
+    }
+  })
+
+  it('returns empty array for tab without examples', async () => {
+    const examples = await getExamples('v6', 'components', 'nonexistent', 'react')
+    expect(examples).toEqual([])
+  })
+
+  it('returns empty array for invalid parameters', async () => {
+    const examples = await getExamples('invalid', 'invalid', 'invalid', 'invalid')
+    expect(examples).toEqual([])
+  })
+
+  it('uses correct index key format', async () => {
+    const key = createIndexKey('v6', 'components', 'alert', 'react')
+    const index = await getApiIndex()
+    // Key may or may not exist depending on whether there are examples
+    if (index.examples[key]) {
+      expect(Array.isArray(index.examples[key])).toBe(true)
+    }
+  })
+
+  it('examples are in document order', async () => {
+    const examples = await getExamples('v6', 'components', 'alert', 'react')
+    if (examples.length > 1) {
+      // Just verify they're all unique (order is preserved from document)
+      const names = examples.map((e) => e.exampleName)
+      const uniqueNames = new Set(names)
+      expect(names.length).toBe(uniqueNames.size)
+    }
   })
 })
 

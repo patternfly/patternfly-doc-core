@@ -22,6 +22,6 @@ export {
   type ApiIndex,
 } from './generate'
 
-export { getApiIndex, getVersions, getSections, getPages, getTabs } from './get'
+export { getApiIndex, getVersions, getSections, getPages, getTabs, getExamples } from './get'
 
 export { fetchApiIndex } from './fetch'

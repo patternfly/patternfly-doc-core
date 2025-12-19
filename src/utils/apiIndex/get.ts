@@ -111,7 +111,7 @@ export async function getExamples(
   section: string,
   page: string,
   tab: string,
-): Promise<Array<{ exampleName: string; title: string | null }>> {
+): Promise<{ exampleName: string; title: string | null }[]> {
   const index = await getApiIndex()
   const { createIndexKey } = await import('../apiHelpers')
   const key = createIndexKey(version, section, page, tab)

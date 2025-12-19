@@ -131,11 +131,30 @@ jest.mock('../../../../../../../utils/apiIndex/get', () => ({
   }),
 }))
 
+/**
+ * Mock fetchApiIndex to return the same data as getApiIndex
+ */
+jest.mock('../../../../../../../utils/apiIndex/fetch', () => ({
+  fetchApiIndex: jest.fn().mockResolvedValue({
+    versions: ['v6'],
+    sections: {
+      v6: ['components'],
+    },
+    pages: {
+      'v6::components': ['alert'],
+    },
+    tabs: {
+      'v6::components::alert': ['react', 'html', 'react-demos'],
+    },
+  }),
+}))
+
 beforeEach(() => {
   jest.clearAllMocks()
 })
 
-it('returns markdown/MDX content as plain text', async () => {
+it('redirects to /text endpoint', async () => {
+  const mockRedirect = jest.fn((path: string) => new Response(null, { status: 302, headers: { Location: path } }))
   const response = await GET({
     params: {
       version: 'v6',
@@ -143,16 +162,17 @@ it('returns markdown/MDX content as plain text', async () => {
       page: 'alert',
       tab: 'react',
     },
+    url: new URL('http://localhost/api/v6/components/alert/react'),
+    redirect: mockRedirect,
   } as any)
-  const body = await response.text()
 
-  expect(response.status).toBe(200)
-  expect(response.headers.get('Content-Type')).toBe('text/plain; charset=utf-8')
-  expect(typeof body).toBe('string')
-  expect(body).toContain('Alert Component')
+  expect(mockRedirect).toHaveBeenCalledWith('/api/v6/components/alert/react/text')
+  expect(response.status).toBe(302)
 })
 
-it('returns different content for different tabs', async () => {
+it('redirects to /text endpoint for different tabs', async () => {
+  const mockRedirect = jest.fn((path: string) => new Response(null, { status: 302, headers: { Location: path } }))
+
   const reactResponse = await GET({
     params: {
       version: 'v6',
@@ -160,9 +180,14 @@ it('returns different content for different tabs', async () => {
       page: 'alert',
       tab: 'react',
     },
+    url: new URL('http://localhost/api/v6/components/alert/react'),
+    redirect: mockRedirect,
   } as any)
-  const reactBody = await reactResponse.text()
 
+  expect(reactResponse.status).toBe(302)
+  expect(mockRedirect).toHaveBeenCalledWith('/api/v6/components/alert/react/text')
+
+  mockRedirect.mockClear()
   const htmlResponse = await GET({
     params: {
       version: 'v6',
@@ -170,15 +195,16 @@ it('returns different content for different tabs', async () => {
       page: 'alert',
       tab: 'html',
     },
+    url: new URL('http://localhost/api/v6/components/alert/html'),
+    redirect: mockRedirect,
   } as any)
-  const htmlBody = await htmlResponse.text()
 
-  expect(reactBody).toContain('React Alert')
-  expect(htmlBody).toContain('HTML')
-  expect(reactBody).not.toEqual(htmlBody)
+  expect(htmlResponse.status).toBe(302)
+  expect(mockRedirect).toHaveBeenCalledWith('/api/v6/components/alert/html/text')
 })
 
-it('returns demo content for demos tabs', async () => {
+it('redirects demos tabs to /text endpoint', async () => {
+  const mockRedirect = jest.fn((path: string) => new Response(null, { status: 302, headers: { Location: path } }))
   const response = await GET({
     params: {
       version: 'v6',
@@ -186,14 +212,16 @@ it('returns demo content for demos tabs', async () => {
       page: 'alert',
       tab: 'react-demos',
     },
+    url: new URL('http://localhost/api/v6/components/alert/react-demos'),
+    redirect: mockRedirect,
   } as any)
-  const body = await response.text()
 
-  expect(response.status).toBe(200)
-  expect(body).toContain('demos')
+  expect(response.status).toBe(302)
+  expect(mockRedirect).toHaveBeenCalledWith('/api/v6/components/alert/react-demos/text')
 })
 
 it('returns 404 error for nonexistent version', async () => {
+  const mockRedirect = jest.fn()
   const response = await GET({
     params: {
       version: 'v99',
@@ -201,6 +229,8 @@ it('returns 404 error for nonexistent version', async () => {
       page: 'alert',
       tab: 'react',
     },
+    url: new URL('http://localhost/api/v99/components/alert/react'),
+    redirect: mockRedirect,
   } as any)
   const body = await response.json()
 
@@ -210,6 +240,7 @@ it('returns 404 error for nonexistent version', async () => {
 })
 
 it('returns 404 error for nonexistent section', async () => {
+  const mockRedirect = jest.fn()
   const response = await GET({
     params: {
       version: 'v6',
@@ -217,6 +248,8 @@ it('returns 404 error for nonexistent section', async () => {
       page: 'alert',
       tab: 'react',
     },
+    url: new URL('http://localhost/api/v6/invalid/alert/react'),
+    redirect: mockRedirect,
   } as any)
   const body = await response.json()
 
@@ -225,6 +258,7 @@ it('returns 404 error for nonexistent section', async () => {
 })
 
 it('returns 404 error for nonexistent page', async () => {
+  const mockRedirect = jest.fn()
   const response = await GET({
     params: {
       version: 'v6',
@@ -232,6 +266,8 @@ it('returns 404 error for nonexistent page', async () => {
       page: 'nonexistent',
       tab: 'react',
     },
+    url: new URL('http://localhost/api/v6/components/nonexistent/react'),
+    redirect: mockRedirect,
   } as any)
   const body = await response.json()
 
@@ -241,6 +277,7 @@ it('returns 404 error for nonexistent page', async () => {
 })
 
 it('returns 404 error for nonexistent tab', async () => {
+  const mockRedirect = jest.fn()
   const response = await GET({
     params: {
       version: 'v6',
@@ -248,6 +285,8 @@ it('returns 404 error for nonexistent tab', async () => {
       page: 'alert',
       tab: 'nonexistent',
     },
+    url: new URL('http://localhost/api/v6/components/alert/nonexistent'),
+    redirect: mockRedirect,
   } as any)
   const body = await response.json()
 
@@ -257,12 +296,15 @@ it('returns 404 error for nonexistent tab', async () => {
 })
 
 it('returns 400 error when required parameters are missing', async () => {
+  const mockRedirect = jest.fn()
   const response = await GET({
     params: {
       version: 'v6',
       section: 'components',
       page: 'alert',
     },
+    url: new URL('http://localhost/api/v6/components/alert'),
+    redirect: mockRedirect,
   } as any)
   const body = await response.json()
 

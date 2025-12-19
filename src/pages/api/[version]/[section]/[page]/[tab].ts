@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { APIRoute } from 'astro'
 import { fetchApiIndex } from '../../../../../utils/apiIndex/fetch'
 import { createJsonResponse, createIndexKey } from '../../../../../utils/apiHelpers'

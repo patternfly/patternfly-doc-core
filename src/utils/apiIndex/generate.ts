@@ -44,7 +44,7 @@ export interface ApiIndex {
   /** Tabs by version::section::page (e.g., { 'v6::components::alert': ['react', 'html'] }) */
   tabs: Record<string, string[]>
   /** Examples by version::section::page::tab with titles (e.g., { 'v6::components::alert::react': [{exampleName: 'AlertDefault', title: 'Default alert'}] }) */
-  examples: Record<string, Array<{ exampleName: string; title: string | null }>>
+  examples: Record<string, { exampleName: string; title: string | null }[]>
 }
 
 /**
@@ -56,13 +56,15 @@ export interface ApiIndex {
  */
 function extractExamplesWithTitles(
   body: string
-): Array<{ exampleName: string; title: string | null }> {
+): { exampleName: string; title: string | null }[] {
   if (!body) {
     return []
   }
 
-  const exampleRegex = /<LiveExample.*src={(\w*)}.*\/?>/g
-  const examples: Array<{ exampleName: string; title: string | null }> = []
+  // Match <LiveExample> tags with src attribute containing an example name
+  // Supports various attribute orders and spacing patterns
+  const exampleRegex = /<LiveExample[^>]*\ssrc=\{\s*(\w+)\s*\}[^>]*\/?>/g
+  const examples: { exampleName: string; title: string | null }[] = []
   const seen = new Set<string>()
   let match
 
@@ -127,7 +129,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const sections = new Set<string>()
     const sectionPages: Record<string, Set<string>> = {}
     const pageTabs: Record<string, Set<string>> = {}
-    const tabExamples: Record<string, Array<{ exampleName: string; title: string | null }>> = {}
+    const tabExamples: Record<string, { exampleName: string; title: string | null }[]> = {}
 
     flatEntries.forEach((entry: any) => {
       if (!entry.data.section) {
@@ -151,7 +153,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       // Collect tab
       const entryTab =
         entry.data.tab || entry.data.source || getDefaultTabForApi(entry.filePath)
-      const tab = addDemosOrDeprecated(entryTab, entry.id)
+      const tab = addDemosOrDeprecated(entryTab, entry.filePath)
       if (!pageTabs[pageKey]) {
         pageTabs[pageKey] = new Set()
       }
