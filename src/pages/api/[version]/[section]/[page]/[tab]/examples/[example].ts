@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content'
 import { readFile } from 'fs/promises'
 import { resolve } from 'path'
 import { content } from '../../../../../../../content'
-import { kebabCase } from '../../../../../../../utils'
+import { kebabCase, addDemosOrDeprecated } from '../../../../../../../utils'
 import { getDefaultTabForApi } from '../../../../../../../utils/packageUtils'
 import { createJsonResponse, createTextResponse, createIndexKey } from '../../../../../../../utils/apiHelpers'
 import { generateAndWriteApiIndex } from '../../../../../../../utils/apiIndex/generate'
@@ -136,12 +136,14 @@ async function getContentEntryFilePath(
   tab: string
 ): Promise<string | null> {
   // Find all matching entries
-  const matchingEntries = collections.filter(
-    (entry) =>
+  const matchingEntries = collections.filter((entry) => {
+    const entryTab = addDemosOrDeprecated(entry.data.tab, entry.filePath)
+    return (
       entry.data.section === section &&
       kebabCase(entry.data.id) === page &&
-      entry.data.tab === tab
-  )
+      entryTab === tab
+    )
+  })
 
   if (matchingEntries.length === 0) {
     console.error('No content entry found for section', section, 'page', page, 'tab', tab)
