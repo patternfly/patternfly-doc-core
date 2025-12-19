@@ -1,3 +1,13 @@
+/**
+ * OpenAPI 3.0 Specification Endpoint
+ *
+ * Architecture Note:
+ * This endpoint uses fetchApiIndex(url) instead of getApiIndex() to:
+ * - Avoid bundling 500KB+ API index data into Cloudflare Workers
+ * - Fetch /apiIndex.json (prerendered static file) at runtime
+ * - Keep Workers bundle small (~110K vs 500KB+)
+ * - Add only ~5-10ms latency from CDN fetch
+ */
 import type { APIRoute } from 'astro'
 import { fetchApiIndex } from '../../utils/apiIndex/fetch'
 import { createJsonResponse } from '../../utils/apiHelpers'
@@ -298,6 +308,77 @@ export const GET: APIRoute = async ({ url }) => {
       },
       '/{version}/{section}/{page}/{tab}': {
         get: {
+          summary: 'Validate and redirect to text endpoint',
+          description:
+            'Validates the path parameters and redirects to the /text endpoint',
+          operationId: 'validateTab',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              description: 'Documentation section',
+              schema: {
+                type: 'string',
+              },
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              description: 'Page ID (kebab-cased)',
+              schema: {
+                type: 'string',
+              },
+              example: 'alert',
+            },
+            {
+              name: 'tab',
+              in: 'path',
+              required: true,
+              description: 'Tab slug',
+              schema: {
+                type: 'string',
+              },
+              example: 'react',
+            },
+          ],
+          responses: {
+            '302': {
+              description: 'Redirects to /{version}/{section}/{page}/{tab}/text',
+            },
+            '404': {
+              description: 'Tab not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/{section}/{page}/{tab}/text': {
+        get: {
           summary: 'Get tab content',
           description:
             'Returns the raw markdown/MDX documentation content for the specified tab',
@@ -360,6 +441,190 @@ export const GET: APIRoute = async ({ url }) => {
             },
             '404': {
               description: 'Tab not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/{section}/{page}/{tab}/examples': {
+        get: {
+          summary: 'List available examples',
+          description:
+            'Returns an array of available examples with their names and titles',
+          operationId: 'getExamples',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              description: 'Documentation section',
+              schema: {
+                type: 'string',
+              },
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              description: 'Page ID (kebab-cased)',
+              schema: {
+                type: 'string',
+              },
+              example: 'alert',
+            },
+            {
+              name: 'tab',
+              in: 'path',
+              required: true,
+              description: 'Tab slug',
+              schema: {
+                type: 'string',
+              },
+              example: 'react',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'List of examples',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        exampleName: {
+                          type: 'string',
+                        },
+                        title: {
+                          type: 'string',
+                          nullable: true,
+                        },
+                      },
+                    },
+                  },
+                  example: [
+                    { exampleName: 'AlertBasic', title: 'Basic' },
+                    { exampleName: 'AlertVariations', title: 'Variations' },
+                  ],
+                },
+              },
+            },
+            '400': {
+              description: 'Missing required parameters',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/{section}/{page}/{tab}/examples/{example}': {
+        get: {
+          summary: 'Get example code',
+          description:
+            'Returns the raw source code for a specific example',
+          operationId: 'getExampleCode',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              description: 'Documentation section',
+              schema: {
+                type: 'string',
+              },
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              description: 'Page ID (kebab-cased)',
+              schema: {
+                type: 'string',
+              },
+              example: 'alert',
+            },
+            {
+              name: 'tab',
+              in: 'path',
+              required: true,
+              description: 'Tab slug',
+              schema: {
+                type: 'string',
+              },
+              example: 'react',
+            },
+            {
+              name: 'example',
+              in: 'path',
+              required: true,
+              description: 'Example name',
+              schema: {
+                type: 'string',
+              },
+              example: 'AlertBasic',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Raw example code',
+              content: {
+                'text/plain; charset=utf-8': {
+                  schema: {
+                    type: 'string',
+                  },
+                  example:
+                    'import React from \'react\';\nimport { Alert } from \'@patternfly/react-core\';\n\nexport const AlertBasic = () => <Alert title="Basic alert" />;',
+                },
+              },
+            },
+            '404': {
+              description: 'Example not found',
               content: {
                 'application/json': {
                   schema: {

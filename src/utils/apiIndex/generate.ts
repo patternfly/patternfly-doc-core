@@ -43,6 +43,47 @@ export interface ApiIndex {
   pages: Record<string, string[]>
   /** Tabs by version::section::page (e.g., { 'v6::components::alert': ['react', 'html'] }) */
   tabs: Record<string, string[]>
+  /** Examples by version::section::page::tab with titles (e.g., { 'v6::components::alert::react': [{exampleName: 'AlertDefault', title: 'Default alert'}] }) */
+  examples: Record<string, { exampleName: string; title: string | null }[]>
+}
+
+/**
+ * Extracts examples with titles from markdown/MDX content
+ * Looks for <LiveExample src={ExampleName} /> patterns and finds associated H3 titles
+ *
+ * @param body - The raw markdown/MDX text content
+ * @returns Array of unique examples with titles in document order
+ */
+function extractExamplesWithTitles(
+  body: string
+): { exampleName: string; title: string | null }[] {
+  if (!body) {
+    return []
+  }
+
+  // Match <LiveExample> tags with src attribute containing an example name
+  // Supports various attribute orders and spacing patterns
+  const exampleRegex = /<LiveExample[^>]*\ssrc=\{\s*(\w+)\s*\}[^>]*\/?>/g
+  const examples: { exampleName: string; title: string | null }[] = []
+  const seen = new Set<string>()
+  let match
+
+  // Find all examples and their positions
+  while ((match = exampleRegex.exec(body)) !== null) {
+    const exampleName = match[1]
+    if (exampleName && !seen.has(exampleName)) {
+      seen.add(exampleName)
+
+      // Find the most recent h3 before this example
+      const textBeforeExample = body.substring(0, match.index)
+      const h3Matches = [...textBeforeExample.matchAll(/^### (.+)$/gm)]
+      const title = h3Matches.length > 0 ? h3Matches[h3Matches.length - 1][1].trim() : null
+
+      examples.push({ exampleName, title })
+    }
+  }
+
+  return examples
 }
 
 /**
@@ -60,6 +101,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     sections: {},
     pages: {},
     tabs: {},
+    examples: {},
   }
 
   // Get all versions
@@ -87,6 +129,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const sections = new Set<string>()
     const sectionPages: Record<string, Set<string>> = {}
     const pageTabs: Record<string, Set<string>> = {}
+    const tabExamples: Record<string, { exampleName: string; title: string | null }[]> = {}
 
     flatEntries.forEach((entry: any) => {
       if (!entry.data.section) {
@@ -110,11 +153,18 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       // Collect tab
       const entryTab =
         entry.data.tab || entry.data.source || getDefaultTabForApi(entry.filePath)
-      const tab = addDemosOrDeprecated(entryTab, entry.id)
+      const tab = addDemosOrDeprecated(entryTab, entry.filePath)
       if (!pageTabs[pageKey]) {
         pageTabs[pageKey] = new Set()
       }
       pageTabs[pageKey].add(tab)
+
+      // Collect examples for this tab
+      const tabKey = `${version}::${section}::${page}::${tab}`
+      const examplesWithTitles = extractExamplesWithTitles(entry.body || '')
+      if (examplesWithTitles.length > 0) {
+        tabExamples[tabKey] = examplesWithTitles
+      }
     })
 
     // Convert sets to sorted arrays
@@ -126,6 +176,10 @@ export async function generateApiIndex(): Promise<ApiIndex> {
 
     Object.entries(pageTabs).forEach(([key, tabs]) => {
       index.tabs[key] = Array.from(tabs).sort(sortSources)
+    })
+
+    Object.entries(tabExamples).forEach(([key, examples]) => {
+      index.examples[key] = examples
     })
   }
 
