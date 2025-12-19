@@ -15,11 +15,19 @@ export const GET: APIRoute = async ({ params, url }) => {
   }
 
   // Get examples with titles directly from the index
-  const index = await fetchApiIndex(url)
-  const tabKey = createIndexKey(version, section, page, tab)
-  const examples = index.examples[tabKey] || []
+  try {
+    const index = await fetchApiIndex(url)
+    const tabKey = createIndexKey(version, section, page, tab)
+    const examples = index.examples[tabKey] || []
 
-  return createJsonResponse(examples)
+    return createJsonResponse(examples)
+  } catch (error) {
+    const details = error instanceof Error ? error.message : String(error)
+    return createJsonResponse(
+      { error: 'Failed to load API index', details },
+      500,
+    )
+  }
 }
 
 
