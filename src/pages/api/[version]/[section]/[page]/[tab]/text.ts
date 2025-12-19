@@ -123,7 +123,7 @@ export const GET: APIRoute = async ({ params }) => {
 
   // Find the matching entry
   const matchingEntry = flatEntries.find((entry: ContentEntry) => {
-    const entryTab = addDemosOrDeprecated(entry.data.tab, entry.id)
+    const entryTab = addDemosOrDeprecated(entry.data.tab, entry.filePath)
     return (
       entry.data.section === section &&
       kebabCase(entry.data.id) === page &&
