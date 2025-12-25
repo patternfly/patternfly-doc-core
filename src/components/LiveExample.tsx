@@ -19,6 +19,7 @@ interface LiveExampleProps {
   src?: string
   html?: string
   isFullscreenPreview?: boolean
+  customScope?: Record<string, any>
 }
 
 function fallbackRender({ error }: any) {
@@ -30,7 +31,7 @@ function fallbackRender({ error }: any) {
   )
 }
 
-function getLivePreview(editorCode: string) {
+function getLivePreview(editorCode: string, customScope?: Record<string, any>) {
   const scope = {
     ...reactCoreModule,
     ...reactIconsModule,
@@ -38,6 +39,7 @@ function getLivePreview(editorCode: string) {
     styles,
     ...reactTokensModule,
     ...{ useState, Fragment, useRef, useEffect, createRef, useReducer },
+    ...customScope,
   }
   const { code: transformedCode } = convertToReactComponent(editorCode)
 
@@ -58,6 +60,7 @@ export const LiveExample = ({
   src,
   html,
   isFullscreenPreview,
+  customScope,
 }: LiveExampleProps) => {
   const inputCode = src || html || ''
   const [code, setCode] = useState(inputCode)
@@ -73,7 +76,7 @@ export const LiveExample = ({
     )
     lang = 'html'
   } else {
-    livePreview = getLivePreview(code)
+    livePreview = getLivePreview(code, customScope)
     lang = 'ts'
   }
 

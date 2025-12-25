@@ -1,7 +1,8 @@
 ---
 import { LiveExample as LiveExampleBase } from './LiveExample'
+import { config } from '../pf-docs.config.mjs'
 
 const { src, html } = Astro.props
 ---
 
-<LiveExampleBase src={src} html={html} client:only="react" />
+<LiveExampleBase src={src} html={html} customScope={config.scope} client:only="react" />
