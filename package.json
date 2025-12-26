@@ -55,7 +55,7 @@
     "@nanostores/react": "^0.8.4",
     "@patternfly/ast-helpers": "1.4.0-alpha.190",
     "@patternfly/patternfly": "^6.0.0",
-    "@patternfly/react-code-editor": "^6.2.2",
+    "@patternfly/react-code-editor": "^6.4.0",
     "@patternfly/react-core": "^6.0.0",
     "@patternfly/react-drag-drop": "^6.0.0",
     "@patternfly/react-icons": "^6.0.0",
