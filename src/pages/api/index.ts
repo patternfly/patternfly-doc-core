@@ -1,3 +1,17 @@
+/**
+ * PatternFly Documentation API
+ *
+ * Architecture:
+ * - Build-time: Static API index generated from content collections (data.ts)
+ * - Runtime: Routes fetch /apiIndex.json (prerendered static file) via HTTP
+ * - Workers-compatible: No Node.js filesystem APIs in SSR handlers
+ * - Optimized bundle: Runtime handlers don't bundle the 500KB+ index data
+ *
+ * Data Flow:
+ * 1. Build: generateApiIndex() → data.ts + apiIndex.json
+ * 2. Static paths: getStaticPaths() uses getApiIndex() (build-time import)
+ * 3. SSR handlers: GET handlers use fetchApiIndex(url) (runtime fetch)
+ */
 import type { APIRoute } from 'astro'
 import { createJsonResponse } from '../../utils/apiHelpers'
 
@@ -121,6 +135,45 @@ export const GET: APIRoute = async () =>
         {
           path: '/api/{version}/{section}/{page}/{tab}',
           method: 'GET',
+          description: 'Redirects to /text endpoint after validation',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'alert',
+            },
+            {
+              name: 'tab',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'react',
+            },
+          ],
+          returns: {
+            type: 'redirect',
+            description: 'Redirects to /{version}/{section}/{page}/{tab}/text',
+          },
+        },
+        {
+          path: '/api/{version}/{section}/{page}/{tab}/text',
+          method: 'GET',
           description: 'Get raw markdown/MDX content for a specific tab',
           parameters: [
             {
@@ -158,6 +211,97 @@ export const GET: APIRoute = async () =>
             description: 'Raw markdown/MDX documentation content',
           },
         },
+        {
+          path: '/api/{version}/{section}/{page}/{tab}/examples',
+          method: 'GET',
+          description: 'Get list of available examples for a tab',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'alert',
+            },
+            {
+              name: 'tab',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'react',
+            },
+          ],
+          returns: {
+            type: 'array',
+            items: 'object',
+            description: 'Array of example objects with exampleName and title',
+            example: [
+              { exampleName: 'AlertBasic', title: 'Basic' },
+              { exampleName: 'AlertVariations', title: 'Variations' },
+            ],
+          },
+        },
+        {
+          path: '/api/{version}/{section}/{page}/{tab}/examples/{example}',
+          method: 'GET',
+          description: 'Get raw code for a specific example',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'alert',
+            },
+            {
+              name: 'tab',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'react',
+            },
+            {
+              name: 'example',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'AlertBasic',
+            },
+          ],
+          returns: {
+            type: 'string',
+            contentType: 'text/plain; charset=utf-8',
+            description: 'Raw example code',
+          },
+        },
       ],
       usage: {
         description: 'Navigate the API hierarchically to discover and retrieve documentation',
@@ -166,7 +310,15 @@ export const GET: APIRoute = async () =>
           'GET /api/v6 → ["components", "layouts", ...]',
           'GET /api/v6/components → ["alert", "button", ...]',
           'GET /api/v6/components/alert → ["react", "html", ...]',
-          'GET /api/v6/components/alert/react → (markdown content)',
+          'GET /api/v6/components/alert/react → 302 redirect to /text',
+          'GET /api/v6/components/alert/react/text → (markdown content)',
+          'GET /api/v6/components/alert/react/examples → [{exampleName, title}, ...]',
+          'GET /api/v6/components/alert/react/examples/AlertBasic → (example code)',
         ],
+        architecture: {
+          buildTime: 'Static index generated to data.ts and apiIndex.json',
+          runtime: 'SSR routes fetch /apiIndex.json to avoid bundling data into Workers',
+          optimization: 'Workers bundle is ~110K instead of 500KB+ with embedded data',
+        },
       },
     })

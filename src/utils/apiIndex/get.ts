@@ -23,6 +23,10 @@ export async function getApiIndex(): Promise<ApiIndex> {
       throw new Error('Invalid API index structure: missing or invalid "versions" array')
     }
 
+    if (!parsed.examples || typeof parsed.examples !== 'object') {
+      throw new Error('Invalid API index structure: missing or invalid "examples" object')
+    }
+
     return parsed as ApiIndex
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -91,4 +95,25 @@ export async function getTabs(version: string, section: string, page: string): P
   const { createIndexKey } = await import('../apiHelpers')
   const key = createIndexKey(version, section, page)
   return index.tabs[key] || []
+}
+
+/**
+ * Gets all examples for a specific tab
+ *
+ * @param version - The documentation version (e.g., 'v6')
+ * @param section - The section name (e.g., 'components')
+ * @param page - The page slug (e.g., 'alert')
+ * @param tab - The tab name (e.g., 'react')
+ * @returns Promise resolving to array of examples with titles, or empty array if not found
+ */
+export async function getExamples(
+  version: string,
+  section: string,
+  page: string,
+  tab: string,
+): Promise<{ exampleName: string; title: string | null }[]> {
+  const index = await getApiIndex()
+  const { createIndexKey } = await import('../apiHelpers')
+  const key = createIndexKey(version, section, page, tab)
+  return index.examples[key] || []
 }
