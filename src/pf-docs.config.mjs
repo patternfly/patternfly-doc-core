@@ -17,5 +17,12 @@ export const config = {
     // },
   ],
   outputDir: "./dist",
-  navSectionOrder: ["get-started", "design-foundations"]
+  navSectionOrder: ["get-started", "design-foundations"],
+  // Add custom scope items for LiveExample component
+  // These will be available in your example code blocks
+  // Example:
+  // scope: {
+  //   MyCustomComponent: () => <div>Custom</div>,
+  //   myUtilFunction: (x) => x * 2,
+  // },
 };
