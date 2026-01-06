@@ -14,7 +14,7 @@ import * as reactDragDropModule from '@patternfly/react-drag-drop'
 import styles from '@patternfly/react-styles/css/components/_index'
 import * as reactTokensModule from '@patternfly/react-tokens'
 import { ExampleToolbar } from './ExampleToolbar'
-import { config } from '../pf-docs.config.mjs'
+import { config } from '../../pf-docs.config.mjs'
 
 interface LiveExampleProps {
   src?: string

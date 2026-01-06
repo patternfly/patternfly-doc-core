@@ -8,10 +8,10 @@ export async function symLinkConfig(
   consumerRootDir: string,
 ) {
   const configFileName = '/pf-docs.config.mjs'
-  const defaultConfigFile = join(astroRootDir, 'src', configFileName)
+  const defaultConfigFile = join(astroRootDir, configFileName)
   const consumerConfigFile = consumerRootDir + configFileName
 
-  if (fileExists(defaultConfigFile)) {
+  if (await fileExists(defaultConfigFile)) {
     await rm(defaultConfigFile)
   }
 

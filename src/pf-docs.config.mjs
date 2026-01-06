@@ -1,1 +1,0 @@
-/Users/ausulliv/repos/patternfly-doc-core/pf-docs.config.mjs
