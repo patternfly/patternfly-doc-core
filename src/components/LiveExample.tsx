@@ -14,12 +14,12 @@ import * as reactDragDropModule from '@patternfly/react-drag-drop'
 import styles from '@patternfly/react-styles/css/components/_index'
 import * as reactTokensModule from '@patternfly/react-tokens'
 import { ExampleToolbar } from './ExampleToolbar'
+import { config } from '../pf-docs.config.mjs'
 
 interface LiveExampleProps {
   src?: string
   html?: string
   isFullscreenPreview?: boolean
-  customScope?: Record<string, any>
 }
 
 function fallbackRender({ error }: any) {
@@ -31,7 +31,7 @@ function fallbackRender({ error }: any) {
   )
 }
 
-function getLivePreview(editorCode: string, customScope?: Record<string, any>) {
+function getLivePreview(editorCode: string) {
   const scope = {
     ...reactCoreModule,
     ...reactIconsModule,
@@ -39,7 +39,7 @@ function getLivePreview(editorCode: string, customScope?: Record<string, any>) {
     styles,
     ...reactTokensModule,
     ...{ useState, Fragment, useRef, useEffect, createRef, useReducer },
-    ...customScope,
+    ...config.scope,
   }
   const { code: transformedCode } = convertToReactComponent(editorCode)
 
@@ -60,7 +60,6 @@ export const LiveExample = ({
   src,
   html,
   isFullscreenPreview,
-  customScope,
 }: LiveExampleProps) => {
   const inputCode = src || html || ''
   const [code, setCode] = useState(inputCode)
@@ -76,7 +75,7 @@ export const LiveExample = ({
     )
     lang = 'html'
   } else {
-    livePreview = getLivePreview(code, customScope)
+    livePreview = getLivePreview(code)
     lang = 'ts'
   }
 
