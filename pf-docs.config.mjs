@@ -11,12 +11,20 @@ export const config = {
     // example content entry for remote content, this would fetch all markdown files matching the glob in 'pattern'
     // from the specified npm package and serve them with a content identifier of 'react-component-docs':
     {
-      packageName: "@patternfly/react-core",
-      pattern: "**/components/**/*.md",
-      name: "react-component-docs",
+      packageName: '@patternfly/react-core',
+      pattern: '**/components/**/*.md',
+      name: 'react-component-docs',
     },
-    { packageName: "@patternfly/patternfly", pattern: "*/**/*.md", name: "core-docs" },
-    { packageName: "@patternfly/quickstarts", pattern: "*/patternfly-docs/**/*.md", name: "quickstarts-docs" },
+    {
+      packageName: '@patternfly/patternfly',
+      pattern: '*/**/*.md',
+      name: 'core-docs',
+    },
+    {
+      packageName: '@patternfly/quickstarts',
+      pattern: '*/patternfly-docs/**/*.md',
+      name: 'quickstarts-docs',
+    },
   ],
   outputDir: './dist',
   propsGlobs: [
@@ -30,11 +38,6 @@ export const config = {
       ],
     },
   ],
-  // Add custom scope items for LiveExample component
-  // These will be available in your example code blocks
-  // Example:
-  // scope: {
-  //   MyCustomComponent: () => <div>Custom</div>,
-  //   myUtilFunction: (x) => x * 2,
-  // },
+  navSectionOrder: ['get-started', 'design-foundations'],
+  scope: {},
 }
