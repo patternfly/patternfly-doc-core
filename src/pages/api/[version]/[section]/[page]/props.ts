@@ -3,7 +3,7 @@ import { createJsonResponse } from '../../../../../utils/apiHelpers'
 import { getConfig } from '../../../../../../cli/getConfig'
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { sentenceCase } from 'change-case'
+import { sentenceCase } from '../../../../../utils/case'
 
 export const prerender = false
 
@@ -26,6 +26,14 @@ export const GET: APIRoute = async ({ params }) => {
     const props = JSON.parse(propsDataFile.toString())
   
     const propsData = props[sentenceCase(page)]
+
+    if(propsData === undefined) {
+      return createJsonResponse(
+        { error: `Props data for ${page} not found` },
+        404,
+      )
+    }
+
     return createJsonResponse(propsData)
   
   } catch (error) {

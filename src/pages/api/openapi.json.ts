@@ -267,7 +267,7 @@ export const GET: APIRoute = async ({ url }) => {
             '200': {
               description: 'Component names with props data',
               content: {
-                array: {
+                'application/json': {
                   schema: {
                     type: 'array',
                     items: {
@@ -413,7 +413,7 @@ export const GET: APIRoute = async ({ url }) => {
             '200': {
               description: 'Props for the specified component',
               content: {
-                array: {
+                'application/json': {
                   schema: {
                     type: 'array',
                     items: {
