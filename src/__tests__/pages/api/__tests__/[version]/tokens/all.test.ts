@@ -207,6 +207,7 @@ it('each token has required properties', async () => {
 
   expect(response.status).toBe(200)
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [_category, tokens] of Object.entries(body)) {
     expect(Array.isArray(tokens)).toBe(true)
     for (const token of tokens as any[]) {

@@ -41,6 +41,7 @@ export function getAllTokens(): Token[] {
 
   const tokens: Token[] = []
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [_exportName, tokenValue] of Object.entries(allTokens)) {
     if (typeof tokenValue === 'object' && tokenValue !== null) {
       const token = tokenValue as Token
