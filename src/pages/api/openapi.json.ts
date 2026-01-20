@@ -641,6 +641,252 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
+      '/{version}/tokens': {
+        get: {
+          summary: 'List token categories',
+          description:
+            'Returns an alphabetically sorted array of available design token categories from @patternfly/react-tokens. Categories are determined by token name prefixes (e.g., c_, t_, chart_). Optimized for MCP/LLM consumption.',
+          operationId: 'getTokenCategories',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'List of token categories',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                  example: ['c', 'chart', 'global', 'hidden', 'l', 't'],
+                },
+              },
+            },
+            '404': {
+              description: 'Version not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/tokens/{category}': {
+        get: {
+          summary: 'Get tokens for a category',
+          description:
+            'Returns design tokens for a specific category with optional filtering. Each token includes name (CSS variable name), value (resolved value), and var (CSS var() reference). Use the filter query parameter for case-insensitive substring matching to minimize response size.',
+          operationId: 'getTokensByCategory',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'category',
+              in: 'path',
+              required: true,
+              description: 'Token category (e.g., c, t, chart)',
+              schema: {
+                type: 'string',
+              },
+              example: 'c',
+            },
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              description: 'Case-insensitive substring filter to match against token names',
+              schema: {
+                type: 'string',
+              },
+              example: 'alert',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Array of tokens matching the criteria',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: {
+                          type: 'string',
+                          description: 'CSS variable name',
+                        },
+                        value: {
+                          type: 'string',
+                          description: 'Resolved CSS value',
+                        },
+                        var: {
+                          type: 'string',
+                          description: 'CSS var() reference',
+                        },
+                      },
+                      required: ['name', 'value', 'var'],
+                    },
+                  },
+                  example: [
+                    {
+                      name: '--pf-v6-c-alert--Color',
+                      value: '#000',
+                      var: 'var(--pf-v6-c-alert--Color)',
+                    },
+                  ],
+                },
+              },
+            },
+            '404': {
+              description: 'Category not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                      validCategories: {
+                        type: 'array',
+                        items: {
+                          type: 'string',
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/tokens/all': {
+        get: {
+          summary: 'Get all tokens grouped by category',
+          description:
+            'Returns all design tokens organized by category with optional filtering. Use the filter query parameter to minimize response size for MCP/LLM consumption. Empty categories are excluded from filtered results.',
+          operationId: 'getAllTokens',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              description: 'Case-insensitive substring filter to match against token names across all categories',
+              schema: {
+                type: 'string',
+              },
+              example: 'color',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Object with category keys and token arrays as values',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    additionalProperties: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          name: {
+                            type: 'string',
+                            description: 'CSS variable name',
+                          },
+                          value: {
+                            type: 'string',
+                            description: 'Resolved CSS value',
+                          },
+                          var: {
+                            type: 'string',
+                            description: 'CSS var() reference',
+                          },
+                        },
+                        required: ['name', 'value', 'var'],
+                      },
+                    },
+                  },
+                  example: {
+                    c: [
+                      {
+                        name: '--pf-v6-c-alert--Color',
+                        value: '#000',
+                        var: 'var(--pf-v6-c-alert--Color)',
+                      },
+                    ],
+                    t: [
+                      {
+                        name: '--pf-v6-t-global--Color',
+                        value: '#333',
+                        var: 'var(--pf-v6-t-global--Color)',
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            '404': {
+              description: 'Version not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     tags: [
       {
