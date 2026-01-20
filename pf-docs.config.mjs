@@ -25,6 +25,8 @@ export const config = {
       pattern: '*/patternfly-docs/**/*.md',
       name: 'quickstarts-docs',
     },
+    { packageName: "@patternfly/react-user-feedback", pattern: "patternfly-docs/**/*.md", name: "user-feedback-docs" },
+    { packageName: "@patternfly/react-data-view", pattern: "patternfly-docs/**/*.md", name: "data-view-docs" },
   ],
   outputDir: './dist',
   propsGlobs: [

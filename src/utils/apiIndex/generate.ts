@@ -31,19 +31,33 @@ const sortSources = (s1: string, s2: string) => {
 }
 
 /**
+ * Section item is always a string (subsections are flattened into page names)
+ */
+export type SectionItem = string
+
+/**
  * Structure of the API index used for routing and navigation
  * Keys in sections/pages/tabs use '::' separator (e.g., 'v6::components::alert')
+ * Subsections are flattened into page names with underscores (e.g., 'forms_checkbox')
  */
 export interface ApiIndex {
   /** Available documentation versions (e.g., ['v5', 'v6']) */
   versions: string[]
-  /** Sections by version (e.g., { 'v6': ['components', 'layouts'] }) */
-  sections: Record<string, string[]>
-  /** Pages by version::section (e.g., { 'v6::components': ['alert', 'button'] }) */
+  /** Sections by version - flat array of section names
+   * (e.g., { 'v6': ['components', 'layouts', 'extensions'] })
+   */
+  sections: Record<string, SectionItem[]>
+  /** Pages by version::section with subsections flattened using underscores
+   * (e.g., { 'v6::components': ['alert', 'button', 'forms_checkbox', 'menus_select'] })
+   */
   pages: Record<string, string[]>
-  /** Tabs by version::section::page (e.g., { 'v6::components::alert': ['react', 'html'] }) */
+  /** Tabs by version::section::page where page may contain underscore-separated subsection
+   * (e.g., { 'v6::components::alert': ['react'], 'v6::components::forms_checkbox': ['react'] })
+   */
   tabs: Record<string, string[]>
-  /** Examples by version::section::page::tab with titles (e.g., { 'v6::components::alert::react': [{exampleName: 'AlertDefault', title: 'Default alert'}] }) */
+  /** Examples by version::section::page::tab with titles
+   * (e.g., { 'v6::components::alert::react': [{exampleName: 'AlertDefault', title: 'Default alert'}] })
+   */
   examples: Record<string, { exampleName: string; title: string | null }[]>
 }
 
@@ -132,42 +146,48 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const tabExamples: Record<string, { exampleName: string; title: string | null }[]> = {}
 
     flatEntries.forEach((entry: any) => {
-      if (!entry.data.section) {
+      const { section, subsection, id } = entry.data
+      if (!section) {
         return
       }
 
-      const section = entry.data.section
-      const page = kebabCase(entry.data.id)
-      const sectionKey = `${version}::${section}`
-      const pageKey = `${version}::${section}::${page}`
+      // Flatten subsections into page name using underscores
+      // e.g., subsection="forms", id="checkbox" becomes page="forms_checkbox"
+      const basePage = kebabCase(id)
+      const page = subsection ? `${subsection}_${basePage}` : basePage
+
+      // All pages are keyed by version::section (no subsection in key)
+      const pageKey = `${version}::${section}`
+      const tabKey = `${version}::${section}::${page}`
 
       // Collect section
       sections.add(section)
 
-      // Collect page
-      if (!sectionPages[sectionKey]) {
-        sectionPages[sectionKey] = new Set()
+      // Collect page under section key
+      if (!sectionPages[pageKey]) {
+        sectionPages[pageKey] = new Set()
       }
-      sectionPages[sectionKey].add(page)
+      sectionPages[pageKey].add(page)
 
       // Collect tab
       const entryTab =
         entry.data.tab || entry.data.source || getDefaultTabForApi(entry.filePath)
       const tab = addDemosOrDeprecated(entryTab, entry.filePath)
-      if (!pageTabs[pageKey]) {
-        pageTabs[pageKey] = new Set()
+      if (!pageTabs[tabKey]) {
+        pageTabs[tabKey] = new Set()
       }
-      pageTabs[pageKey].add(tab)
+      pageTabs[tabKey].add(tab)
 
       // Collect examples for this tab
-      const tabKey = `${version}::${section}::${page}::${tab}`
+      const exampleKey = `${tabKey}::${tab}`
       const examplesWithTitles = extractExamplesWithTitles(entry.body || '')
       if (examplesWithTitles.length > 0) {
-        tabExamples[tabKey] = examplesWithTitles
+        tabExamples[exampleKey] = examplesWithTitles
       }
     })
 
     // Convert sets to sorted arrays
+    // Sections are now always flat strings (subsections are in page names)
     index.sections[version] = Array.from(sections).sort()
 
     Object.entries(sectionPages).forEach(([key, pages]) => {

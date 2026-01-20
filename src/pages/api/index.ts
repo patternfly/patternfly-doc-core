@@ -6,6 +6,7 @@
  * - Runtime: Routes fetch /apiIndex.json (prerendered static file) via HTTP
  * - Workers-compatible: No Node.js filesystem APIs in SSR handlers
  * - Optimized bundle: Runtime handlers don't bundle the 500KB+ index data
+ * - Flattened structure: Subsections are encoded into page names with underscores (e.g., "forms_checkbox")
  *
  * Data Flow:
  * 1. Build: generateApiIndex() → data.ts + apiIndex.json
@@ -68,13 +69,13 @@ export const GET: APIRoute = async () =>
           returns: {
             type: 'array',
             items: 'string',
-            example: ['components', 'layouts', 'utilities'],
+            example: ['components', 'layouts', 'patterns', 'utility-classes'],
           },
         },
         {
           path: '/api/{version}/{section}',
           method: 'GET',
-          description: 'List available pages within a section',
+          description: 'List available pages within a section (includes underscore-separated subsection pages)',
           parameters: [
             {
               name: 'version',
@@ -94,14 +95,14 @@ export const GET: APIRoute = async () =>
           returns: {
             type: 'array',
             items: 'string',
-            description: 'Array of kebab-cased page IDs',
-            example: ['alert', 'button', 'card'],
+            description: 'Array of page IDs. Subsection pages use underscore-separated format: subsection_page',
+            example: ['alert', 'button', 'forms_checkbox', 'forms_radio', 'menus_dropdown'],
           },
         },
         {
           path: '/api/{version}/{section}/{page}',
           method: 'GET',
-          description: 'List available tabs for a page',
+          description: 'List available tabs for a page (page may be underscore-separated for subsection pages)',
           parameters: [
             {
               name: 'version',
@@ -122,20 +123,21 @@ export const GET: APIRoute = async () =>
               in: 'path',
               required: true,
               type: 'string',
-              example: 'alert',
+              description: 'Page ID (may be underscore-separated for subsection pages like "forms_checkbox")',
+              example: 'alert or forms_checkbox',
             },
           ],
           returns: {
             type: 'array',
             items: 'string',
-            description: 'Array of tab slugs',
+            description: 'Array of tab slugs available for this page',
             example: ['react', 'react-demos', 'html'],
           },
         },
         {
           path: '/api/{version}/{section}/{page}/{tab}',
           method: 'GET',
-          description: 'Redirects to /text endpoint after validation',
+          description: 'Redirects to /text endpoint for the specified tab',
           parameters: [
             {
               name: 'version',
@@ -156,7 +158,8 @@ export const GET: APIRoute = async () =>
               in: 'path',
               required: true,
               type: 'string',
-              example: 'alert',
+              description: 'Page ID (may be underscore-separated for subsection pages)',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
@@ -168,7 +171,7 @@ export const GET: APIRoute = async () =>
           ],
           returns: {
             type: 'redirect',
-            description: 'Redirects to /{version}/{section}/{page}/{tab}/text',
+            description: '302 redirect to /{version}/{section}/{page}/{tab}/text',
           },
         },
         {
@@ -195,7 +198,8 @@ export const GET: APIRoute = async () =>
               in: 'path',
               required: true,
               type: 'string',
-              example: 'alert',
+              description: 'Page ID (may be underscore-separated for subsection pages)',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
@@ -235,7 +239,8 @@ export const GET: APIRoute = async () =>
               in: 'path',
               required: true,
               type: 'string',
-              example: 'alert',
+              description: 'Page ID (may be underscore-separated for subsection pages)',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
@@ -279,7 +284,8 @@ export const GET: APIRoute = async () =>
               in: 'path',
               required: true,
               type: 'string',
-              example: 'alert',
+              description: 'Page ID (may be underscore-separated for subsection pages)',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
@@ -304,21 +310,31 @@ export const GET: APIRoute = async () =>
         },
       ],
       usage: {
-        description: 'Navigate the API hierarchically to discover and retrieve documentation',
-        exampleFlow: [
+        description: 'Navigate the API hierarchically to discover and retrieve documentation. Subsections are flattened into page names using underscore separators (e.g., "forms_checkbox" represents the checkbox page in the forms subsection).',
+        exampleFlowRegularPage: [
           'GET /api/versions → ["v6"]',
           'GET /api/v6 → ["components", "layouts", ...]',
-          'GET /api/v6/components → ["alert", "button", ...]',
+          'GET /api/v6/components → ["alert", "button", "forms_checkbox", ...]',
           'GET /api/v6/components/alert → ["react", "html", ...]',
           'GET /api/v6/components/alert/react → 302 redirect to /text',
           'GET /api/v6/components/alert/react/text → (markdown content)',
           'GET /api/v6/components/alert/react/examples → [{exampleName, title}, ...]',
           'GET /api/v6/components/alert/react/examples/AlertBasic → (example code)',
         ],
+        exampleFlowSubsectionPage: [
+          'GET /api/v6 → ["components", "layouts", ...]',
+          'GET /api/v6/components → ["alert", "forms_checkbox", "forms_radio", ...]',
+          'GET /api/v6/components/forms_checkbox → ["react", "html", ...]',
+          'GET /api/v6/components/forms_checkbox/react → 302 redirect to /text',
+          'GET /api/v6/components/forms_checkbox/react/text → (markdown content)',
+          'GET /api/v6/components/forms_checkbox/react/examples → [{exampleName, title}, ...]',
+          'GET /api/v6/components/forms_checkbox/react/examples/CheckboxBasic → (example code)',
+        ],
         architecture: {
           buildTime: 'Static index generated to data.ts and apiIndex.json',
           runtime: 'SSR routes fetch /apiIndex.json to avoid bundling data into Workers',
           optimization: 'Workers bundle is ~110K instead of 500KB+ with embedded data',
+          flattenedStructure: 'Subsections encoded into page names with underscores (e.g., "forms_checkbox")',
         },
       },
     })

@@ -146,6 +146,7 @@ jest.mock('../../../../../../../utils/apiIndex/fetch', () => ({
     tabs: {
       'v6::components::alert': ['react', 'html', 'react-demos'],
     },
+    examples: {},
   }),
 }))
 

@@ -23,16 +23,19 @@ export const GET: APIRoute = async ({ params, redirect, url }) => {
   }
 
   // Check if section exists for this version
-  const sectionKey = createIndexKey(version, section)
-  if (!index.sections[version]?.includes(section)) {
+  const sections = index.sections[version] || []
+
+  if (!sections.includes(section)) {
     return createJsonResponse(
       { error: `Section '${section}' not found for version '${version}'` },
       404,
     )
   }
 
-  // Check if page exists for this section
+  const sectionKey = createIndexKey(version, section)
   const pageKey = createIndexKey(version, section, page)
+
+  // Check if page exists for this section (page may be underscore-separated like "forms_checkbox")
   if (!index.pages[sectionKey]?.includes(page)) {
     return createJsonResponse(
       {

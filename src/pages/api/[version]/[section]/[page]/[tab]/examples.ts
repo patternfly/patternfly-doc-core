@@ -17,9 +17,11 @@ export const GET: APIRoute = async ({ params, url }) => {
   // Get examples with titles directly from the index
   try {
     const index = await fetchApiIndex(url)
-    const tabKey = createIndexKey(version, section, page, tab)
-    const examples = index.examples[tabKey] || []
 
+    // Example key is version::section::page::tab (page may be underscore-separated like "forms_checkbox")
+    const exampleKey = createIndexKey(version, section, page, tab)
+
+    const examples = index.examples[exampleKey] || []
     return createJsonResponse(examples)
   } catch (error) {
     const details = error instanceof Error ? error.message : String(error)

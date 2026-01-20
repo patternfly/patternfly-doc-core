@@ -11,13 +11,13 @@ export default defineConfig({
   vite: {
     ssr: {
       noExternal: ["@patternfly/*", "react-dropzone"],
-      external: ["node:fs", "node:path"]
+      external: ["node:fs", "node:path", "fs/promises", "path"]
     },
     server: {
       fs: {
         allow: ['./']
       }
-    }
+    },
   },
   adapter: cloudflare()
 });

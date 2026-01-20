@@ -1,14 +1,12 @@
 /* eslint-disable no-console */
 import type { APIRoute, GetStaticPaths } from 'astro'
-import type { CollectionEntry, CollectionKey } from 'astro:content'
-import { getCollection } from 'astro:content'
 import { readFile } from 'fs/promises'
 import { resolve } from 'path'
-import { content } from '../../../../../../../content'
-import { kebabCase, addDemosOrDeprecated } from '../../../../../../../utils'
-import { getDefaultTabForApi } from '../../../../../../../utils/packageUtils'
-import { createJsonResponse, createTextResponse, createIndexKey } from '../../../../../../../utils/apiHelpers'
+import { createJsonResponse, createTextResponse } from '../../../../../../../utils/apiHelpers'
 import { generateAndWriteApiIndex } from '../../../../../../../utils/apiIndex/generate'
+import { getEnrichedCollections } from '../../../../../../../utils/apiRoutes/collections'
+import { findContentEntryFilePath } from '../../../../../../../utils/apiRoutes/contentMatching'
+import { extractImports, extractExampleFilePath } from '../../../../../../../utils/apiRoutes/exampleParsing'
 
 export const prerender = true
 
@@ -26,142 +24,28 @@ export const getStaticPaths: GetStaticPaths = async () => {
     }
   }[] = []
 
-  // Build paths from index structure
-  for (const version of index.versions) {
-    for (const section of index.sections[version] || []) {
-      const sectionKey = createIndexKey(version, section)
-      for (const page of index.pages[sectionKey] || []) {
-        const pageKey = createIndexKey(version, section, page)
-        for (const tab of index.tabs[pageKey] || []) {
-          const tabKey = createIndexKey(version, section, page, tab)
+  // Build paths from index structure by iterating over examples
+  // All examples are keyed by version::section::page::tab (page may be underscore-separated like "forms_checkbox")
+  for (const [exampleKey, examples] of Object.entries(index.examples)) {
+    const parts = exampleKey.split('::')
 
-          // Get all examples for this tab
-          const examples = index.examples[tabKey] || []
-          for (const example of examples) {
-            paths.push({
-              params: {
-                version,
-                section,
-                page,
-                tab,
-                example: example.exampleName,
-              },
-            })
-          }
-        }
+    if (parts.length === 4) {
+      const [version, section, page, tab] = parts
+      for (const example of examples) {
+        paths.push({
+          params: {
+            version,
+            section,
+            page,
+            tab,
+            example: example.exampleName,
+          },
+        })
       }
     }
   }
 
   return paths
-}
-
-/**
- * Extracts import statements from file content
- * Matches import statements with relative paths (starting with ./ or ../)
- *
- * @param fileContent - The file content to parse
- * @returns Array of import statements or null if none found
- */
-function getImports(fileContent: string): string[] | null {
-  // Match import statements with relative paths
-  // Supports: import X from './path', import X from "../path/file.tsx"
-  const importRegex = /import\s+.*\s+from\s+['"]\.{1,2}\/[^'"]+['"]/gm
-  const matches = fileContent.match(importRegex)
-  return matches
-}
-
-/**
- * Extracts the file path for a specific example from import statements
- * Looks for imports that reference the example name
- *
- * @param imports - Array of import statements
- * @param exampleName - Name of the example to find
- * @returns Relative file path without quotes (including query params like ?raw), or null if not found
- */
-function getExampleFilePath(imports: string[], exampleName: string): string | null {
-  const exampleImport = imports.find((imp) => imp.includes(exampleName))
-  if (!exampleImport) {
-    console.error('No import path found for example', exampleName)
-    return null
-  }
-  // Extract path from import statement, handling query parameters like ?raw
-  // Matches: "./path" or "../path" with optional file extensions and query params
-  const match = exampleImport.match(/['"](\.[^'"]+)['"]/i)
-  if (!match || !match[1]) {
-    return null
-  }
-  return match[1]
-}
-
-/**
- * Fetches all content collections for a specific version
- * Enriches entries with default tab information if not specified
- *
- * @param version - The documentation version (e.g., 'v6')
- * @returns Promise resolving to array of collection entries with metadata
- */
-async function getCollections(version: string) {
-  const collectionsToFetch = content
-    .filter((entry) => entry.version === version)
-    .map((entry) => entry.name as CollectionKey)
-  const collections = await Promise.all(
-    collectionsToFetch.map(async (name) => await getCollection(name)),
-  )
-  return collections.flat().map(({ data, filePath, ...rest }) => ({
-    filePath,
-    ...rest,
-    data: {
-      ...data,
-      tab: data.tab || data.source || getDefaultTabForApi(filePath),
-    },
-  }))
-}
-
-/**
- * Finds the file path for a content entry matching the given parameters
- * Prefers .mdx files over .md files when both exist, since .mdx files
- * contain the LiveExample components and example imports
- *
- * @param collections - Array of collection entries to search
- * @param section - The section name (e.g., 'components')
- * @param page - The page slug (e.g., 'alert')
- * @param tab - The tab name (e.g., 'react')
- * @returns Promise resolving to the file path, or null if not found
- */
-async function getContentEntryFilePath(
-  collections: CollectionEntry<'core-docs' | 'quickstarts-docs' | 'react-component-docs'>[],
-  section: string,
-  page: string,
-  tab: string
-): Promise<string | null> {
-  // Find all matching entries
-  const matchingEntries = collections.filter((entry) => {
-    const entryTab = addDemosOrDeprecated(entry.data.tab, entry.filePath)
-    return (
-      entry.data.section === section &&
-      kebabCase(entry.data.id) === page &&
-      entryTab === tab
-    )
-  })
-
-  if (matchingEntries.length === 0) {
-    console.error('No content entry found for section', section, 'page', page, 'tab', tab)
-    return null
-  }
-
-  // Prefer .mdx files over .md files (mdx files have LiveExample components)
-  const mdxEntry = matchingEntries.find((entry) =>
-    typeof entry.filePath === 'string' && entry.filePath.endsWith('.mdx')
-  )
-  const contentEntry = mdxEntry || matchingEntries[0]
-
-  if (typeof contentEntry.filePath !== 'string') {
-    console.error('No file path found for content entry', contentEntry.id)
-    return null
-  }
-
-  return contentEntry.filePath
 }
 
 /**
@@ -175,14 +59,18 @@ export const GET: APIRoute = async ({ params }) => {
   const { version, section, page, tab, example } = params
   if (!version || !section || !page || !tab || !example) {
     return createJsonResponse(
-      { error: 'Version, section, page, tab, and example parameters are required' },
+      { error: 'All parameters are required' },
       400
     )
   }
 
   try {
-    const collections = await getCollections(version)
-    const contentEntryFilePath = await getContentEntryFilePath(collections, section, page, tab)
+    const collections = await getEnrichedCollections(version)
+    const contentEntryFilePath = findContentEntryFilePath(collections, {
+      section,
+      page,
+      tab
+    })
 
     if (!contentEntryFilePath) {
       return createJsonResponse(
@@ -203,7 +91,7 @@ export const GET: APIRoute = async ({ params }) => {
       )
     }
 
-    const contentEntryImports = getImports(contentEntryFileContent)
+    const contentEntryImports = extractImports(contentEntryFileContent)
     if (!contentEntryImports) {
       return createJsonResponse(
         { error: 'No imports found in content entry' },
@@ -211,7 +99,7 @@ export const GET: APIRoute = async ({ params }) => {
       )
     }
 
-    const relativeExampleFilePath = getExampleFilePath(contentEntryImports, example)
+    const relativeExampleFilePath = extractExampleFilePath(contentEntryImports, example)
     if (!relativeExampleFilePath) {
       return createJsonResponse(
         { error: `Example "${example}" not found in imports` },

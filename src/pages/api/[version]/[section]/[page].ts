@@ -16,8 +16,10 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   try {
     const index = await fetchApiIndex(url)
-    const key = createIndexKey(version, section, page)
-    const tabs = index.tabs[key]
+
+    // Return tabs for this page (page may be underscore-separated like "forms_checkbox")
+    const pageKey = createIndexKey(version, section, page)
+    const tabs = index.tabs[pageKey]
 
     if (!tabs) {
       return createJsonResponse(

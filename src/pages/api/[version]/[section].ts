@@ -16,6 +16,8 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   try {
     const index = await fetchApiIndex(url)
+
+    // Get pages for this section (includes underscore-separated subsection pages like "forms-checkbox")
     const key = createIndexKey(version, section)
     const pages = index.pages[key]
 
@@ -26,6 +28,7 @@ export const GET: APIRoute = async ({ params, url }) => {
       )
     }
 
+    // Return pages array (already sorted, contains both regular and underscore-separated subsection pages)
     return createJsonResponse(pages)
   } catch (error) {
     const details = error instanceof Error ? error.message : String(error)
