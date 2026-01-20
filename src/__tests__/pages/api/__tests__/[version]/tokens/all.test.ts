@@ -207,7 +207,7 @@ it('each token has required properties', async () => {
 
   expect(response.status).toBe(200)
 
-  for (const [category, tokens] of Object.entries(body)) {
+  for (const [_category, tokens] of Object.entries(body)) {
     expect(Array.isArray(tokens)).toBe(true)
     for (const token of tokens as any[]) {
       expect(token).toHaveProperty('name')

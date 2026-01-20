@@ -41,7 +41,7 @@ export function getAllTokens(): Token[] {
 
   const tokens: Token[] = []
 
-  for (const [exportName, tokenValue] of Object.entries(allTokens)) {
+  for (const [_exportName, tokenValue] of Object.entries(allTokens)) {
     if (typeof tokenValue === 'object' && tokenValue !== null) {
       const token = tokenValue as Token
 
