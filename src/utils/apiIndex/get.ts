@@ -27,6 +27,10 @@ export async function getApiIndex(): Promise<ApiIndex> {
       throw new Error('Invalid API index structure: missing or invalid "examples" object')
     }
 
+    if (!parsed.css || typeof parsed.css !== 'object') {
+      throw new Error('Invalid API index structure: missing or invalid "css" object')
+    }
+
     return parsed as ApiIndex
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -116,4 +120,23 @@ export async function getExamples(
   const { createIndexKey } = await import('../apiHelpers')
   const key = createIndexKey(version, section, page, tab)
   return index.examples[key] || []
+}
+
+/**
+ * Gets CSS token objects for a specific page
+ *
+ * @param version - The documentation version (e.g., 'v6')
+ * @param section - The section name (e.g., 'components')
+ * @param page - The page slug (e.g., 'accordion')
+ * @returns Promise resolving to array of token objects, or empty array if not found
+ */
+export async function getCssTokens(
+  version: string,
+  section: string,
+  page: string,
+): Promise<Array<{ name: string; value: string; var: string }>> {
+  const index = await getApiIndex()
+  const { createIndexKey } = await import('../apiHelpers')
+  const key = createIndexKey(version, section, page)
+  return index.css[key] || []
 }

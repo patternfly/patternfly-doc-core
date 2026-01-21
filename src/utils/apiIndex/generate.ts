@@ -8,6 +8,7 @@ import { kebabCase, addDemosOrDeprecated } from '../index'
 import { getDefaultTabForApi } from '../packageUtils'
 import { getOutputDir } from '../getOutputDir'
 import { addSubsection } from '../case'
+import { extractReactTokens } from '../extractReactTokens'
 
 const SOURCE_ORDER: Record<string, number> = {
   react: 1,
@@ -60,6 +61,8 @@ export interface ApiIndex {
    * (e.g., { 'v6::components::alert::react': [{exampleName: 'AlertDefault', title: 'Default alert'}] })
    */
   examples: Record<string, { exampleName: string; title: string | null }[]>
+  /** CSS token objects by version::section::page (e.g., { 'v6::components::accordion': [{name: '--pf-v6-c-accordion--...', value: '...', var: '...'}] }) */
+  css: Record<string, Array<{ name: string; value: string; var: string }>>
 }
 
 /**
@@ -117,6 +120,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     pages: {},
     tabs: {},
     examples: {},
+    css: {},
   }
 
   // Get all versions
@@ -145,6 +149,8 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const sectionPages: Record<string, Set<string>> = {}
     const pageTabs: Record<string, Set<string>> = {}
     const tabExamples: Record<string, { exampleName: string; title: string | null }[]> = {}
+    const pageCss: Record<string, Array<{ name: string; value: string; var: string }>> = {}
+    const pageCssPrefixes: Record<string, string | string[]> = {}
 
     flatEntries.forEach((entry: any) => {
       const { section, subsection, id } = entry.data
@@ -185,7 +191,24 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       if (examplesWithTitles.length > 0) {
         tabExamples[exampleKey] = examplesWithTitles
       }
+
+      // Collect CSS prefixes for pages - we'll extract tokens later
+      if (entry.data.cssPrefix && !pageCssPrefixes[pageKey]) {
+        pageCssPrefixes[pageKey] = entry.data.cssPrefix
+      }
     })
+
+    // Extract CSS tokens for pages that have cssPrefix
+    for (const [pageKey, cssPrefix] of Object.entries(pageCssPrefixes)) {
+      try {
+        const tokens = await extractReactTokens(cssPrefix)
+        if (tokens.length > 0) {
+          pageCss[pageKey] = tokens
+        }
+      } catch (error) {
+        console.warn(`Failed to extract CSS tokens for ${pageKey}:`, error)
+      }
+    }
 
     // Convert sets to sorted arrays
     // Sections are now always flat strings (subsections are in page names)
@@ -201,6 +224,11 @@ export async function generateApiIndex(): Promise<ApiIndex> {
 
     Object.entries(tabExamples).forEach(([key, examples]) => {
       index.examples[key] = examples
+    })
+
+    // Add CSS token objects to index
+    Object.entries(pageCss).forEach(([key, tokens]) => {
+      index.css[key] = tokens
     })
   }
 
