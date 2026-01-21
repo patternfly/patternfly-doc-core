@@ -15,15 +15,20 @@ export function extractImports(fileContent: string): string[] | null {
 
 /**
  * Extracts the file path for a specific example from import statements
- * Looks for imports that reference the example name
+ * Looks for imports that reference the example name using word boundaries to avoid substring matches
  *
  * @param imports - Array of import statements
- * @param exampleName - Name of the example to find
+ * @param exampleName - Name of the example to find (must be a valid React component name)
  * @returns Relative file path without quotes (including query params like ?raw), or null if not found
  */
 export function extractExampleFilePath(imports: string[], exampleName: string): string | null {
-  const exampleImport = imports.find((imp) => imp.includes(exampleName))
+  // Use word boundaries to match exact example names (e.g., "AlertBasic" won't match "AlertBasicExpanded")
+  // No escaping needed - React component names can only contain [A-Za-z0-9_]
+  const wordRegex = new RegExp(`\\b${exampleName}\\b`)
+  const exampleImport = imports.find((imp) => wordRegex.test(imp))
+
   if (!exampleImport) {
+    // eslint-disable-next-line no-console
     console.error('No import path found for example', exampleName)
     return null
   }
