@@ -13,6 +13,37 @@ export interface ContentMatchParams {
 }
 
 /**
+ * Checks if a content entry matches the specified parameters
+ * Handles both regular pages and subsection pages (with flattened underscore-separated names)
+ *
+ * @param entry - Content entry to check
+ * @param params - Parameters to match against (section, page, tab)
+ * @returns True if entry matches all parameters
+ */
+function matchesParams(entry: EnrichedContentEntry, params: ContentMatchParams): boolean {
+  const { section, page, tab } = params
+
+  // Match section
+  if (entry.data.section !== section) {
+    return false
+  }
+
+  // Match tab (with demos/deprecated suffix handling)
+  const entryTab = addDemosOrDeprecated(entry.data.tab, entry.filePath)
+  if (entryTab !== tab) {
+    return false
+  }
+
+  // Match page (handling flattened subsection names with underscores)
+  const entryId = kebabCase(entry.data.id)
+  const entryPage = entry.data.subsection
+    ? `${entry.data.subsection}_${entryId}`
+    : entryId
+
+  return entryPage === page
+}
+
+/**
  * Finds a content entry matching the specified parameters
  * Handles both regular pages and subsection pages (with flattened underscore-separated names)
  *
@@ -25,29 +56,7 @@ export function findContentEntry(
   entries: EnrichedContentEntry[],
   params: ContentMatchParams
 ): EnrichedContentEntry | null {
-  const { section, page, tab } = params
-
-  const matchingEntry = entries.find((entry) => {
-    // Match section and tab
-    if (entry.data.section !== section) {
-      return false
-    }
-
-    const entryTab = addDemosOrDeprecated(entry.data.tab, entry.filePath)
-    if (entryTab !== tab) {
-      return false
-    }
-
-    // Match page (handling flattened subsection names)
-    const entryId = kebabCase(entry.data.id)
-    const entryPage = entry.data.subsection
-      ? `${entry.data.subsection}_${entryId}`
-      : entryId
-
-    return entryPage === page
-  })
-
-  return matchingEntry || null
+  return entries.find((entry) => matchesParams(entry, params)) || null
 }
 
 /**
@@ -64,26 +73,8 @@ export function findContentEntryFilePath(
   entries: EnrichedContentEntry[],
   params: ContentMatchParams
 ): string | null {
-  const { section, page, tab } = params
-
-  // Find all matching entries
-  const matchingEntries = entries.filter((entry) => {
-    if (entry.data.section !== section) {
-      return false
-    }
-
-    const entryTab = addDemosOrDeprecated(entry.data.tab, entry.filePath)
-    if (entryTab !== tab) {
-      return false
-    }
-
-    const entryId = kebabCase(entry.data.id)
-    const entryPage = entry.data.subsection
-      ? `${entry.data.subsection}_${entryId}`
-      : entryId
-
-    return entryPage === page
-  })
+  // Find all matching entries using shared matching logic
+  const matchingEntries = entries.filter((entry) => matchesParams(entry, params))
 
   if (matchingEntries.length === 0) {
     return null
