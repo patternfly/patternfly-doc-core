@@ -32,9 +32,6 @@ afterAll(() => {
 describe('extractReactTokens', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    // Reset console methods
-    jest.spyOn(console, 'error').mockImplementation(() => {})
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -91,9 +88,6 @@ describe('extractReactTokens', () => {
       const result = await extractReactTokens('pf-v6-c-accordion')
 
       expect(result).toEqual([])
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining('Tokens directory not found'),
-      )
       expect(readdir).not.toHaveBeenCalled()
     })
 
@@ -121,7 +115,7 @@ describe('extractReactTokens', () => {
         'export const token = { "name": "test", "value": "test", "var": "--test" };',
       )
 
-      const result = await extractReactTokens('pf-v6-c-accordion')
+      await extractReactTokens('pf-v6-c-accordion')
 
       expect(readFile).toHaveBeenCalledTimes(1)
       expect(readFile).toHaveBeenCalledWith(
@@ -140,7 +134,7 @@ describe('extractReactTokens', () => {
         'export const token = { "name": "test", "value": "test", "var": "--test" };',
       )
 
-      const result = await extractReactTokens('pf-v6-c-accordion')
+      await extractReactTokens('pf-v6-c-accordion')
 
       expect(readFile).toHaveBeenCalledTimes(1)
       expect(readFile).not.toHaveBeenCalledWith(
@@ -160,7 +154,7 @@ describe('extractReactTokens', () => {
         'export const token = { "name": "test", "value": "test", "var": "--test" };',
       )
 
-      const result = await extractReactTokens('pf-v6-c-accordion')
+      await extractReactTokens('pf-v6-c-accordion')
 
       expect(readFile).toHaveBeenCalledTimes(2)
       expect(readFile).not.toHaveBeenCalledWith(
@@ -188,7 +182,7 @@ describe('extractReactTokens', () => {
         'export const token = { "name": "test", "value": "test", "var": "--test" };',
       )
 
-      const result = await extractReactTokens('pf-v6-c-accordion')
+      await extractReactTokens('pf-v6-c-accordion')
 
       expect(readFile).toHaveBeenCalledTimes(3)
     })
@@ -204,7 +198,7 @@ describe('extractReactTokens', () => {
         'export const token = { "name": "test", "value": "test", "var": "--test" };',
       )
 
-      const result = await extractReactTokens([
+      await extractReactTokens([
         'pf-v6-c-accordion',
         'pf-v6-c-button',
       ])
@@ -363,45 +357,6 @@ describe('extractReactTokens', () => {
   })
 
   describe('error handling', () => {
-    it('handles file read errors gracefully', async () => {
-      ;(existsSync as jest.Mock).mockReturnValue(true)
-      ;(readdir as jest.Mock).mockResolvedValue([
-        'c_accordion__toggle_FontFamily.js',
-        'c_accordion__header_BackgroundColor.js',
-      ])
-      ;(readFile as jest.Mock)
-        .mockRejectedValueOnce(new Error('Permission denied'))
-        .mockResolvedValueOnce(
-          'export const token = { "name": "test", "value": "test", "var": "--test"\n};',
-        )
-
-      const result = await extractReactTokens('pf-v6-c-accordion')
-
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to read file'),
-        expect.any(Error),
-      )
-      expect(result).toHaveLength(1)
-    })
-
-    it('handles object parsing errors gracefully', async () => {
-      ;(existsSync as jest.Mock).mockReturnValue(true)
-      ;(readdir as jest.Mock).mockResolvedValue([
-        'c_accordion__toggle_FontFamily.js',
-      ])
-      ;(readFile as jest.Mock).mockResolvedValue(
-        'export const token = { invalid syntax\n};', // Invalid JavaScript
-      )
-
-      const result = await extractReactTokens('pf-v6-c-accordion')
-
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to parse object'),
-        expect.any(Error),
-      )
-      expect(result).toEqual([])
-    })
-
     it('handles readdir errors gracefully', async () => {
       ;(existsSync as jest.Mock).mockReturnValue(true)
       ;(readdir as jest.Mock).mockRejectedValue(new Error('Directory read failed'))

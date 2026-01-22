@@ -62,7 +62,7 @@ export interface ApiIndex {
    */
   examples: Record<string, { exampleName: string; title: string | null }[]>
   /** CSS token objects by version::section::page (e.g., { 'v6::components::accordion': [{name: '--pf-v6-c-accordion--...', value: '...', var: '...'}] }) */
-  css: Record<string, Array<{ name: string; value: string; var: string }>>
+  css: Record<string, { name: string; value: string; var: string }[]>
 }
 
 /**
@@ -149,7 +149,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const sectionPages: Record<string, Set<string>> = {}
     const pageTabs: Record<string, Set<string>> = {}
     const tabExamples: Record<string, { exampleName: string; title: string | null }[]> = {}
-    const pageCss: Record<string, Array<{ name: string; value: string; var: string }>> = {}
+    const pageCss: Record<string, { name: string; value: string; var: string }[]> = {}
     const pageCssPrefixes: Record<string, string | string[]> = {}
 
     flatEntries.forEach((entry: any) => {

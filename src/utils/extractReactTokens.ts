@@ -4,7 +4,7 @@ import { existsSync } from 'fs'
 
 /**
  * Converts a CSS prefix (e.g., "pf-v6-c-accordion") to a token prefix (e.g., "c_accordion")
- * 
+ *
  * @param cssPrefix - The CSS prefix from front matter
  * @returns The token prefix used in file names
  */
@@ -15,7 +15,7 @@ function cssPrefixToTokenPrefix(cssPrefix: string): string {
 
 /**
  * Extracts all token objects from @patternfly/react-tokens that match a given CSS prefix
- * 
+ *
  * @param cssPrefix - The CSS prefix (e.g., "pf-v6-c-accordion")
  * @returns Array of token objects with name, value, and var properties
  */
@@ -37,8 +37,6 @@ export async function extractReactTokens(
   )
 
   if (!existsSync(tokensDir)) {
-    // eslint-disable-next-line no-console
-    console.error(`Tokens directory not found: ${tokensDir}`)
     return []
   }
 
@@ -68,53 +66,43 @@ export async function extractReactTokens(
 
   await Promise.all(
     matchingFiles.map(async (file) => {
-      try {
-        const filePath = join(tokensDir, file)
-        const fileContent = await readFile(filePath, 'utf8')
+      const filePath = join(tokensDir, file)
+      const fileContent = await readFile(filePath, 'utf8')
 
-        // Extract the exported object using regex
-        // Pattern: export const variableName = { "name": "...", "value": "...", "var": "..." };
-        // Use non-greedy match to get just the first exported const object
-        const objectMatch = fileContent.match(
-          /export const \w+ = \{[\s\S]*?\n\};/,
-        )
+      // Extract the exported object using regex
+      // Pattern: export const variableName = { "name": "...", "value": "...", "var": "..." };
+      // Use non-greedy match to get just the first exported const object
+      const objectMatch = fileContent.match(
+        /export const \w+ = \{[\s\S]*?\n\};/,
+      )
 
-        if (objectMatch) {
-          // Parse the object string to extract the JSON-like object
-          const objectContent = objectMatch[0]
-            .replace(/export const \w+ = /, '')
-            .replace(/;$/, '')
+      if (objectMatch) {
+        // Parse the object string to extract the JSON-like object
+        const objectContent = objectMatch[0]
+          .replace(/export const \w+ = /, '')
+          .replace(/;$/, '')
 
-          try {
-            // Use Function constructor for safe evaluation
-            // The object content is valid JavaScript, so we can evaluate it
-            const tokenObject = new Function(`return ${objectContent}`)() as {
-              name: string
-              value: string
-              var: string
-            }
-
-            if (
-              tokenObject &&
-              typeof tokenObject === 'object' &&
-              typeof tokenObject.name === 'string' &&
-              typeof tokenObject.value === 'string' &&
-              typeof tokenObject.var === 'string'
-            ) {
-              tokenObjects.push({
-                name: tokenObject.name,
-                value: tokenObject.value,
-                var: tokenObject.var,
-              })
-            }
-          } catch (evalError) {
-            // eslint-disable-next-line no-console
-            console.warn(`Failed to parse object from ${file}:`, evalError)
-          }
+        // Use Function constructor for safe evaluation
+        // The object content is valid JavaScript, so we can evaluate it
+        const tokenObject = new Function(`return ${objectContent}`)() as {
+          name: string
+          value: string
+          var: string
         }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to read file ${file}:`, error)
+
+        if (
+          tokenObject &&
+          typeof tokenObject === 'object' &&
+          typeof tokenObject.name === 'string' &&
+          typeof tokenObject.value === 'string' &&
+          typeof tokenObject.var === 'string'
+        ) {
+          tokenObjects.push({
+            name: tokenObject.name,
+            value: tokenObject.value,
+            var: tokenObject.var,
+          })
+        }
       }
     }),
   )

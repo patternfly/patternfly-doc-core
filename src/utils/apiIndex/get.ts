@@ -134,7 +134,7 @@ export async function getCssTokens(
   version: string,
   section: string,
   page: string,
-): Promise<Array<{ name: string; value: string; var: string }>> {
+): Promise<{ name: string; value: string; var: string }[]> {
   const index = await getApiIndex()
   const { createIndexKey } = await import('../apiHelpers')
   const key = createIndexKey(version, section, page)

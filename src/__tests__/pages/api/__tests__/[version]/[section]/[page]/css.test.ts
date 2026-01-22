@@ -161,6 +161,7 @@ it('returns 400 error when all parameters are missing', async () => {
 })
 
 it('returns 500 error when fetchApiIndex fails', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { fetchApiIndex } = require('../../../../../../../utils/apiIndex/fetch')
   fetchApiIndex.mockRejectedValueOnce(new Error('Network error'))
 
@@ -182,6 +183,7 @@ it('returns 500 error when fetchApiIndex fails', async () => {
 })
 
 it('returns 500 error when fetchApiIndex throws a non-Error object', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { fetchApiIndex } = require('../../../../../../../utils/apiIndex/fetch')
   fetchApiIndex.mockRejectedValueOnce('String error')
 
@@ -203,6 +205,7 @@ it('returns 500 error when fetchApiIndex throws a non-Error object', async () =>
 })
 
 it('returns empty array when CSS tokens array exists but is empty', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { fetchApiIndex } = require('../../../../../../../utils/apiIndex/fetch')
   fetchApiIndex.mockResolvedValueOnce({
     versions: ['v6'],
