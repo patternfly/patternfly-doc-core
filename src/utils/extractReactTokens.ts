@@ -21,7 +21,7 @@ function cssPrefixToTokenPrefix(cssPrefix: string): string {
  */
 export async function extractReactTokens(
   cssPrefix: string | string[],
-): Promise<Array<{ name: string; value: string; var: string }>> {
+): Promise<{ name: string; value: string; var: string }[]> {
   // Handle both single prefix and array of prefixes to support the subcomponents.
   const prefixes = Array.isArray(cssPrefix) ? cssPrefix : [cssPrefix]
   const tokenPrefixes = prefixes.map(cssPrefixToTokenPrefix)
@@ -37,6 +37,7 @@ export async function extractReactTokens(
   )
 
   if (!existsSync(tokensDir)) {
+    // eslint-disable-next-line no-console
     console.error(`Tokens directory not found: ${tokensDir}`)
     return []
   }
@@ -63,56 +64,60 @@ export async function extractReactTokens(
   })
 
   // Import and extract objects from each matching file
-  const tokenObjects: Array<{ name: string; value: string; var: string }> = []
+  const tokenObjects: { name: string; value: string; var: string }[] = []
 
-  for (const file of matchingFiles) {
-    try {
-      const filePath = join(tokensDir, file)
-      const fileContent = await readFile(filePath, 'utf8')
+  await Promise.all(
+    matchingFiles.map(async (file) => {
+      try {
+        const filePath = join(tokensDir, file)
+        const fileContent = await readFile(filePath, 'utf8')
 
-      // Extract the exported object using regex
-      // Pattern: export const variableName = { "name": "...", "value": "...", "var": "..." };
-      // Use non-greedy match to get just the first exported const object
-      const objectMatch = fileContent.match(
-        /export const \w+ = \{[\s\S]*?\n\};/,
-      )
+        // Extract the exported object using regex
+        // Pattern: export const variableName = { "name": "...", "value": "...", "var": "..." };
+        // Use non-greedy match to get just the first exported const object
+        const objectMatch = fileContent.match(
+          /export const \w+ = \{[\s\S]*?\n\};/,
+        )
 
-      if (objectMatch) {
-        // Parse the object string to extract the JSON-like object
-        const objectContent = objectMatch[0]
-          .replace(/export const \w+ = /, '')
-          .replace(/;$/, '')
+        if (objectMatch) {
+          // Parse the object string to extract the JSON-like object
+          const objectContent = objectMatch[0]
+            .replace(/export const \w+ = /, '')
+            .replace(/;$/, '')
 
-        try {
-          // Use Function constructor for safe evaluation
-          // The object content is valid JavaScript, so we can evaluate it
-          const tokenObject = new Function(`return ${objectContent}`)() as {
-            name: string
-            value: string
-            var: string
+          try {
+            // Use Function constructor for safe evaluation
+            // The object content is valid JavaScript, so we can evaluate it
+            const tokenObject = new Function(`return ${objectContent}`)() as {
+              name: string
+              value: string
+              var: string
+            }
+
+            if (
+              tokenObject &&
+              typeof tokenObject === 'object' &&
+              typeof tokenObject.name === 'string' &&
+              typeof tokenObject.value === 'string' &&
+              typeof tokenObject.var === 'string'
+            ) {
+              tokenObjects.push({
+                name: tokenObject.name,
+                value: tokenObject.value,
+                var: tokenObject.var,
+              })
+            }
+          } catch (evalError) {
+            // eslint-disable-next-line no-console
+            console.warn(`Failed to parse object from ${file}:`, evalError)
           }
-
-          if (
-            tokenObject &&
-            typeof tokenObject === 'object' &&
-            typeof tokenObject.name === 'string' &&
-            typeof tokenObject.value === 'string' &&
-            typeof tokenObject.var === 'string'
-          ) {
-            tokenObjects.push({
-              name: tokenObject.name,
-              value: tokenObject.value,
-              var: tokenObject.var,
-            })
-          }
-        } catch (evalError) {
-          console.warn(`Failed to parse object from ${file}:`, evalError)
         }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn(`Failed to read file ${file}:`, error)
       }
-    } catch (error) {
-      console.warn(`Failed to read file ${file}:`, error)
-    }
-  }
+    }),
+  )
 
   // Sort by name for consistent ordering
   return tokenObjects.sort((a, b) => a.name.localeCompare(b.name))
