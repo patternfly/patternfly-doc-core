@@ -52,60 +52,68 @@ export async function extractReactTokens(
     // Check if file starts with any of the token prefixes
     // We want individual token files (e.g., c_accordion__toggle_FontFamily.js)
     // but not the main component index file (e.g., c_accordion.js)
-    return tokenPrefixes.some((prefix) => {
-      if (file === `${prefix}.js`) {
-        // This is the main component file, skip it
-        return false
-      }
-      return file.startsWith(prefix)
-    })
-  })
-
   // Import and extract objects from each matching file
-  const tokenObjects: { name: string; value: string; var: string }[] = []
+  const results = await Promise.all(
+    matchingFiles.map(async (file): Promise<{ name: string; value: string; var: string } | null> => {
+      try {
+        const filePath = join(tokensDir, file)
+        const fileContent = await readFile(filePath, 'utf8')
 
-  await Promise.all(
-    matchingFiles.map(async (file) => {
-      const filePath = join(tokensDir, file)
-      const fileContent = await readFile(filePath, 'utf8')
+        // Extract the exported object using regex
+        // Pattern: export const variableName = { "name": "...", "value": "...", "var": "..." };
+        // Use non-greedy match to get just the first exported const object
+        const objectMatch = fileContent.match(
+          /export const \w+ = \{[\s\S]*?\n\};/,
+        )
 
-      // Extract the exported object using regex
-      // Pattern: export const variableName = { "name": "...", "value": "...", "var": "..." };
-      // Use non-greedy match to get just the first exported const object
-      const objectMatch = fileContent.match(
-        /export const \w+ = \{[\s\S]*?\n\};/,
-      )
+        if (objectMatch) {
+          // Parse the object string to extract the JSON-like object
+          const objectContent = objectMatch[0]
+            .replace(/export const \w+ = /, '')
+            .replace(/;$/, '')
 
-      if (objectMatch) {
-        // Parse the object string to extract the JSON-like object
-        const objectContent = objectMatch[0]
-          .replace(/export const \w+ = /, '')
-          .replace(/;$/, '')
+          try {
+            // Use Function constructor for safe evaluation
+            // The object content is valid JavaScript, so we can evaluate it
+            const tokenObject = new Function(`return ${objectContent}`)() as {
+              name: string
+              value: string
+              var: string
+            }
 
-        // Use Function constructor for safe evaluation
-        // The object content is valid JavaScript, so we can evaluate it
-        const tokenObject = new Function(`return ${objectContent}`)() as {
-          name: string
-          value: string
-          var: string
+            if (
+              tokenObject &&
+              typeof tokenObject === 'object' &&
+              typeof tokenObject.name === 'string' &&
+              typeof tokenObject.value === 'string' &&
+              typeof tokenObject.var === 'string'
+            ) {
+              return {
+                name: tokenObject.name,
+                value: tokenObject.value,
+                var: tokenObject.var,
+              }
+            }
+          } catch (evalError) {
+            // eslint-disable-next-line no-console
+            console.warn(`Failed to parse object from ${file}:`, evalError)
+          }
         }
-
-        if (
-          tokenObject &&
-          typeof tokenObject === 'object' &&
-          typeof tokenObject.name === 'string' &&
-          typeof tokenObject.value === 'string' &&
-          typeof tokenObject.var === 'string'
-        ) {
-          tokenObjects.push({
-            name: tokenObject.name,
-            value: tokenObject.value,
-            var: tokenObject.var,
-          })
-        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn(`Failed to read file ${file}:`, error)
       }
+      return null
     }),
   )
+
+  // Filter out null results
+  const tokenObjects = results.filter(
+    (obj): obj is { name: string; value: string; var: string } => obj !== null,
+  )
+
+  // Sort by name for consistent ordering
+  return tokenObjects.sort((a, b) => a.name.localeCompare(b.name))
 
   // Sort by name for consistent ordering
   return tokenObjects.sort((a, b) => a.name.localeCompare(b.name))
