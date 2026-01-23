@@ -22,13 +22,6 @@ function getCategoryFromTokenName(tokenName: string): string {
   }
 
   return parts[0]
-  // --pf-[t|vX]-
-  // add test for nonversion token
-  // strip out leading --pf-
-  // check if 1st thing is version, strip out version and grab first part after, v6-chart-global
-  // if not version, put that thing in category
-  // CSS variable format: --pf-v6-{category}-...
-  // Split by hyphen and get the category part (index 4 after splitting)
 }
 
 export function getAllTokens(): Token[] {
