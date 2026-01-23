@@ -1,35 +1,41 @@
-// eslint-disable @typescript-eslint/camelcase
 jest.mock('@patternfly/react-tokens', () => ({
+  // eslint-disable-next-line camelcase
   c_alert_BackgroundColor: {
     name: '--pf-v6-c-alert--BackgroundColor',
     value: '#ffffff',
     var: 'var(--pf-v6-c-alert--BackgroundColor)',
   },
+  // eslint-disable-next-line camelcase
   c_alert_Color: {
     name: '--pf-v6-c-alert--Color',
     value: '#000000',
     var: 'var(--pf-v6-c-alert--Color)',
   },
+  // eslint-disable-next-line camelcase
   c_button_BackgroundColor: {
     name: '--pf-v6-c-button--BackgroundColor',
     value: '#0066cc',
     var: 'var(--pf-v6-c-button--BackgroundColor)',
   },
+  // eslint-disable-next-line camelcase
   t_global_color_100: {
     name: '--pf-v6-t-global--color--100',
     value: '#f0f0f0',
     var: 'var(--pf-v6-t-global--color--100)',
   },
+  // eslint-disable-next-line camelcase
   t_global_color_200: {
     name: '--pf-v6-t-global--color--200',
     value: '#e0e0e0',
     var: 'var(--pf-v6-t-global--color--200)',
   },
+  // eslint-disable-next-line camelcase
   chart_global_Fill: {
     name: '--pf-v6-chart-global--Fill',
     value: '#06c',
     var: 'var(--pf-v6-chart-global--Fill)',
   },
+  // eslint-disable-next-line camelcase
   l_grid_gutter: {
     name: '--pf-v6-l-grid--gutter',
     value: '1rem',
