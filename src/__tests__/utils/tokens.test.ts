@@ -1,3 +1,4 @@
+// eslint-disable @typescript-eslint/camelcase
 jest.mock('@patternfly/react-tokens', () => ({
   c_alert_BackgroundColor: {
     name: '--pf-v6-c-alert--BackgroundColor',

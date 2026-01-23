@@ -22,7 +22,7 @@ function getCategoryFromTokenName(tokenName: string): string {
     // Handle multi-word categories like 'chart'
     // Find where the component name starts (after category)
     // Categories can be: c, t, l, chart, global, hidden, patternfly
-    let category = parts[4]
+    const category = parts[4]
 
     // Check if this might be a multi-word category
     // For patterns like: --pf-v6-chart-global-...
