@@ -25,9 +25,9 @@ jest.mock('@patternfly/react-tokens', () => ({
   },
   // eslint-disable-next-line camelcase
   t_global_color_200: {
-    name: '--pf-v6-t-global--color--200',
+    name: '--pf-t-global--color--200',
     value: '#e0e0e0',
-    var: 'var(--pf-v6-t-global--color--200)',
+    var: 'var(--pf-t-global--color--200)',
   },
   // eslint-disable-next-line camelcase
   chart_global_Fill: {
@@ -149,7 +149,8 @@ describe('getTokensByCategory', () => {
 
     Object.entries(byCategory).forEach(([category, tokens]) => {
       tokens.forEach((token) => {
-        const prefix = token.name.split('-')[4] // --pf-v6-{prefix}-...
+        const isVersionedToken = /^--pf-v6/.test(token.name)
+        const prefix = token.name.split('-')[isVersionedToken ? 4 : 3] // --pf-v6-{prefix}- if versioned or --pf-{prefix}- if unversioned
         expect(prefix).toBe(category)
       })
     })

@@ -15,27 +15,20 @@ let cachedCategories: string[] | null = null
 let cachedTokensByCategory: TokensByCategory | null = null
 
 function getCategoryFromTokenName(tokenName: string): string {
-  // CSS variable format: --pf-v6-{category}-...
-  // Split by hyphen and get the category part (index 4 after splitting)
-  const parts = tokenName.split('-')
-  if (parts.length >= 5) {
-    // Handle multi-word categories like 'chart'
-    // Find where the component name starts (after category)
-    // Categories can be: c, t, l, chart, global, hidden, patternfly
-    const category = parts[4]
-
-    // Check if this might be a multi-word category
-    // For patterns like: --pf-v6-chart-global-...
-    // we want to check if parts[4] + parts[5] forms a known longer category
-    if (parts.length >= 6 && parts[4] === 'chart' && parts[5] !== '') {
-      // For chart tokens, the category is just 'chart'
-      return 'chart'
-    }
-
-    return category
+  const nameWithoutPfPrefix = tokenName.replace(/^--pf-/, '')
+  const parts = nameWithoutPfPrefix.split(/-+/)
+  if (/^v\d+/.test(parts[0])) {
+    return parts[1]
   }
 
-  return tokenName
+  return parts[0]
+  // --pf-[t|vX]-
+  // add test for nonversion token
+  // strip out leading --pf-
+  // check if 1st thing is version, strip out version and grab first part after, v6-chart-global
+  // if not version, put that thing in category
+  // CSS variable format: --pf-v6-{category}-...
+  // Split by hyphen and get the category part (index 4 after splitting)
 }
 
 export function getAllTokens(): Token[] {
