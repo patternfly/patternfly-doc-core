@@ -14,26 +14,30 @@ let cachedTokens: Token[] | null = null
 let cachedCategories: string[] | null = null
 let cachedTokensByCategory: TokensByCategory | null = null
 
-/**
- * Extracts the category from a token name
- * Categories are determined by the first prefix before underscore
- * Examples:
- *   c_alert_Title -> c
- *   t_global_color -> t
- *   chart_color_blue -> chart
- */
 function getCategoryFromTokenName(tokenName: string): string {
-  const firstUnderscore = tokenName.indexOf('_')
-  if (firstUnderscore === -1) {
-    return tokenName
+  // CSS variable format: --pf-v6-{category}-...
+  // Split by hyphen and get the category part (index 4 after splitting)
+  const parts = tokenName.split('-')
+  if (parts.length >= 5) {
+    // Handle multi-word categories like 'chart'
+    // Find where the component name starts (after category)
+    // Categories can be: c, t, l, chart, global, hidden, patternfly
+    let category = parts[4]
+
+    // Check if this might be a multi-word category
+    // For patterns like: --pf-v6-chart-global-...
+    // we want to check if parts[4] + parts[5] forms a known longer category
+    if (parts.length >= 6 && parts[4] === 'chart' && parts[5] !== '') {
+      // For chart tokens, the category is just 'chart'
+      return 'chart'
+    }
+
+    return category
   }
-  return tokenName.substring(0, firstUnderscore)
+
+  return tokenName
 }
 
-/**
- * Loads all tokens from @patternfly/react-tokens
- * Returns an array of token objects with { name, value, var }
- */
 export function getAllTokens(): Token[] {
   if (cachedTokens) {
     return cachedTokens
@@ -60,9 +64,6 @@ export function getAllTokens(): Token[] {
   return tokens
 }
 
-/**
- * Gets a sorted array of unique token categories
- */
 export function getTokenCategories(): string[] {
   if (cachedCategories) {
     return cachedCategories
@@ -80,9 +81,6 @@ export function getTokenCategories(): string[] {
   return cachedCategories
 }
 
-/**
- * Gets all tokens organized by category
- */
 export function getTokensByCategory(): TokensByCategory {
   if (cachedTokensByCategory) {
     return cachedTokensByCategory
@@ -103,19 +101,11 @@ export function getTokensByCategory(): TokensByCategory {
   return byCategory
 }
 
-/**
- * Gets tokens for a specific category
- * Returns undefined if category doesn't exist
- */
 export function getTokensForCategory(category: string): Token[] | undefined {
   const byCategory = getTokensByCategory()
   return byCategory[category]
 }
 
-/**
- * Filters tokens by substring match (case-insensitive)
- * Matches against the token name field
- */
 export function filterTokens(tokens: Token[], filter: string): Token[] {
   if (!filter) {
     return tokens
@@ -127,10 +117,6 @@ export function filterTokens(tokens: Token[], filter: string): Token[] {
   )
 }
 
-/**
- * Filters tokens by category (case-insensitive)
- * Matches against the category name
- */
 export function filterTokensByCategory(
   byCategory: TokensByCategory,
   filter: string,
