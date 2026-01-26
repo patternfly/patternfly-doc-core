@@ -8,11 +8,11 @@ import { sentenceCase } from '../../../../../utils/case'
 export const prerender = false
 
 export const GET: APIRoute = async ({ params }) => {
-  const { version, section, page } = params
+  const { page } = params
 
-  if (!version || !section || !page) {
+  if (!page) {
     return createJsonResponse(
-      { error: 'Version, section, and page parameters are required' },
+      { error: 'Page parameter is required' },
       400,
     )
   }
@@ -20,14 +20,14 @@ export const GET: APIRoute = async ({ params }) => {
   try {
     const config = await getConfig(`${process.cwd()}/pf-docs.config.mjs`)
     const outputDir = config?.outputDir || join(process.cwd(), 'dist')
-  
+
     const propsFilePath = join(outputDir, 'props.json')
     const propsDataFile = readFileSync(propsFilePath)
     const props = JSON.parse(propsDataFile.toString())
-  
+
     const propsData = props[sentenceCase(page)]
 
-    if(propsData === undefined) {
+    if (propsData === undefined) {
       return createJsonResponse(
         { error: `Props data for ${page} not found` },
         404,
@@ -35,7 +35,7 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     return createJsonResponse(propsData)
-  
+
   } catch (error) {
     const details = error instanceof Error ? error.message : String(error)
     return createJsonResponse(
