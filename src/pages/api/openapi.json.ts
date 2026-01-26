@@ -23,7 +23,7 @@ export const GET: APIRoute = async ({ url }) => {
     const details = error instanceof Error ? error.message : String(error)
     return createJsonResponse(
       { error: 'Failed to load API index', details },
-      500
+      500,
     )
   }
 
@@ -103,7 +103,8 @@ export const GET: APIRoute = async ({ url }) => {
       '/openapi.json': {
         get: {
           summary: 'Get OpenAPI specification',
-          description: 'Returns the complete OpenAPI 3.0 specification for this API',
+          description:
+            'Returns the complete OpenAPI 3.0 specification for this API',
           operationId: 'getOpenApiSpec',
           responses: {
             '200': {
@@ -234,6 +235,70 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
+      '/{version}/{section}/names': {
+        get: {
+          summary: 'Get component names',
+          description: 'Returns the component names that have props data',
+          operationId: 'getNames',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              description: 'Documentation section',
+              schema: {
+                type: 'string',
+              },
+              example: 'components',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Component names with props data',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'string'
+                    },
+                  },
+                  example: [
+                    'Alert',
+                    'AlertGroup'
+                  ],
+                },
+              },
+            },
+            '404': {
+              description: 'Props not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       '/{version}/{section}/{page}': {
         get: {
           summary: 'List tabs for a page',
@@ -306,6 +371,102 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
+      '/{version}/{section}/{page}/props': {
+        get: {
+          summary: 'Get component props',
+          description: 'Returns the props for the specified component',
+          operationId: 'getProps',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              description: 'Documentation section',
+              schema: {
+                type: 'string',
+              },
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              description: 'Page ID (kebab-cased)',
+              schema: {
+                type: 'string',
+              },
+              example: 'alert',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Props for the specified component',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        type: { type: 'string' },
+                        description: { type: 'string' },
+                        defaultValue: { type: 'string' },
+                      },
+                    },
+                  },
+                  example: [
+                    {
+                      name: 'actionClose',
+                      type: 'React.ReactNode',
+                      description:
+                        'Close button; use the alert action close button component.',
+                    },
+                    {
+                      name: 'actionLinks',
+                      type: 'React.ReactNode',
+                      description:
+                        'Action links; use a single alert action link component or multiple wrapped in an array\nor React fragment.',
+                    },
+                    {
+                      name: 'children',
+                      type: 'React.ReactNode',
+                      description: 'Content rendered inside the alert.',
+                      defaultValue: "''",
+                    },
+                  ],
+                },
+              },
+            },
+            '404': {
+              description: 'Props not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       '/{version}/{section}/{page}/{tab}': {
         get: {
           summary: 'Validate and redirect to text endpoint',
@@ -357,7 +518,8 @@ export const GET: APIRoute = async ({ url }) => {
           ],
           responses: {
             '302': {
-              description: 'Redirects to /{version}/{section}/{page}/{tab}/text',
+              description:
+                'Redirects to /{version}/{section}/{page}/{tab}/text',
             },
             '404': {
               description: 'Tab not found',
@@ -554,8 +716,7 @@ export const GET: APIRoute = async ({ url }) => {
       '/{version}/{section}/{page}/{tab}/examples/{example}': {
         get: {
           summary: 'Get example code',
-          description:
-            'Returns the raw source code for a specific example',
+          description: 'Returns the raw source code for a specific example',
           operationId: 'getExampleCode',
           parameters: [
             {
@@ -619,7 +780,7 @@ export const GET: APIRoute = async ({ url }) => {
                     type: 'string',
                   },
                   example:
-                    'import React from \'react\';\nimport { Alert } from \'@patternfly/react-core\';\n\nexport const AlertBasic = () => <Alert title="Basic alert" />;',
+                    "import React from 'react';\nimport { Alert } from '@patternfly/react-core';\n\nexport const AlertBasic = () => <Alert title=\"Basic alert\" />;",
                 },
               },
             },
