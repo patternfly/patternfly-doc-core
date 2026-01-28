@@ -7,6 +7,7 @@ import { content } from '../../content'
 import { kebabCase, addDemosOrDeprecated } from '../index'
 import { getDefaultTabForApi } from '../packageUtils'
 import { getOutputDir } from '../getOutputDir'
+import { addSubsection } from '../case'
 
 const SOURCE_ORDER: Record<string, number> = {
   react: 1,
@@ -154,7 +155,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       // Flatten subsections into page name using underscores
       // e.g., subsection="forms", id="checkbox" becomes page="forms_checkbox"
       const basePage = kebabCase(id)
-      const page = subsection ? `${subsection}_${basePage}` : basePage
+      const page = addSubsection(basePage, subsection)
 
       // All pages are keyed by version::section (no subsection in key)
       const pageKey = `${version}::${section}`

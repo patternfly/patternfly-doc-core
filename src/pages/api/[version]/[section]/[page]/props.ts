@@ -3,7 +3,7 @@ import { createJsonResponse } from '../../../../../utils/apiHelpers'
 import { getConfig } from '../../../../../../cli/getConfig'
 import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { sentenceCase } from '../../../../../utils/case'
+import { sentenceCase, removeSubsection } from '../../../../../utils/case'
 
 export const prerender = false
 
@@ -25,7 +25,7 @@ export const GET: APIRoute = async ({ params }) => {
     const propsDataFile = readFileSync(propsFilePath)
     const props = JSON.parse(propsDataFile.toString())
 
-    const propsData = props[sentenceCase(page)]
+    const propsData = props[sentenceCase(removeSubsection(page))]
 
     if (propsData === undefined) {
       return createJsonResponse(

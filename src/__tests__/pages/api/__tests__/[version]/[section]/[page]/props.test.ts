@@ -1,6 +1,6 @@
 import { GET } from '../../../../../../../pages/api/[version]/[section]/[page]/props'
 import { getConfig } from '../../../../../../../../cli/getConfig'
-import { sentenceCase } from '../../../../../../../utils/case'
+import { sentenceCase, removeSubsection } from '../../../../../../../utils/case'
 
 /**
  * Mock getConfig to return a test configuration
@@ -28,7 +28,7 @@ jest.mock('node:fs', () => ({
 }))
 
 /**
- * Mock sentenceCase utility
+ * Mock sentenceCase and removeSubsection utilities
  */
 jest.mock('../../../../../../../utils/case', () => ({
   sentenceCase: jest.fn((id: string) =>
@@ -38,6 +38,13 @@ jest.mock('../../../../../../../utils/case', () => ({
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
   ),
+  removeSubsection: jest.fn((page: string) => {
+    // Simple mock: remove subsection prefix from page name
+    if (page.includes('_')) {
+      return page.split('_')[1]
+    }
+    return page
+  }),
 }))
 
 const mockData = {
@@ -354,4 +361,34 @@ it('handles request when tab is in URL path but not in params', async () => {
   expect(response.status).toBe(200)
   expect(body).toHaveProperty('name')
   expect(body.name).toBe('Alert')
+})
+
+it('removes subsection from page name before looking up props', async () => {
+  // Add test data for checkbox component
+  const dataWithSubsection = {
+    ...mockData,
+    Checkbox: {
+      name: 'Checkbox',
+      description: 'Checkbox component',
+      props: [
+        {
+          name: 'isChecked',
+          type: 'boolean',
+          description: 'Flag to control checked state',
+        },
+      ],
+    },
+  }
+  mockReadFileSync.mockReturnValueOnce(JSON.stringify(dataWithSubsection))
+
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page: 'forms_checkbox' },
+    url: new URL('http://localhost:4321/api/v6/components/forms_checkbox/props'),
+  } as any)
+  const body = await response.json()
+
+  expect(response.status).toBe(200)
+  expect(body.name).toBe('Checkbox')
+  expect(removeSubsection).toHaveBeenCalledWith('forms_checkbox')
+  expect(sentenceCase).toHaveBeenCalledWith('checkbox')
 })

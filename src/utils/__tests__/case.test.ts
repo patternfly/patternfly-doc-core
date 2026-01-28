@@ -1,4 +1,4 @@
-import { fixPatternflyCasing, kebabCase, sentenceCase } from '../case'
+import { fixPatternflyCasing, kebabCase, sentenceCase, addSubsection, removeSubsection } from '../case'
 
 describe('fixPatternflyCasing', () => {
   it('replaces PatternFly with Patternfly', () => {
@@ -35,5 +35,33 @@ describe('sentenceCase', () => {
   it('handles sentence case for regular strings', () => {
     expect(sentenceCase('button-component')).toBe('Button component')
     expect(sentenceCase('camelCase')).toBe('Camel case')
+  })
+})
+
+describe('addSubsection', () => {
+  it('adds subsection to page name with underscore separator', () => {
+    expect(addSubsection('checkbox', 'forms')).toBe('forms_checkbox')
+    expect(addSubsection('button', 'components')).toBe('components_button')
+  })
+
+  it('returns page name when no subsection is provided', () => {
+    expect(addSubsection('alert')).toBe('alert')
+    expect(addSubsection('button', undefined)).toBe('button')
+  })
+
+  it('returns page name when subsection is empty string', () => {
+    expect(addSubsection('alert', '')).toBe('alert')
+  })
+})
+
+describe('removeSubsection', () => {
+  it('removes subsection from page name by splitting on underscore', () => {
+    expect(removeSubsection('forms_checkbox')).toBe('checkbox')
+    expect(removeSubsection('components_button')).toBe('button')
+  })
+
+  it('returns page name when no subsection exists', () => {
+    expect(removeSubsection('alert')).toBe('alert')
+    expect(removeSubsection('button')).toBe('button')
   })
 })
