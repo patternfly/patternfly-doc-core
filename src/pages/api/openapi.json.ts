@@ -378,7 +378,7 @@ export const GET: APIRoute = async ({ url }) => {
       '/{version}/{section}/{page}/props': {
         get: {
           summary: 'Get component props',
-          description: 'Returns the props for the specified component',
+          description: 'Returns the props for the specified component. Automatically handles subsection-prefixed page names by removing the subsection prefix before lookup.',
           operationId: 'getProps',
           parameters: [
             {
@@ -406,11 +406,11 @@ export const GET: APIRoute = async ({ url }) => {
               name: 'page',
               in: 'path',
               required: true,
-              description: 'Page ID (kebab-cased)',
+              description: 'Page ID (kebab-cased, may be underscore-separated for subsection pages like "forms_checkbox"). Subsection prefix is automatically removed for props lookup.',
               schema: {
                 type: 'string',
               },
-              example: 'alert',
+              example: 'alert or forms_checkbox',
             },
           ],
           responses: {
