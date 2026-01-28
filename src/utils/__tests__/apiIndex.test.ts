@@ -30,7 +30,7 @@ describe('getApiIndex (build-time)', () => {
     expect(Object.keys(index.sections).length).toBeGreaterThan(0)
 
     // Validate structure of sections array
-    const sectionsArray = index.sections['v6']
+    const sectionsArray = index.sections.v6
     expect(Array.isArray(sectionsArray)).toBe(true)
     expect(sectionsArray.length).toBeGreaterThan(0)
 

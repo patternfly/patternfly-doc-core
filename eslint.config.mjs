@@ -14,6 +14,7 @@ export default [
         '.history/*',
         '**/.cache',
         "**/*.d.ts",
+        '.wrangler/*',
     ]
   },
   // add more generic rule sets here, such as:

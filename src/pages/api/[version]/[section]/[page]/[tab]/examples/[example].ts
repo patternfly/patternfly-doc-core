@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+ 
 import type { APIRoute, GetStaticPaths } from 'astro'
 import { readFile } from 'fs/promises'
 import { resolve } from 'path'
