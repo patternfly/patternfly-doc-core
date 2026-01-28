@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ url }) => {
     const details = error instanceof Error ? error.message : String(error)
     return createJsonResponse(
       { error: 'Failed to load API index', details },
-      500
+      500,
     )
   }
 
@@ -107,7 +107,8 @@ export const GET: APIRoute = async ({ url }) => {
       '/openapi.json': {
         get: {
           summary: 'Get OpenAPI specification',
-          description: 'Returns the complete OpenAPI 3.0 specification for this API',
+          description:
+            'Returns the complete OpenAPI 3.0 specification for this API',
           operationId: 'getOpenApiSpec',
           responses: {
             '200': {
@@ -238,6 +239,70 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
+      '/{version}/{section}/names': {
+        get: {
+          summary: 'Get component names',
+          description: 'Returns the component names that have props data',
+          operationId: 'getNames',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              description: 'Documentation section',
+              schema: {
+                type: 'string',
+              },
+              example: 'components',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Component names with props data',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'string'
+                    },
+                  },
+                  example: [
+                    'Alert',
+                    'AlertGroup'
+                  ],
+                },
+              },
+            },
+            '404': {
+              description: 'Props not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       '/{version}/{section}/{page}': {
         get: {
           summary: 'List tabs for a page',
@@ -310,6 +375,102 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
+      '/{version}/{section}/{page}/props': {
+        get: {
+          summary: 'Get component props',
+          description: 'Returns the props for the specified component',
+          operationId: 'getProps',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              description: 'Documentation section',
+              schema: {
+                type: 'string',
+              },
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              description: 'Page ID (kebab-cased)',
+              schema: {
+                type: 'string',
+              },
+              example: 'alert',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Props for the specified component',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        type: { type: 'string' },
+                        description: { type: 'string' },
+                        defaultValue: { type: 'string' },
+                      },
+                    },
+                  },
+                  example: [
+                    {
+                      name: 'actionClose',
+                      type: 'React.ReactNode',
+                      description:
+                        'Close button; use the alert action close button component.',
+                    },
+                    {
+                      name: 'actionLinks',
+                      type: 'React.ReactNode',
+                      description:
+                        'Action links; use a single alert action link component or multiple wrapped in an array\nor React fragment.',
+                    },
+                    {
+                      name: 'children',
+                      type: 'React.ReactNode',
+                      description: 'Content rendered inside the alert.',
+                      defaultValue: "''",
+                    },
+                  ],
+                },
+              },
+            },
+            '404': {
+              description: 'Props not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       '/{version}/{section}/{page}/{tab}': {
         get: {
           summary: 'Validate and redirect to text endpoint',
@@ -361,7 +522,8 @@ export const GET: APIRoute = async ({ url }) => {
           ],
           responses: {
             '302': {
-              description: 'Redirects to /{version}/{section}/{page}/{tab}/text',
+              description:
+                'Redirects to /{version}/{section}/{page}/{tab}/text',
             },
             '404': {
               description: 'Tab not found',
@@ -623,12 +785,258 @@ export const GET: APIRoute = async ({ url }) => {
                     type: 'string',
                   },
                   example:
-                    'import React from \'react\';\nimport { Alert } from \'@patternfly/react-core\';\n\nexport const AlertBasic = () => <Alert title="Basic alert" />;',
+                    "import React from 'react';\nimport { Alert } from '@patternfly/react-core';\n\nexport const AlertBasic = () => <Alert title=\"Basic alert\" />;",
                 },
               },
             },
             '404': {
               description: 'Example not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/tokens': {
+        get: {
+          summary: 'List token categories',
+          description:
+            'Returns an alphabetically sorted array of available design token categories from @patternfly/react-tokens. Categories are determined by token name prefixes (e.g., c_, t_, chart_). Optimized for MCP/LLM consumption.',
+          operationId: 'getTokenCategories',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'List of token categories',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                  example: ['c', 'chart', 'global', 'hidden', 'l', 't'],
+                },
+              },
+            },
+            '404': {
+              description: 'Version not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/tokens/{category}': {
+        get: {
+          summary: 'Get tokens for a category',
+          description:
+            'Returns design tokens for a specific category with optional filtering. Each token includes name (CSS variable name), value (resolved value), and var (CSS var() reference). Use the filter query parameter for case-insensitive substring matching to minimize response size.',
+          operationId: 'getTokensByCategory',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'category',
+              in: 'path',
+              required: true,
+              description: 'Token category (e.g., c, t, chart)',
+              schema: {
+                type: 'string',
+              },
+              example: 'c',
+            },
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              description: 'Case-insensitive substring filter to match against token names',
+              schema: {
+                type: 'string',
+              },
+              example: 'alert',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Array of tokens matching the criteria',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: {
+                          type: 'string',
+                          description: 'CSS variable name',
+                        },
+                        value: {
+                          type: 'string',
+                          description: 'Resolved CSS value',
+                        },
+                        var: {
+                          type: 'string',
+                          description: 'CSS var() reference',
+                        },
+                      },
+                      required: ['name', 'value', 'var'],
+                    },
+                  },
+                  example: [
+                    {
+                      name: '--pf-v6-c-alert--Color',
+                      value: '#000',
+                      var: 'var(--pf-v6-c-alert--Color)',
+                    },
+                  ],
+                },
+              },
+            },
+            '404': {
+              description: 'Category not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: {
+                        type: 'string',
+                      },
+                      validCategories: {
+                        type: 'array',
+                        items: {
+                          type: 'string',
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/tokens/all': {
+        get: {
+          summary: 'Get all tokens grouped by category',
+          description:
+            'Returns all design tokens organized by category with optional filtering. Use the filter query parameter to minimize response size for MCP/LLM consumption. Empty categories are excluded from filtered results.',
+          operationId: 'getAllTokens',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              description: 'Documentation version',
+              schema: {
+                type: 'string',
+                enum: versions,
+              },
+              example: 'v6',
+            },
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              description: 'Case-insensitive substring filter to match against token names across all categories',
+              schema: {
+                type: 'string',
+              },
+              example: 'color',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'Object with category keys and token arrays as values',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    additionalProperties: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          name: {
+                            type: 'string',
+                            description: 'CSS variable name',
+                          },
+                          value: {
+                            type: 'string',
+                            description: 'Resolved CSS value',
+                          },
+                          var: {
+                            type: 'string',
+                            description: 'CSS var() reference',
+                          },
+                        },
+                        required: ['name', 'value', 'var'],
+                      },
+                    },
+                  },
+                  example: {
+                    c: [
+                      {
+                        name: '--pf-v6-c-alert--Color',
+                        value: '#000',
+                        var: 'var(--pf-v6-c-alert--Color)',
+                      },
+                    ],
+                    t: [
+                      {
+                        name: '--pf-v6-t-global--Color',
+                        value: '#333',
+                        var: 'var(--pf-v6-t-global--Color)',
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            '404': {
+              description: 'Version not found',
               content: {
                 'application/json': {
                   schema: {

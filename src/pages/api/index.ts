@@ -100,6 +100,36 @@ export const GET: APIRoute = async () =>
           },
         },
         {
+          path: '/api/{version}/{section}/names',
+          method: 'GET',
+          description: 'Get component names that have props data',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'components',
+            }
+          ],
+          returns: {
+            type: 'array',
+            items: 'string',
+            description: 'All component names with props data',
+            example: [
+              'Alert',
+              'AlertGroup'
+            ],
+          },
+        },
+        {
           path: '/api/{version}/{section}/{page}',
           method: 'GET',
           description: 'List available tabs for a page (page may be underscore-separated for subsection pages)',
@@ -132,6 +162,46 @@ export const GET: APIRoute = async () =>
             items: 'string',
             description: 'Array of tab slugs available for this page',
             example: ['react', 'react-demos', 'html'],
+          },
+        },
+        {
+          path: '/api/{version}/{section}/{page}/props',
+          method: 'GET',
+          description: 'Get props for a specific component',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'alert',
+            },
+          ],
+          returns: {
+            type: 'array',
+            items: 'object',
+            description: 'Props for a specific component',
+            example: [
+              {
+                name: 'actionClose',
+                type: 'React.ReactNode',
+                description: 'Close button; use the alert action close button component.',
+              },
+            ],
           },
         },
         {
