@@ -24,10 +24,20 @@ describe('getApiIndex (build-time)', () => {
     expect(index.versions.length).toBeGreaterThan(0)
   })
 
-  it('sections is an object with version keys', async () => {
+  it('sections is an object with version keys containing string arrays', async () => {
     const index = await getApiIndex()
     expect(typeof index.sections).toBe('object')
     expect(Object.keys(index.sections).length).toBeGreaterThan(0)
+
+    // Validate structure of sections array
+    const sectionsArray = index.sections.v6
+    expect(Array.isArray(sectionsArray)).toBe(true)
+    expect(sectionsArray.length).toBeGreaterThan(0)
+
+    // All items should be strings (subsections are flattened into page names)
+    sectionsArray.forEach(item => {
+      expect(typeof item).toBe('string')
+    })
   })
 
   it('pages is an object with composite keys', async () => {
@@ -43,9 +53,9 @@ describe('getApiIndex (build-time)', () => {
     const index = await getApiIndex()
     expect(typeof index.tabs).toBe('object')
     expect(Object.keys(index.tabs).length).toBeGreaterThan(0)
-    // Keys should be in format "version::section::page"
+    // Keys should be in format "version::section::page" (always 3 parts, page may be hyphenated)
     const firstKey = Object.keys(index.tabs)[0]
-    expect(firstKey.split('::').length).toBeGreaterThanOrEqual(3)
+    expect(firstKey.split('::').length).toBe(3)
   })
 
   it('examples is an object with composite keys and example arrays', async () => {
@@ -53,9 +63,10 @@ describe('getApiIndex (build-time)', () => {
     expect(typeof index.examples).toBe('object')
     const exampleKeys = Object.keys(index.examples)
     expect(exampleKeys.length).toBeGreaterThan(0)
-    // Keys should be in format "version::section::page::tab"
+    // Keys are always "version::section::page::tab" (4 parts, page may be hyphenated)
     const firstKey = exampleKeys[0]
-    expect(firstKey.split('::').length).toBe(4)
+    const parts = firstKey.split('::').length
+    expect(parts).toBe(4)
     // Values should be arrays of example objects
     const examples = index.examples[firstKey]
     expect(Array.isArray(examples)).toBe(true)
@@ -98,6 +109,8 @@ describe('getSections', () => {
   })
 })
 
+
+
 describe('getPages', () => {
   it('returns array of pages for valid version and section', async () => {
     const pages = await getPages('v6', 'components')
@@ -105,10 +118,13 @@ describe('getPages', () => {
     expect(pages.length).toBeGreaterThan(0)
   })
 
-  it('includes expected pages', async () => {
+  it('includes expected pages (including underscore-separated subsection pages)', async () => {
     const pages = await getPages('v6', 'components')
     expect(pages).toContain('alert')
     expect(pages).toContain('button')
+    // Check for at least one underscore-separated page (subsection page like "forms_checkbox")
+    const hasUnderscorePage = pages.some(page => page.includes('_'))
+    expect(hasUnderscorePage).toBe(true)
   })
 
   it('returns empty array for invalid section', async () => {
@@ -198,6 +214,60 @@ describe('getExamples', () => {
   })
 })
 
+describe('Flattened subsection support', () => {
+  it('subsections are flattened into page names with underscores', async () => {
+    const index = await getApiIndex()
+    const pages = index.pages['v6::components']
+    expect(pages).toBeDefined()
+    // Should contain underscore-separated page names like "forms_checkbox"
+    const formsCheckbox = pages?.find(p => p === 'forms_checkbox')
+    expect(formsCheckbox).toBeDefined()
+  })
+
+  it('flattened pages have tabs with 3-part keys', async () => {
+    const index = await getApiIndex()
+    // Underscore-separated page name (former subsection page)
+    const formsCheckboxKey = createIndexKey('v6', 'components', 'forms_checkbox')
+    expect(index.tabs[formsCheckboxKey]).toBeDefined()
+    expect(index.tabs[formsCheckboxKey].length).toBeGreaterThan(0)
+    expect(formsCheckboxKey.split('::').length).toBe(3)
+  })
+
+  it('flattened pages have examples with 4-part keys', async () => {
+    const index = await getApiIndex()
+    // Check if forms_checkbox has react examples
+    const formsCheckboxReactKey = createIndexKey('v6', 'components', 'forms_checkbox', 'react')
+    // May or may not have examples, just check structure if it exists
+    if (index.examples[formsCheckboxReactKey]) {
+      expect(Array.isArray(index.examples[formsCheckboxReactKey])).toBe(true)
+      expect(formsCheckboxReactKey.split('::').length).toBe(4)
+    }
+  })
+
+  it('regular pages continue to work with 3-part tab keys', async () => {
+    const index = await getApiIndex()
+    const alertKey = createIndexKey('v6', 'components', 'alert')
+    expect(index.tabs[alertKey]).toBeDefined()
+    expect(alertKey.split('::').length).toBe(3)
+  })
+
+  it('all tab keys are 3-part (no 4-part keys)', async () => {
+    const index = await getApiIndex()
+    const tabKeys = Object.keys(index.tabs)
+    // All tab keys should be 3-part (version::section::page)
+    const allThreePart = tabKeys.every(key => key.split('::').length === 3)
+    expect(allThreePart).toBe(true)
+  })
+
+  it('all example keys are 4-part (no 5-part keys)', async () => {
+    const index = await getApiIndex()
+    const exampleKeys = Object.keys(index.examples)
+    // All example keys should be 4-part (version::section::page::tab)
+    const allFourPart = exampleKeys.every(key => key.split('::').length === 4)
+    expect(allFourPart).toBe(true)
+  })
+})
+
 describe('API Index architecture', () => {
   it('data structure supports hierarchical navigation', async () => {
     const index = await getApiIndex()
@@ -206,13 +276,13 @@ describe('API Index architecture', () => {
     const version = index.versions[0]
     expect(version).toBeTruthy()
 
-    // Get sections for version
+    // Get sections for version (all sections are flat strings)
     const sections = index.sections[version]
     expect(sections).toBeDefined()
     expect(sections!.length).toBeGreaterThan(0)
+    const section = sections![0]
 
     // Get pages for first section
-    const section = sections![0]
     const sectionKey = createIndexKey(version, section)
     const pages = index.pages[sectionKey]
     expect(pages).toBeDefined()

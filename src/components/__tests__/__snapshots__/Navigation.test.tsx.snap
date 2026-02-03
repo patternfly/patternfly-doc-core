@@ -197,6 +197,7 @@ exports[`matches snapshot 1`] = `
             aria-labelledby="nav-section-section-two"
             class="pf-v6-c-nav__subnav"
             hidden=""
+            inert=""
           >
             <ul
               class="pf-v6-c-nav__list"

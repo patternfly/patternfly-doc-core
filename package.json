@@ -110,7 +110,9 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript-eslint": "^8.15.0",
-    "wrangler": "^4.20.0"
+    "wrangler": "^4.20.0",
+    "@patternfly/react-user-feedback": "^6.0.0",
+    "@patternfly/react-data-view": "^6.0.0"
   },
   "config": {
     "commitizen": {

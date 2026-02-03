@@ -7,6 +7,10 @@
  * - Fetch /apiIndex.json (prerendered static file) at runtime
  * - Keep Workers bundle small (~110K vs 500KB+)
  * - Add only ~5-10ms latency from CDN fetch
+ *
+ * Structure Note:
+ * All routes use a flattened structure where subsections are kebab-cased
+ * and encoded into page names with underscores (e.g., "forms_checkbox")
  */
 import type { APIRoute } from 'astro'
 import { fetchApiIndex } from '../../utils/apiIndex/fetch'
@@ -32,7 +36,7 @@ export const GET: APIRoute = async ({ url }) => {
     info: {
       title: 'PatternFly Documentation API',
       description:
-        'Machine-readable documentation API for LLM agents and MCP servers. Provides hierarchical access to PatternFly documentation content.',
+        'Machine-readable documentation API for LLM agents and MCP servers. Provides hierarchical access to PatternFly documentation content. Uses a flattened structure where subsections are kebab-cased and encoded into page names with underscores (e.g., "forms_checkbox").',
       version: '1.0.0',
       contact: {
         name: 'PatternFly',
@@ -151,7 +155,7 @@ export const GET: APIRoute = async ({ url }) => {
                       type: 'string',
                     },
                   },
-                  example: ['components', 'layouts', 'utilities'],
+                  example: ['components', 'layouts', 'patterns', 'utility-classes'],
                 },
               },
             },
@@ -177,7 +181,7 @@ export const GET: APIRoute = async ({ url }) => {
         get: {
           summary: 'List pages in a section',
           description:
-            'Returns an array of page IDs within the specified section',
+            'Returns an array of page IDs within the specified section. Subsection pages use underscore-separated format (subsection_page, e.g., "forms_checkbox").',
           operationId: 'getPages',
           parameters: [
             {
@@ -204,7 +208,7 @@ export const GET: APIRoute = async ({ url }) => {
           ],
           responses: {
             '200': {
-              description: 'List of page IDs (kebab-cased)',
+              description: 'List of page IDs (kebab-cased, with underscore-separated subsection pages)',
               content: {
                 'application/json': {
                   schema: {
@@ -213,7 +217,7 @@ export const GET: APIRoute = async ({ url }) => {
                       type: 'string',
                     },
                   },
-                  example: ['alert', 'button', 'card'],
+                  example: ['alert', 'button', 'forms_checkbox', 'forms_radio', 'menus_dropdown'],
                 },
               },
             },
@@ -303,7 +307,7 @@ export const GET: APIRoute = async ({ url }) => {
         get: {
           summary: 'List tabs for a page',
           description:
-            'Returns an array of available tab slugs for the specified page',
+            'Returns an array of tab slugs available for the specified page. Page parameter may be underscore-separated for subsection pages (e.g., "forms_checkbox").',
           operationId: 'getTabs',
           parameters: [
             {
@@ -331,16 +335,16 @@ export const GET: APIRoute = async ({ url }) => {
               name: 'page',
               in: 'path',
               required: true,
-              description: 'Page ID (kebab-cased)',
+              description: 'Page ID (kebab-cased, may be underscore-separated for subsection pages like "forms_checkbox")',
               schema: {
                 type: 'string',
               },
-              example: 'alert',
+              example: 'alert or forms_checkbox',
             },
           ],
           responses: {
             '200': {
-              description: 'List of available tab slugs',
+              description: 'List of tab slugs',
               content: {
                 'application/json': {
                   schema: {
@@ -374,7 +378,7 @@ export const GET: APIRoute = async ({ url }) => {
       '/{version}/{section}/{page}/props': {
         get: {
           summary: 'Get component props',
-          description: 'Returns the props for the specified component',
+          description: 'Returns the props for the specified component. Automatically handles subsection-prefixed page names by removing the subsection prefix before lookup.',
           operationId: 'getProps',
           parameters: [
             {
@@ -402,11 +406,11 @@ export const GET: APIRoute = async ({ url }) => {
               name: 'page',
               in: 'path',
               required: true,
-              description: 'Page ID (kebab-cased)',
+              description: 'Page ID (kebab-cased, may be underscore-separated for subsection pages like "forms_checkbox"). Subsection prefix is automatically removed for props lookup.',
               schema: {
                 type: 'string',
               },
-              example: 'alert',
+              example: 'alert or forms_checkbox',
             },
           ],
           responses: {
@@ -471,7 +475,7 @@ export const GET: APIRoute = async ({ url }) => {
         get: {
           summary: 'Validate and redirect to text endpoint',
           description:
-            'Validates the path parameters and redirects to the /text endpoint',
+            'Validates the path parameters and redirects to the /text endpoint. Page parameter may be underscore-separated for subsection pages.',
           operationId: 'validateTab',
           parameters: [
             {
@@ -499,11 +503,11 @@ export const GET: APIRoute = async ({ url }) => {
               name: 'page',
               in: 'path',
               required: true,
-              description: 'Page ID (kebab-cased)',
+              description: 'Page ID (kebab-cased, may be underscore-separated for subsection pages)',
               schema: {
                 type: 'string',
               },
-              example: 'alert',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
@@ -543,7 +547,7 @@ export const GET: APIRoute = async ({ url }) => {
         get: {
           summary: 'Get tab content',
           description:
-            'Returns the raw markdown/MDX documentation content for the specified tab',
+            'Returns the raw markdown/MDX documentation content for the specified tab. Page parameter may be underscore-separated for subsection pages.',
           operationId: 'getContent',
           parameters: [
             {
@@ -571,11 +575,11 @@ export const GET: APIRoute = async ({ url }) => {
               name: 'page',
               in: 'path',
               required: true,
-              description: 'Page ID (kebab-cased)',
+              description: 'Page ID (kebab-cased, may be underscore-separated for subsection pages)',
               schema: {
                 type: 'string',
               },
-              example: 'alert',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
@@ -623,7 +627,7 @@ export const GET: APIRoute = async ({ url }) => {
         get: {
           summary: 'List available examples',
           description:
-            'Returns an array of available examples with their names and titles',
+            'Returns an array of available examples with their names and titles. Page parameter may be underscore-separated for subsection pages.',
           operationId: 'getExamples',
           parameters: [
             {
@@ -651,11 +655,11 @@ export const GET: APIRoute = async ({ url }) => {
               name: 'page',
               in: 'path',
               required: true,
-              description: 'Page ID (kebab-cased)',
+              description: 'Page ID (kebab-cased, may be underscore-separated for subsection pages)',
               schema: {
                 type: 'string',
               },
-              example: 'alert',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
@@ -716,7 +720,8 @@ export const GET: APIRoute = async ({ url }) => {
       '/{version}/{section}/{page}/{tab}/examples/{example}': {
         get: {
           summary: 'Get example code',
-          description: 'Returns the raw source code for a specific example',
+          description:
+            'Returns the raw source code for a specific example. Page parameter may be underscore-separated for subsection pages.',
           operationId: 'getExampleCode',
           parameters: [
             {
@@ -744,11 +749,11 @@ export const GET: APIRoute = async ({ url }) => {
               name: 'page',
               in: 'path',
               required: true,
-              description: 'Page ID (kebab-cased)',
+              description: 'Page ID (kebab-cased, may be underscore-separated for subsection pages)',
               schema: {
                 type: 'string',
               },
-              example: 'alert',
+              example: 'alert or forms_checkbox',
             },
             {
               name: 'tab',
