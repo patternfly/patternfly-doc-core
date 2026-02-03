@@ -9,8 +9,8 @@
  * - Add only ~5-10ms latency from CDN fetch
  *
  * Structure Note:
- * All routes use a flattened structure where subsections are encoded
- * into page names with underscores (e.g., "forms_checkbox")
+ * All routes use a flattened structure where subsections are kebab-cased
+ * and encoded into page names with underscores (e.g., "forms_checkbox")
  */
 import type { APIRoute } from 'astro'
 import { fetchApiIndex } from '../../utils/apiIndex/fetch'
@@ -36,7 +36,7 @@ export const GET: APIRoute = async ({ url }) => {
     info: {
       title: 'PatternFly Documentation API',
       description:
-        'Machine-readable documentation API for LLM agents and MCP servers. Provides hierarchical access to PatternFly documentation content. Uses a flattened structure where subsections are encoded into page names with underscores (e.g., "forms_checkbox").',
+        'Machine-readable documentation API for LLM agents and MCP servers. Provides hierarchical access to PatternFly documentation content. Uses a flattened structure where subsections are kebab-cased and encoded into page names with underscores (e.g., "forms_checkbox").',
       version: '1.0.0',
       contact: {
         name: 'PatternFly',

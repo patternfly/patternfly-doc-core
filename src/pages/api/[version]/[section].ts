@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ params, url }) => {
   try {
     const index = await fetchApiIndex(url)
 
-    // Get pages for this section (includes underscore-separated subsection pages like "forms-checkbox")
+    // Get pages for this section (includes underscore-separated subsection pages like "forms_checkbox")
     const key = createIndexKey(version, section)
     const pages = index.pages[key]
 

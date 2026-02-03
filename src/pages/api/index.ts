@@ -6,7 +6,7 @@
  * - Runtime: Routes fetch /apiIndex.json (prerendered static file) via HTTP
  * - Workers-compatible: No Node.js filesystem APIs in SSR handlers
  * - Optimized bundle: Runtime handlers don't bundle the 500KB+ index data
- * - Flattened structure: Subsections are encoded into page names with underscores (e.g., "forms_checkbox")
+ * - Flattened structure: Subsections are kebab-cased and encoded into page names with underscores (e.g., "forms_checkbox")
  *
  * Data Flow:
  * 1. Build: generateApiIndex() → data.ts + apiIndex.json
@@ -381,7 +381,7 @@ export const GET: APIRoute = async () =>
         },
       ],
       usage: {
-        description: 'Navigate the API hierarchically to discover and retrieve documentation. Subsections are flattened into page names using underscore separators (e.g., "forms_checkbox" represents the checkbox page in the forms subsection).',
+        description: 'Navigate the API hierarchically to discover and retrieve documentation. Subsections are kebab-cased and flattened into page names using underscore separators (e.g., "forms_checkbox" represents the checkbox page in the forms subsection).',
         exampleFlowRegularPage: [
           'GET /api/versions → ["v6"]',
           'GET /api/v6 → ["components", "layouts", ...]',
@@ -405,7 +405,7 @@ export const GET: APIRoute = async () =>
           buildTime: 'Static index generated to data.ts and apiIndex.json',
           runtime: 'SSR routes fetch /apiIndex.json to avoid bundling data into Workers',
           optimization: 'Workers bundle is ~110K instead of 500KB+ with embedded data',
-          flattenedStructure: 'Subsections encoded into page names with underscores (e.g., "forms_checkbox")',
+          flattenedStructure: 'Subsections are kebab-cased and encoded into page names with underscores (e.g., "forms_checkbox")',
         },
       },
     })

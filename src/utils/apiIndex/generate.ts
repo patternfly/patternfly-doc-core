@@ -32,14 +32,14 @@ const sortSources = (s1: string, s2: string) => {
 }
 
 /**
- * Section item is always a string (subsections are flattened into page names)
+ * Section item is always a string (subsections are kebab-cased and flattened into page names)
  */
 export type SectionItem = string
 
 /**
  * Structure of the API index used for routing and navigation
  * Keys in sections/pages/tabs use '::' separator (e.g., 'v6::components::alert')
- * Subsections are flattened into page names with underscores (e.g., 'forms_checkbox')
+ * Subsections are kebab-cased and flattened into page names with underscores (e.g., 'forms_checkbox')
  */
 export interface ApiIndex {
   /** Available documentation versions (e.g., ['v5', 'v6']) */
@@ -48,7 +48,7 @@ export interface ApiIndex {
    * (e.g., { 'v6': ['components', 'layouts', 'extensions'] })
    */
   sections: Record<string, SectionItem[]>
-  /** Pages by version::section with subsections flattened using underscores
+  /** Pages by version::section with subsections kebab-cased and flattened using underscores
    * (e.g., { 'v6::components': ['alert', 'button', 'forms_checkbox', 'menus_select'] })
    */
   pages: Record<string, string[]>

@@ -23,7 +23,7 @@ export const sentenceCase = (id: string) =>
  */
 export const addSubsection = (page: string, subsection?: string) => {
   if (subsection) {
-    return `${subsection}_${page}`
+    return `${kebabCase(subsection)}_${page}`
   }
   return page;
 }

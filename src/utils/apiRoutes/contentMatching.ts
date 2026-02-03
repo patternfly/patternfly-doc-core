@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content'
-import { kebabCase, addDemosOrDeprecated } from '../index'
+import { kebabCase, addDemosOrDeprecated, addSubsection } from '../index'
 import type { EnrichedContentEntry } from './collections'
 
 export type ContentEntry = CollectionEntry<
@@ -36,9 +36,8 @@ function matchesParams(entry: EnrichedContentEntry, params: ContentMatchParams):
 
   // Match page (handling flattened subsection names with underscores)
   const entryId = kebabCase(entry.data.id)
-  const entryPage = entry.data.subsection
-    ? `${entry.data.subsection}_${entryId}`
-    : entryId
+
+  const entryPage = addSubsection(entryId, entry.data.subsection)
 
   return entryPage === page
 }

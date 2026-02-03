@@ -44,6 +44,13 @@ describe('addSubsection', () => {
     expect(addSubsection('button', 'components')).toBe('components_button')
   })
 
+  it('kebab-cases subsection before adding to page name', () => {
+    expect(addSubsection('checkbox', 'Forms')).toBe('forms_checkbox')
+    expect(addSubsection('checkbox', 'Forms Group')).toBe('forms-group_checkbox')
+    expect(addSubsection('dropdown', 'MenusGroup')).toBe('menus-group_dropdown')
+    expect(addSubsection('button', 'PatternFly Components')).toBe('patternfly-components_button')
+  })
+
   it('returns page name when no subsection is provided', () => {
     expect(addSubsection('alert')).toBe('alert')
     expect(addSubsection('button', undefined)).toBe('button')
