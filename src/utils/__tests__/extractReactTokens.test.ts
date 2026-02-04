@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- mock data mirrors @patternfly/react-tokens componentIndex structure */
 import { extractReactTokens } from '../extractReactTokens'
 
 const mockComponentIndex: Record<
