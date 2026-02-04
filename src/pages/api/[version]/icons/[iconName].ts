@@ -2,18 +2,35 @@ import type { APIRoute } from 'astro'
 import {
   createJsonResponse,
   createSvgResponse,
-} from '../../../utils/apiHelpers'
-import { getIconSvg, parseIconId } from '../../../utils/icons/reactIcons'
+} from '../../../../utils/apiHelpers'
+import { fetchApiIndex } from '../../../../utils/apiIndex/fetch'
+import { getIconSvg, parseIconId } from '../../../../utils/icons/reactIcons'
 
 export const prerender = false
 
 /**
- * GET /api/icons/[icon-name]
+ * GET /api/{version}/icons/[icon-name]
  * Returns actual SVG markup for the icon.
  * Icon name format: {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)
  */
-export const GET: APIRoute = async ({ params }) => {
-  const iconId = params.iconName
+export const GET: APIRoute = async ({ params, url }) => {
+  const { version, iconName: iconId } = params
+
+  if (!version) {
+    return createJsonResponse(
+      { error: 'Version parameter is required' },
+      400,
+    )
+  }
+
+  try {
+    const index = await fetchApiIndex(url)
+    if (!index.versions.includes(version)) {
+      return createJsonResponse({ error: `Version '${version}' not found` }, 404)
+    }
+  } catch {
+    return createJsonResponse({ error: 'Failed to fetch API index' }, 500)
+  }
 
   if (!iconId) {
     return createJsonResponse(

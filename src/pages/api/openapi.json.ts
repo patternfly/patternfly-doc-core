@@ -104,13 +104,20 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
-      '/icons': {
+      '/{version}/icons': {
         get: {
           summary: 'List available icons',
           description:
             'Returns list of all available icons from react-icons with metadata. Use filter query param to filter by name.',
           operationId: 'getIcons',
           parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              example: 'v6',
+            },
             {
               name: 'filter',
               in: 'query',
@@ -154,13 +161,20 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
-      '/icons/{icon-name}': {
+      '/{version}/icons/{icon-name}': {
         get: {
           summary: 'Get icon SVG markup',
           description:
             'Returns actual SVG markup for the icon. Icon name format: {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)',
           operationId: 'getIconSvg',
           parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              example: 'v6',
+            },
             {
               name: 'icon-name',
               in: 'path',

@@ -1,18 +1,33 @@
 import type { APIRoute } from 'astro'
-import { createJsonResponse } from '../../../utils/apiHelpers'
-import { getAllIcons, filterIcons } from '../../../utils/icons/reactIcons'
+import { createJsonResponse } from '../../../../utils/apiHelpers'
+import { fetchApiIndex } from '../../../../utils/apiIndex/fetch'
+import { getAllIcons, filterIcons } from '../../../../utils/icons/reactIcons'
 
 export const prerender = false
 
 /**
- * GET /api/icons
+ * GET /api/{version}/icons
  * Returns list of all available icons with metadata.
  *
- * GET /api/icons?filter=circle
+ * GET /api/{version}/icons?filter=circle
  * Returns filtered list of icons matching the filter term (case-insensitive).
  */
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ params, url }) => {
+  const { version } = params
+
+  if (!version) {
+    return createJsonResponse(
+      { error: 'Version parameter is required' },
+      400,
+    )
+  }
+
   try {
+    const index = await fetchApiIndex(url)
+    if (!index.versions.includes(version)) {
+      return createJsonResponse({ error: `Version '${version}' not found` }, 404)
+    }
+
     const filter = url.searchParams.get('filter') ?? ''
     const icons = await getAllIcons()
     const filtered = filterIcons(icons, filter)

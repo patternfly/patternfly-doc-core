@@ -368,10 +368,17 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/api/icons',
+          path: '/api/{version}/icons',
           method: 'GET',
           description: 'List all available icons with metadata from react-icons',
           parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
             {
               name: 'filter',
               in: 'query',
@@ -400,10 +407,17 @@ export const GET: APIRoute = async () =>
           },
         },
         {
-          path: '/api/icons/{icon-name}',
+          path: '/api/{version}/icons/{icon-name}',
           method: 'GET',
           description: 'Get SVG markup for a specific icon',
           parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
             {
               name: 'icon-name',
               in: 'path',
