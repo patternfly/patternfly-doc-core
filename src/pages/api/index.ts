@@ -206,6 +206,42 @@ export const GET: APIRoute = async () =>
           },
         },
         {
+          path: '/api/{version}/{section}/{page}/css',
+          method: 'GET',
+          description: 'Get CSS tokens for a specific page',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'section',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'components',
+            },
+            {
+              name: 'page',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'alert',
+            },
+          ],
+          returns: {
+            type: 'array',
+            items: 'object',
+            description: 'Array of CSS token objects with tokenName, value, and variableName',
+            example: [
+              { name: 'c_alert__Background', value: '#000000', var: 'c_alert__Background' },  
+            ],
+          },
+        },
+        {
           path: '/api/{version}/{section}/{page}/{tab}',
           method: 'GET',
           description: 'Redirects to /text endpoint for the specified tab',
