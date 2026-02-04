@@ -368,6 +368,58 @@ export const GET: APIRoute = async () =>
           },
         },
         {
+          path: '/api/icons',
+          method: 'GET',
+          description: 'List all available icons with metadata from react-icons',
+          parameters: [
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              type: 'string',
+              description: 'Filter icons by name (case-insensitive)',
+              example: 'circle',
+            },
+          ],
+          returns: {
+            type: 'object',
+            description: 'List of icons with name, reactName, style, usage, unicode',
+            example: {
+              icons: [
+                {
+                  name: 'circle',
+                  reactName: 'FaCircle',
+                  style: 'solid',
+                  usage: "import { FaCircle } from 'react-icons/fa'",
+                  unicode: '',
+                },
+              ],
+              total: 1,
+              filter: 'circle',
+            },
+          },
+        },
+        {
+          path: '/api/icons/{icon-name}',
+          method: 'GET',
+          description: 'Get SVG markup for a specific icon',
+          parameters: [
+            {
+              name: 'icon-name',
+              in: 'path',
+              required: true,
+              type: 'string',
+              description: 'Icon identifier in format {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)',
+              example: 'fa_FaCircle',
+            },
+          ],
+          returns: {
+            type: 'string',
+            contentType: 'image/svg+xml',
+            description: 'SVG markup for the icon',
+          },
+        },
+        {
           path: '/api/{version}/{section}/{page}/{tab}/examples/{example}',
           method: 'GET',
           description: 'Get raw code for a specific example',

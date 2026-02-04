@@ -104,6 +104,87 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
+      '/icons': {
+        get: {
+          summary: 'List available icons',
+          description:
+            'Returns list of all available icons from react-icons with metadata. Use filter query param to filter by name.',
+          operationId: 'getIcons',
+          parameters: [
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              schema: { type: 'string' },
+              description: 'Filter icons by name (case-insensitive)',
+              example: 'circle',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'List of icons with metadata',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      icons: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            name: { type: 'string', example: 'circle' },
+                            reactName: { type: 'string', example: 'FaCircle' },
+                            style: { type: 'string', example: 'solid' },
+                            usage: {
+                              type: 'string',
+                              example: "import { FaCircle } from 'react-icons/fa'",
+                            },
+                            unicode: { type: 'string', example: '' },
+                          },
+                        },
+                      },
+                      total: { type: 'integer' },
+                      filter: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/icons/{icon-name}': {
+        get: {
+          summary: 'Get icon SVG markup',
+          description:
+            'Returns actual SVG markup for the icon. Icon name format: {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)',
+          operationId: 'getIconSvg',
+          parameters: [
+            {
+              name: 'icon-name',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Icon identifier: {set}_{iconName}',
+              example: 'fa_FaCircle',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'SVG markup for the icon',
+              content: {
+                'image/svg+xml': {
+                  schema: { type: 'string' },
+                },
+              },
+            },
+            '404': {
+              description: 'Icon not found',
+            },
+          },
+        },
+      },
       '/openapi.json': {
         get: {
           summary: 'Get OpenAPI specification',
