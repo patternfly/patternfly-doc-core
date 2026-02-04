@@ -237,7 +237,7 @@ export const GET: APIRoute = async () =>
             items: 'object',
             description: 'Array of CSS token objects with tokenName, value, and variableName',
             example: [
-              { tokenName: 'c_alert__Background', value: '#000000', variableName: 'c_alert__Background' },  
+              { name: 'c_alert__Background', value: '#000000', var: 'c_alert__Background' },  
             ],
           },
         },

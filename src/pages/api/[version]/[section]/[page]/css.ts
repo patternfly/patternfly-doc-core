@@ -20,12 +20,7 @@ export const GET: APIRoute = async ({ params, url }) => {
     const cssTokens = index.css[pageKey] || []
 
     if (cssTokens.length === 0) {
-      return createJsonResponse(
-        {
-          error: `No CSS tokens found for page '${page}' in section '${section}' for version '${version}'. CSS tokens are only available for content with a cssPrefix in the front matter.`,
-        },
-        404,
-      )
+      return createJsonResponse([])
     }
 
     return createJsonResponse(cssTokens)

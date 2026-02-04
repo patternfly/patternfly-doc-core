@@ -2,6 +2,7 @@ import { join } from 'path'
 import { readFile } from 'fs/promises'
 import type { ApiIndex } from './generate'
 import { getOutputDir } from '../getOutputDir'
+import { createIndexKey } from'../apiHelpers';
 
 /**
  * Reads and parses the API index file
@@ -136,7 +137,6 @@ export async function getCssTokens(
   page: string,
 ): Promise<{ name: string; value: string; var: string }[]> {
   const index = await getApiIndex()
-  const { createIndexKey } = await import('../apiHelpers')
   const key = createIndexKey(version, section, page)
   return index.css[key] || []
 }

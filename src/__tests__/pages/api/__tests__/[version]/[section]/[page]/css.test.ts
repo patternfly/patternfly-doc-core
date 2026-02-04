@@ -21,11 +21,13 @@ jest.mock('../../../../../../../utils/apiIndex/fetch', () => ({
         {
           name: '--pf-v6-c-alert--BackgroundColor',
           value: '#ffffff',
+          var: '--pf-v6-c-alert--BackgroundColor',
           description: 'Alert background color',
         },
         {
           name: '--pf-v6-c-alert--Color',
           value: '#151515',
+          var: '--pf-v6-c-alert--Color',
           description: 'Alert text color',
         },
       ],
@@ -33,6 +35,7 @@ jest.mock('../../../../../../../utils/apiIndex/fetch', () => ({
         {
           name: '--pf-v6-c-button--BackgroundColor',
           value: '#0066cc',
+          var: '--pf-v6-c-button--BackgroundColor',
           description: 'Button background color',
         },
       ],
@@ -61,7 +64,7 @@ it('returns CSS tokens for a valid page', async () => {
   expect(body).toHaveLength(2)
   expect(body[0]).toHaveProperty('name')
   expect(body[0]).toHaveProperty('value')
-  expect(body[0]).toHaveProperty('description')
+  expect(body[0]).toHaveProperty('var')
   expect(body[0].name).toBe('--pf-v6-c-alert--BackgroundColor')
   expect(body[0].value).toBe('#ffffff')
 })
@@ -83,7 +86,7 @@ it('returns CSS tokens for different pages', async () => {
   expect(buttonBody[0].name).toBe('--pf-v6-c-button--BackgroundColor')
 })
 
-it('returns 404 error when no CSS tokens are found', async () => {
+it('returns empty array when no CSS tokens are found for page', async () => {
   const response = await GET({
     params: {
       version: 'v6',
@@ -94,13 +97,9 @@ it('returns 404 error when no CSS tokens are found', async () => {
   } as any)
   const body = await response.json()
 
-  expect(response.status).toBe(404)
-  expect(body).toHaveProperty('error')
-  expect(body.error).toContain('No CSS tokens found')
-  expect(body.error).toContain('nonexistent')
-  expect(body.error).toContain('components')
-  expect(body.error).toContain('v6')
-  expect(body.error).toContain('cssPrefix')
+  expect(response.status).toBe(200)
+  expect(Array.isArray(body)).toBe(true)
+  expect(body).toHaveLength(0)
 })
 
 it('returns 400 error when version parameter is missing', async () => {
@@ -233,7 +232,7 @@ it('returns empty array when CSS tokens array exists but is empty', async () => 
   } as any)
   const body = await response.json()
 
-  expect(response.status).toBe(404)
-  expect(body).toHaveProperty('error')
-  expect(body.error).toContain('No CSS tokens found')
+  expect(response.status).toBe(200)
+  expect(Array.isArray(body)).toBe(true)
+  expect(body).toHaveLength(0)
 })
