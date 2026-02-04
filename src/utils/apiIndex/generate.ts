@@ -193,8 +193,9 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       }
 
       // Collect CSS prefixes for pages - we'll extract tokens later
-      if (entry.data.cssPrefix && !pageCssPrefixes[pageKey]) {
-        pageCssPrefixes[pageKey] = entry.data.cssPrefix
+      // Key by version::section::page (tabKey) so each page gets its own tokens
+      if (entry.data.cssPrefix && !pageCssPrefixes[tabKey]) {
+        pageCssPrefixes[tabKey] = entry.data.cssPrefix
       }
     })
 
