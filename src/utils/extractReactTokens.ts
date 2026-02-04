@@ -82,24 +82,30 @@ export async function extractReactTokens(
           .replace(/export const \w+ = /, '')
           .replace(/;$/, '')
 
-        // Use Function constructor for safe evaluation
-        // The object content is valid JavaScript, so we can evaluate it
-        const tokenObject = new Function(`return ${objectContent}`)() as {
-          name: string
-          value: string
-          var: string
+        // Parse as JSON - the token format uses double-quoted keys/values, so it's JSON-compatible.
+        // Avoids new Function()/eval which would execute arbitrary code from dependency files.
+        let tokenObject: { name: string; value: string | string[]; var: string }
+        try {
+          tokenObject = JSON.parse(objectContent)
+        } catch {
+          return // Skip malformed content
         }
 
         if (
           tokenObject &&
           typeof tokenObject === 'object' &&
           typeof tokenObject.name === 'string' &&
-          typeof tokenObject.value === 'string' &&
+          (typeof tokenObject.value === 'string' ||
+            (Array.isArray(tokenObject.value) &&
+              tokenObject.value.every((v) => typeof v === 'string'))) &&
           typeof tokenObject.var === 'string'
         ) {
+          const value = Array.isArray(tokenObject.value)
+            ? tokenObject.value.join(', ')
+            : tokenObject.value
           tokenObjects.push({
             name: tokenObject.name,
-            value: tokenObject.value,
+            value,
             var: tokenObject.var,
           })
         }
