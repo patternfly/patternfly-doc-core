@@ -54,7 +54,10 @@ export const GET: APIRoute = async ({ params, url }) => {
   const svg = await getIconSvg(setId, iconName)
 
   if (!svg) {
-    return createJsonResponse([]);
+    return createJsonResponse(
+      { error: `Icon '${iconName}' not found in set '${setId}'` },
+      404,
+    )
   }
 
   return createSvgResponse(svg)
