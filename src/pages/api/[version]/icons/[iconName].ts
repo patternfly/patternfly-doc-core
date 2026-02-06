@@ -4,7 +4,8 @@ import {
   createSvgResponse,
 } from '../../../../utils/apiHelpers'
 import { fetchApiIndex } from '../../../../utils/apiIndex/fetch'
-import { getIconSvg, parseIconId } from '../../../../utils/icons/reactIcons'
+import { fetchIconSvgs } from '../../../../utils/icons/fetch'
+import { parseIconId } from '../../../../utils/icons/reactIcons'
 
 export const prerender = false
 
@@ -51,7 +52,8 @@ export const GET: APIRoute = async ({ params, url }) => {
   }
 
   const { setId, iconName } = parsed
-  const svg = await getIconSvg(setId, iconName)
+  const svgs = await fetchIconSvgs(url, setId)
+  const svg = svgs?.[iconName] ?? null
 
   if (!svg) {
     return createJsonResponse(

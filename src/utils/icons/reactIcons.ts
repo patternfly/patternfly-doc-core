@@ -110,6 +110,41 @@ export function filterIcons(
 }
 
 /**
+ * Get SVG markup for all icons in a set. Used at build time for prerendering.
+ * @param setId - Icon set id (e.g., "fa", "md")
+ * @returns Record of iconName -> SVG string
+ */
+export async function getIconSvgsForSet(
+  setId: string,
+): Promise<Record<string, string>> {
+  if (!ICON_SET_IDS.includes(setId)) {
+    return {}
+  }
+
+  try {
+    const module = await import(`react-icons/${setId}`)
+    const svgs: Record<string, string> = {}
+
+    for (const iconName of Object.keys(module)) {
+      const IconComponent = module[iconName]
+      if (typeof IconComponent !== 'function' || iconName === 'default') {
+        continue
+      }
+
+      const element = React.createElement(IconComponent, {
+        size: '1em',
+        style: { verticalAlign: 'middle' },
+      })
+      svgs[iconName] = renderToStaticMarkup(element)
+    }
+
+    return svgs
+  } catch {
+    return {}
+  }
+}
+
+/**
  * Get SVG markup for a specific icon.
  * @param setId - Icon set id (e.g., "fa", "md")
  * @param iconName - Icon component name (e.g., "FaCircle")

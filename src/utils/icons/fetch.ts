@@ -25,3 +25,26 @@ export async function fetchIconsIndex(url: URL): Promise<IconMetadata[]> {
   const data = (await response.json()) as IconsIndex
   return data.icons
 }
+
+/**
+ * Fetches prerendered SVG markup for all icons in a set.
+ * Used by the icon SVG API route at runtime instead of getIconSvg() which
+ * uses dynamic imports that fail in Cloudflare Workers.
+ *
+ * @param url - The URL object from the API route context
+ * @param setId - Icon set id (e.g., "fa", "ci")
+ * @returns Promise resolving to Record of iconName -> SVG string, or null if fetch fails
+ */
+export async function fetchIconSvgs(
+  url: URL,
+  setId: string,
+): Promise<Record<string, string> | null> {
+  const iconsSvgsUrl = new URL(`/iconsSvgs/${setId}.json`, url.origin)
+  const response = await fetch(iconsSvgsUrl)
+
+  if (!response.ok) {
+    return null
+  }
+
+  return (await response.json()) as Record<string, string>
+}

@@ -9,13 +9,30 @@ const mockApiIndex = {
 
 const mockSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="200"/></svg>'
 
-jest.mock('../../../../../../utils/icons/reactIcons', () => ({
-  getIconSvg: jest.fn((setId: string, iconName: string) => {
-    if (setId === 'fa' && iconName === 'FaCircle') {
-      return Promise.resolve(mockSvg)
+const mockIconSvgs: Record<string, Record<string, string>> = {
+  fa: { FaCircle: mockSvg },
+}
+
+function createFetchMock(): typeof fetch {
+  return jest.fn((input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString()
+    const match = url.match(/\/iconsSvgs\/([^/]+)\.json/)
+    if (match) {
+      const setId = match[1]
+      const svgs = mockIconSvgs[setId] ?? {}
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(svgs),
+      } as Response)
     }
-    return Promise.resolve(null)
-  }),
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockApiIndex),
+    } as Response)
+  }) as typeof fetch
+}
+
+jest.mock('../../../../../../utils/icons/reactIcons', () => ({
   parseIconId: jest.fn((iconId: string) => {
     const underscoreIndex = iconId.indexOf('_')
     if (underscoreIndex <= 0) {
@@ -31,12 +48,7 @@ jest.mock('../../../../../../utils/icons/reactIcons', () => ({
 }))
 
 it('returns SVG markup for valid icon', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6', iconName: 'fa_FaCircle' },
@@ -55,12 +67,7 @@ it('returns SVG markup for valid icon', async () => {
 })
 
 it('returns 404 when icon is not found in set', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6', iconName: 'fa_FaNonExistent' },
@@ -78,12 +85,7 @@ it('returns 404 when icon is not found in set', async () => {
 })
 
 it('returns 400 for invalid icon name format (no underscore)', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6', iconName: 'invalid' },
@@ -101,12 +103,7 @@ it('returns 400 for invalid icon name format (no underscore)', async () => {
 })
 
 it('returns 400 for invalid icon name format (leading underscore)', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6', iconName: '_FaCircle' },
@@ -122,12 +119,7 @@ it('returns 400 for invalid icon name format (leading underscore)', async () => 
 })
 
 it('returns 400 when icon name parameter is missing', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6' },
@@ -143,12 +135,7 @@ it('returns 400 when icon name parameter is missing', async () => {
 })
 
 it('returns 404 for nonexistent version', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v99', iconName: 'fa_FaCircle' },
@@ -165,12 +152,7 @@ it('returns 404 for nonexistent version', async () => {
 })
 
 it('returns 400 when version parameter is missing', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { iconName: 'fa_FaCircle' },
@@ -186,13 +168,20 @@ it('returns 400 when version parameter is missing', async () => {
 })
 
 it('returns 500 when fetchApiIndex fails', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error',
-    } as Response),
-  )
+  global.fetch = jest.fn((input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString()
+    if (url.includes('apiIndex.json')) {
+      return Promise.resolve({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      } as Response)
+    }
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({}),
+    } as Response)
+  }) as typeof fetch
 
   const response = await GET({
     params: { version: 'v6', iconName: 'fa_FaCircle' },
