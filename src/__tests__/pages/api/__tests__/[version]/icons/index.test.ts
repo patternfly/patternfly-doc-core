@@ -97,7 +97,7 @@ it('filters icons when filter parameter is provided', async () => {
   expect(body.icons).toHaveLength(2)
   expect(body.total).toBe(2)
   expect(body.filter).toBe('circle')
-  expect(body.icons.every((i: { name: string }) => i.name.includes('circle')))
+  expect(body.icons.every((i: { name: string }) => i.name.includes('circle'))).toBe(true)
 
   jest.restoreAllMocks()
 })
