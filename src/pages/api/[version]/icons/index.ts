@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro'
 import { createJsonResponse } from '../../../../utils/apiHelpers'
 import { fetchApiIndex } from '../../../../utils/apiIndex/fetch'
-import { getAllIcons, filterIcons } from '../../../../utils/icons/reactIcons'
+import { fetchIconsIndex } from '../../../../utils/icons/fetch'
+import { filterIcons } from '../../../../utils/icons/reactIcons'
 
 export const prerender = false
 
@@ -29,7 +30,7 @@ export const GET: APIRoute = async ({ params, url }) => {
     }
 
     const filter = url.searchParams.get('filter') ?? ''
-    const icons = await getAllIcons()
+    const icons = await fetchIconsIndex(url)
     const filtered = filterIcons(icons, filter)
 
     return createJsonResponse({

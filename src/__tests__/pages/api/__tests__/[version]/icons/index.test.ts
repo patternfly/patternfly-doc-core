@@ -1,5 +1,4 @@
 import { GET } from '../../../../../../pages/api/[version]/icons/index'
-import { getAllIcons } from '../../../../../../utils/icons/reactIcons'
 
 const mockApiIndex = {
   versions: ['v5', 'v6'],
@@ -35,8 +34,18 @@ const mockIcons = [
   },
 ]
 
+function createFetchMock(): typeof fetch {
+  return jest.fn((input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString()
+    const json = () =>
+      Promise.resolve(
+        url.includes('iconsIndex.json') ? { icons: mockIcons } : mockApiIndex
+      )
+    return Promise.resolve({ ok: true, json } as Response)
+  }) as typeof fetch
+}
+
 jest.mock('../../../../../../utils/icons/reactIcons', () => ({
-  getAllIcons: jest.fn(() => Promise.resolve(mockIcons)),
   filterIcons: jest.fn((icons: typeof mockIcons, filter: string) => {
     if (!filter || !filter.trim()) {
       return icons
@@ -51,12 +60,7 @@ jest.mock('../../../../../../utils/icons/reactIcons', () => ({
 }))
 
 it('returns all icons with metadata', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6' },
@@ -83,12 +87,7 @@ it('returns all icons with metadata', async () => {
 })
 
 it('filters icons when filter parameter is provided', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6' },
@@ -106,12 +105,7 @@ it('filters icons when filter parameter is provided', async () => {
 })
 
 it('filter is case-insensitive', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6' },
@@ -126,12 +120,7 @@ it('filter is case-insensitive', async () => {
 })
 
 it('returns empty icons array when filter yields no matches', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v6' },
@@ -147,12 +136,7 @@ it('returns empty icons array when filter yields no matches', async () => {
 })
 
 it('returns 404 error for nonexistent version', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: { version: 'v99' },
@@ -169,12 +153,7 @@ it('returns 404 error for nonexistent version', async () => {
 })
 
 it('returns 400 error when version parameter is missing', async () => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+  global.fetch = createFetchMock()
 
   const response = await GET({
     params: {},
@@ -189,15 +168,17 @@ it('returns 400 error when version parameter is missing', async () => {
   jest.restoreAllMocks()
 })
 
-it('returns 500 error when getAllIcons throws', async () => {
-  ;(getAllIcons as jest.Mock).mockRejectedValueOnce(new Error('Load failed'))
-
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
+it('returns 500 error when fetchIconsIndex throws', async () => {
+  global.fetch = jest.fn((input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString()
+    if (url.includes('iconsIndex.json')) {
+      return Promise.resolve({ ok: false, status: 500, statusText: 'Internal Server Error' } as Response)
+    }
+    return Promise.resolve({
       ok: true,
       json: () => Promise.resolve(mockApiIndex),
-    } as Response),
-  )
+    } as Response)
+  }) as typeof fetch
 
   const response = await GET({
     params: { version: 'v6' },
