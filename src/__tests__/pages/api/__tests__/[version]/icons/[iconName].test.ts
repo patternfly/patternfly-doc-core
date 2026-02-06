@@ -11,15 +11,21 @@ const mockSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><
 
 jest.mock('../../../../../../utils/icons/reactIcons', () => ({
   getIconSvg: jest.fn((setId: string, iconName: string) => {
-    if (setId === 'fa' && iconName === 'FaCircle') return Promise.resolve(mockSvg)
+    if (setId === 'fa' && iconName === 'FaCircle') {
+      return Promise.resolve(mockSvg)
+    }
     return Promise.resolve(null)
   }),
   parseIconId: jest.fn((iconId: string) => {
     const underscoreIndex = iconId.indexOf('_')
-    if (underscoreIndex <= 0) return null
+    if (underscoreIndex <= 0) {
+      return null
+    }
     const setId = iconId.slice(0, underscoreIndex)
     const iconName = iconId.slice(underscoreIndex + 1)
-    if (!setId || !iconName) return null
+    if (!setId || !iconName) {
+      return null
+    }
     return { setId, iconName }
   }),
 }))

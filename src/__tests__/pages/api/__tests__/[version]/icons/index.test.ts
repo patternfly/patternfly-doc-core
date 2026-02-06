@@ -1,4 +1,5 @@
 import { GET } from '../../../../../../pages/api/[version]/icons/index'
+import { getAllIcons } from '../../../../../../utils/icons/reactIcons'
 
 const mockApiIndex = {
   versions: ['v5', 'v6'],
@@ -37,7 +38,9 @@ const mockIcons = [
 jest.mock('../../../../../../utils/icons/reactIcons', () => ({
   getAllIcons: jest.fn(() => Promise.resolve(mockIcons)),
   filterIcons: jest.fn((icons: typeof mockIcons, filter: string) => {
-    if (!filter || !filter.trim()) return icons
+    if (!filter || !filter.trim()) {
+      return icons
+    }
     const term = filter.toLowerCase().trim()
     return icons.filter(
       (icon: (typeof mockIcons)[0]) =>
@@ -187,7 +190,6 @@ it('returns 400 error when version parameter is missing', async () => {
 })
 
 it('returns 500 error when getAllIcons throws', async () => {
-  const { getAllIcons } = require('../../../../../../utils/icons/reactIcons')
   ;(getAllIcons as jest.Mock).mockRejectedValueOnce(new Error('Load failed'))
 
   global.fetch = jest.fn(() =>

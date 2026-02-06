@@ -21,8 +21,12 @@ const ICON_SET_IDS = IconsManifest.map((m) => m.id)
 /** Derive style from set id and react name (e.g., fa + FaRegCircle -> "regular") */
 function getStyle(setId: string, reactName: string): string {
   if (setId === 'fa' || setId === 'fa6') {
-    if (reactName.startsWith('FaReg')) return 'regular'
-    if (reactName.startsWith('FaBrands')) return 'brands'
+    if (reactName.startsWith('FaReg')) {
+      return 'regular'
+    }
+    if (reactName.startsWith('FaBrands')) {
+      return 'brands'
+    }
     return 'solid'
   }
   return setId
@@ -94,7 +98,9 @@ export function filterIcons(
   icons: IconMetadata[],
   filter: string,
 ): IconMetadata[] {
-  if (!filter || !filter.trim()) return icons
+  if (!filter || !filter.trim()) {
+    return icons
+  }
   const term = filter.toLowerCase().trim()
   return icons.filter(
     (icon) =>
@@ -112,12 +118,16 @@ export async function getIconSvg(
   setId: string,
   iconName: string,
 ): Promise<string | null> {
-  if (!ICON_SET_IDS.includes(setId)) return null
+  if (!ICON_SET_IDS.includes(setId)) {
+    return null
+  }
 
   try {
     const module = await import(`react-icons/${setId}`)
     const IconComponent = module[iconName]
-    if (typeof IconComponent !== 'function') return null
+    if (typeof IconComponent !== 'function') {
+      return null
+    }
 
     const element = React.createElement(IconComponent, {
       size: '1em',
@@ -134,11 +144,15 @@ export async function getIconSvg(
  */
 export function parseIconId(iconId: string): { setId: string; iconName: string } | null {
   const underscoreIndex = iconId.indexOf('_')
-  if (underscoreIndex <= 0) return null
+  if (underscoreIndex <= 0) {
+    return null
+  }
 
   const setId = iconId.slice(0, underscoreIndex)
   const iconName = iconId.slice(underscoreIndex + 1)
-  if (!setId || !iconName) return null
+  if (!setId || !iconName) {
+    return null
+  }
 
   return { setId, iconName }
 }
