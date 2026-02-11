@@ -165,7 +165,7 @@ export const GET: APIRoute = async ({ url }) => {
         get: {
           summary: 'Get icon SVG markup',
           description:
-            'Returns actual SVG markup for the icon. Icon name format: {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)',
+            'Returns actual SVG markup for the icon. Icon name: React component name (e.g., FaCircle, MdHome)',
           operationId: 'getIconSvg',
           parameters: [
             {
@@ -180,8 +180,8 @@ export const GET: APIRoute = async ({ url }) => {
               in: 'path',
               required: true,
               schema: { type: 'string' },
-              description: 'Icon identifier: {set}_{iconName}',
-              example: 'fa_FaCircle',
+              description: 'Icon identifier: React component name',
+              example: 'FaCircle',
             },
           ],
           responses: {

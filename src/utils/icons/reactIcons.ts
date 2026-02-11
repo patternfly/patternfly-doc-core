@@ -12,7 +12,7 @@ export interface IconMetadata {
   style: string
   usage: string
   unicode: string
-  /** Set id for SVG URL: /api/icons/{set}_{reactName} */
+  /** Set id for SVG lookup (react name used in URL: /api/icons/{reactName}) */
   set?: string
 }
 

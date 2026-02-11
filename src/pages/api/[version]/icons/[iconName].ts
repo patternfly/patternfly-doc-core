@@ -4,18 +4,17 @@ import {
   createSvgResponse,
 } from '../../../../utils/apiHelpers'
 import { fetchApiIndex } from '../../../../utils/apiIndex/fetch'
-import { fetchIconSvgs } from '../../../../utils/icons/fetch'
-import { parseIconId } from '../../../../utils/icons/reactIcons'
+import { fetchIconSvgs, fetchIconsIndex } from '../../../../utils/icons/fetch'
 
 export const prerender = false
 
 /**
  * GET /api/{version}/icons/[icon-name]
  * Returns actual SVG markup for the icon.
- * Icon name format: {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)
+ * Icon name: React component name (e.g., FaCircle, MdHome)
  */
 export const GET: APIRoute = async ({ params, url }) => {
-  const { version, iconName: iconId } = params
+  const { version, iconName: reactName } = params
 
   if (!version) {
     return createJsonResponse(
@@ -33,31 +32,28 @@ export const GET: APIRoute = async ({ params, url }) => {
     return createJsonResponse({ error: 'Failed to fetch API index' }, 500)
   }
 
-  if (!iconId) {
+  if (!reactName) {
     return createJsonResponse(
       { error: 'Icon name parameter is required' },
       400,
     )
   }
 
-  const parsed = parseIconId(iconId)
-  if (!parsed) {
+  const icons = await fetchIconsIndex(url)
+  const icon = icons.find((i) => i.reactName === reactName)
+  if (!icon?.set) {
     return createJsonResponse(
-      {
-        error: 'Invalid icon name format',
-        expected: 'Use format {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)',
-      },
-      400,
+      { error: `Icon '${reactName}' not found` },
+      404,
     )
   }
 
-  const { setId, iconName } = parsed
-  const svgs = await fetchIconSvgs(url, setId)
-  const svg = svgs?.[iconName] ?? null
+  const svgs = await fetchIconSvgs(url, icon.set)
+  const svg = svgs?.[reactName] ?? null
 
   if (!svg) {
     return createJsonResponse(
-      { error: `Icon '${iconName}' not found in set '${setId}'` },
+      { error: `Icon '${reactName}' not found in set '${icon.set}'` },
       404,
     )
   }

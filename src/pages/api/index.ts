@@ -423,8 +423,8 @@ export const GET: APIRoute = async () =>
               in: 'path',
               required: true,
               type: 'string',
-              description: 'Icon identifier in format {set}_{iconName} (e.g., fa_FaCircle, md_MdHome)',
-              example: 'fa_FaCircle',
+              description: 'Icon identifier: React component name (e.g., FaCircle, MdHome)',
+              example: 'FaCircle',
             },
           ],
           returns: {
