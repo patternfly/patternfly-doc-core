@@ -108,7 +108,7 @@ export const GET: APIRoute = async ({ url }) => {
         get: {
           summary: 'List available icons',
           description:
-            'Returns list of all available icons from react-icons with metadata. Use filter query param to filter by name.',
+            'Returns list of all available icons from @patternfly/react-icons (dist/static) with metadata. Use filter query param to filter by name.',
           operationId: 'getIcons',
           parameters: [
             {
@@ -141,11 +141,11 @@ export const GET: APIRoute = async ({ url }) => {
                           type: 'object',
                           properties: {
                             name: { type: 'string', example: 'circle' },
-                            reactName: { type: 'string', example: 'FaCircle' },
-                            style: { type: 'string', example: 'solid' },
+                            reactName: { type: 'string', example: 'CircleIcon' },
+                            style: { type: 'string', example: 'pf' },
                             usage: {
                               type: 'string',
-                              example: "import { FaCircle } from 'react-icons/fa'",
+                              example: "import { CircleIcon } from '@patternfly/react-icons'",
                             },
                             unicode: { type: 'string', example: '' },
                           },

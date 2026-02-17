@@ -370,7 +370,7 @@ export const GET: APIRoute = async () =>
         {
           path: '/api/{version}/icons',
           method: 'GET',
-          description: 'List all available icons with metadata from react-icons',
+          description: 'List all available icons with metadata from @patternfly/react-icons',
           parameters: [
             {
               name: 'version',
@@ -395,9 +395,9 @@ export const GET: APIRoute = async () =>
               icons: [
                 {
                   name: 'circle',
-                  reactName: 'FaCircle',
-                  style: 'solid',
-                  usage: "import { FaCircle } from 'react-icons/fa'",
+                  reactName: 'CircleIcon',
+                  style: 'pf',
+                  usage: "import { CircleIcon } from '@patternfly/react-icons'",
                   unicode: '',
                 },
               ],

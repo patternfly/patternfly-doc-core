@@ -3,8 +3,7 @@ import { getAllIcons } from '../utils/icons/reactIcons'
 
 /**
  * Prerender at build time so this doesn't run in the Cloudflare Worker.
- * getAllIcons() uses dynamic imports of react-icons which fail in Workers
- * due to bundle size and Node.js compatibility.
+ * getAllIcons() reads from @patternfly/react-icons/dist/static (Node fs).
  */
 export const prerender = true
 

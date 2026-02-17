@@ -10,12 +10,12 @@ const mockApiIndex = {
 const mockSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="200"/></svg>'
 
 const mockIconSvgs: Record<string, Record<string, string>> = {
-  fa: { FaCircle: mockSvg },
+  pf: { CircleIcon: mockSvg },
 }
 
 const mockIconsIndex = {
   icons: [
-    { name: 'circle', reactName: 'FaCircle', style: 'solid', usage: '', unicode: '', set: 'fa' },
+    { name: 'circle', reactName: 'CircleIcon', style: 'pf', usage: '', unicode: '', set: 'pf' },
   ],
 }
 
@@ -48,8 +48,8 @@ it('returns SVG markup for valid icon', async () => {
   global.fetch = createFetchMock()
 
   const response = await GET({
-    params: { version: 'v6', iconName: 'FaCircle' },
-    url: new URL('http://localhost:4321/api/v6/icons/FaCircle'),
+    params: { version: 'v6', iconName: 'CircleIcon' },
+    url: new URL('http://localhost:4321/api/v6/icons/CircleIcon'),
   } as any)
   const body = await response.text()
 
@@ -67,14 +67,14 @@ it('returns 404 when icon is not found', async () => {
   global.fetch = createFetchMock()
 
   const response = await GET({
-    params: { version: 'v6', iconName: 'FaNonExistent' },
-    url: new URL('http://localhost:4321/api/v6/icons/FaNonExistent'),
+    params: { version: 'v6', iconName: 'NonExistentIcon' },
+    url: new URL('http://localhost:4321/api/v6/icons/NonExistentIcon'),
   } as any)
   const body = await response.json()
 
   expect(response.status).toBe(404)
   expect(body).toHaveProperty('error')
-  expect(body.error).toContain('FaNonExistent')
+  expect(body.error).toContain('NonExistentIcon')
   expect(body.error).toContain('not found')
 
   jest.restoreAllMocks()
@@ -117,8 +117,8 @@ it('returns 404 for nonexistent version', async () => {
   global.fetch = createFetchMock()
 
   const response = await GET({
-    params: { version: 'v99', iconName: 'FaCircle' },
-    url: new URL('http://localhost:4321/api/v99/icons/FaCircle'),
+    params: { version: 'v99', iconName: 'CircleIcon' },
+    url: new URL('http://localhost:4321/api/v99/icons/CircleIcon'),
   } as any)
   const body = await response.json()
 
@@ -134,8 +134,8 @@ it('returns 400 when version parameter is missing', async () => {
   global.fetch = createFetchMock()
 
   const response = await GET({
-    params: { iconName: 'FaCircle' },
-    url: new URL('http://localhost:4321/api/icons/FaCircle'),
+    params: { iconName: 'CircleIcon' },
+    url: new URL('http://localhost:4321/api/icons/CircleIcon'),
   } as any)
   const body = await response.json()
 
@@ -163,8 +163,8 @@ it('returns 500 when fetchApiIndex fails', async () => {
   }) as typeof fetch
 
   const response = await GET({
-    params: { version: 'v6', iconName: 'FaCircle' },
-    url: new URL('http://localhost:4321/api/v6/icons/FaCircle'),
+    params: { version: 'v6', iconName: 'CircleIcon' },
+    url: new URL('http://localhost:4321/api/v6/icons/CircleIcon'),
   } as any)
   const body = await response.json()
 

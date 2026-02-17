@@ -1,10 +1,12 @@
 /**
- * Utilities for working with react-icons from the ESM package.
- * Icons are loaded from node_modules/react-icons icon set folders.
+ * Utilities for working with @patternfly/react-icons.
+ * Icons are loaded from @patternfly/react-icons/dist/static (SVG files).
  */
-import { renderToStaticMarkup } from 'react-dom/server'
-import React from 'react'
-import { IconsManifest } from 'react-icons/lib'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export interface IconMetadata {
   name: string
@@ -12,80 +14,68 @@ export interface IconMetadata {
   style: string
   usage: string
   unicode: string
-  /** Set id for SVG lookup (react name used in URL: /api/icons/{reactName}) */
+  /** Set id for SVG lookup (used internally by API) */
   set?: string
 }
 
-const ICON_SET_IDS = IconsManifest.map((m) => m.id)
+const PF_ICONS_SET_ID = 'pf'
 
-/** Derive style from set id and react name (e.g., fa + FaRegCircle -> "regular") */
-function getStyle(setId: string, reactName: string): string {
-  if (setId === 'fa' || setId === 'fa6') {
-    if (reactName.startsWith('FaReg')) {
-      return 'regular'
-    }
-    if (reactName.startsWith('FaBrands')) {
-      return 'brands'
-    }
-    return 'solid'
-  }
-  return setId
+/** Resolve path to @patternfly/react-icons/dist/static (from project root). */
+function getStaticIconsDir(): string {
+  const projectRoot = path.resolve(__dirname, '../..')
+  return path.join(
+    projectRoot,
+    'node_modules',
+    '@patternfly',
+    'react-icons',
+    'dist',
+    'static',
+  )
 }
 
-/** Convert PascalCase to kebab-case */
-function toKebabCase(str: string): string {
-  return str
+/** Convert kebab-case filename (no .svg) to PatternFly React component name (PascalCase + "Icon"). */
+function kebabToReactName(kebab: string): string {
+  const pascal = kebab
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join('')
+  return pascal + 'Icon'
+}
+
+/** Convert React component name back to kebab-case (without "Icon" suffix). */
+function reactNameToKebab(reactName: string): string {
+  const withoutIcon = reactName.replace(/Icon$/, '')
+  return withoutIcon
     .replace(/([a-z])([A-Z])/g, '$1-$2')
     .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
     .toLowerCase()
 }
 
-/** Derive base name from react name by removing set-specific prefixes */
-function getBaseName(setId: string, reactName: string): string {
-  let base = reactName
-  if (setId === 'fa' || setId === 'fa6') {
-    base = base.replace(/^Fa(Reg|Brands)?/, '')
-  } else if (setId === 'io' || setId === 'io5') {
-    base = base.replace(/^Io(5)?/, '')
-  } else if (setId === 'md') {
-    base = base.replace(/^Md/, '')
-  } else if (setId === 'hi' || setId === 'hi2') {
-    base = base.replace(/^Hi(2)?/, '')
-  } else {
-    const setPrefix = setId.charAt(0).toUpperCase() + setId.slice(1)
-    const prefix = new RegExp(`^${setPrefix}`, 'i')
-    base = base.replace(prefix, '')
-  }
-  return toKebabCase(base) || toKebabCase(reactName)
-}
-
 /**
- * Get all icons from all sets with metadata.
+ * Get all icons from @patternfly/react-icons/dist/static with metadata.
  * Shape: { name, reactName, style, usage, unicode }
  */
 export async function getAllIcons(): Promise<IconMetadata[]> {
+  const staticDir = getStaticIconsDir()
+  if (!fs.existsSync(staticDir)) {
+    return []
+  }
+
+  const files = fs.readdirSync(staticDir)
+  const svgFiles = files.filter((f) => f.endsWith('.svg'))
   const icons: IconMetadata[] = []
 
-  for (const setId of ICON_SET_IDS) {
-    try {
-      const module = await import(`react-icons/${setId}`)
-      const iconNames = Object.keys(module).filter(
-        (k) => typeof module[k] === 'function' && k !== 'default',
-      )
-
-      for (const reactName of iconNames) {
-        icons.push({
-          name: getBaseName(setId, reactName),
-          reactName,
-          style: getStyle(setId, reactName),
-          usage: `import { ${reactName} } from 'react-icons/${setId}'`,
-          unicode: '',
-          set: setId,
-        })
-      }
-    } catch {
-      // Skip sets that fail to load
-    }
+  for (const file of svgFiles) {
+    const name = file.replace(/\.svg$/, '')
+    const reactName = kebabToReactName(name)
+    icons.push({
+      name,
+      reactName,
+      style: PF_ICONS_SET_ID,
+      usage: `import { ${reactName} } from '@patternfly/react-icons'`,
+      unicode: '',
+      set: PF_ICONS_SET_ID,
+    })
   }
 
   return icons
@@ -110,74 +100,69 @@ export function filterIcons(
 }
 
 /**
- * Get SVG markup for all icons in a set. Used at build time for prerendering.
- * @param setId - Icon set id (e.g., "fa", "md")
- * @returns Record of iconName -> SVG string
+ * Get SVG markup for all PatternFly icons (single set).
+ * Used at build time for prerendering.
+ * @param setId - Must be "pf" for PatternFly icons
+ * @returns Record of reactName -> SVG string
  */
 export async function getIconSvgsForSet(
   setId: string,
 ): Promise<Record<string, string>> {
-  if (!ICON_SET_IDS.includes(setId)) {
+  if (setId !== PF_ICONS_SET_ID) {
     return {}
   }
 
-  try {
-    const module = await import(`react-icons/${setId}`)
-    const svgs: Record<string, string> = {}
-
-    for (const iconName of Object.keys(module)) {
-      const IconComponent = module[iconName]
-      if (typeof IconComponent !== 'function' || iconName === 'default') {
-        continue
-      }
-
-      const element = React.createElement(IconComponent, {
-        size: '1em',
-        style: { verticalAlign: 'middle' },
-      })
-      svgs[iconName] = renderToStaticMarkup(element)
-    }
-
-    return svgs
-  } catch {
+  const staticDir = getStaticIconsDir()
+  if (!fs.existsSync(staticDir)) {
     return {}
   }
+
+  const files = fs.readdirSync(staticDir)
+  const svgFiles = files.filter((f) => f.endsWith('.svg'))
+  const svgs: Record<string, string> = {}
+
+  for (const file of svgFiles) {
+    const name = file.replace(/\.svg$/, '')
+    const reactName = kebabToReactName(name)
+    const filePath = path.join(staticDir, file)
+    const content = fs.readFileSync(filePath, 'utf-8')
+    svgs[reactName] = content.trim()
+  }
+
+  return svgs
 }
 
 /**
  * Get SVG markup for a specific icon.
- * @param setId - Icon set id (e.g., "fa", "md")
- * @param iconName - Icon component name (e.g., "FaCircle")
+ * @param setId - Must be "pf"
+ * @param iconName - React component name (e.g., "AccessibleIconIcon")
  */
 export async function getIconSvg(
   setId: string,
   iconName: string,
 ): Promise<string | null> {
-  if (!ICON_SET_IDS.includes(setId)) {
+  if (setId !== PF_ICONS_SET_ID) {
     return null
   }
 
-  try {
-    const module = await import(`react-icons/${setId}`)
-    const IconComponent = module[iconName]
-    if (typeof IconComponent !== 'function') {
-      return null
-    }
+  const kebab = reactNameToKebab(iconName)
+  const fileName = `${kebab}.svg`
+  const staticDir = getStaticIconsDir()
+  const filePath = path.join(staticDir, fileName)
 
-    const element = React.createElement(IconComponent, {
-      size: '1em',
-      style: { verticalAlign: 'middle' },
-    })
-    return renderToStaticMarkup(element)
-  } catch {
+  if (!fs.existsSync(filePath)) {
     return null
   }
+
+  return fs.readFileSync(filePath, 'utf-8').trim()
 }
 
 /**
  * Parse icon id "set_iconName" into { setId, iconName }
  */
-export function parseIconId(iconId: string): { setId: string; iconName: string } | null {
+export function parseIconId(
+  iconId: string,
+): { setId: string; iconName: string } | null {
   const underscoreIndex = iconId.indexOf('_')
   if (underscoreIndex <= 0) {
     return null
