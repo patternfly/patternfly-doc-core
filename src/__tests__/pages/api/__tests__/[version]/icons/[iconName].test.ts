@@ -15,7 +15,7 @@ const mockIconSvgs: Record<string, Record<string, string>> = {
 
 const mockIconsIndex = {
   icons: [
-    { name: 'circle', reactName: 'CircleIcon', style: 'pf', usage: '', unicode: '', set: 'pf' },
+    { name: 'circle', reactName: 'CircleIcon', usage: '' },
   ],
 }
 

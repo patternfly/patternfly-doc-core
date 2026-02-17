@@ -390,15 +390,13 @@ export const GET: APIRoute = async () =>
           ],
           returns: {
             type: 'object',
-            description: 'List of icons with name, reactName, style, usage, unicode',
+            description: 'List of icons with name, reactName, usage',
             example: {
               icons: [
                 {
                   name: 'circle',
                   reactName: 'CircleIcon',
-                  style: 'pf',
                   usage: "import { CircleIcon } from '@patternfly/react-icons'",
-                  unicode: '',
                 },
               ],
               total: 1,

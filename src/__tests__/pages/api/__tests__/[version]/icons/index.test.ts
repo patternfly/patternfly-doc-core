@@ -11,26 +11,17 @@ const mockIcons = [
   {
     name: 'circle',
     reactName: 'CircleIcon',
-    style: 'pf',
     usage: "import { CircleIcon } from '@patternfly/react-icons'",
-    unicode: '',
-    set: 'pf',
   },
   {
     name: 'home',
     reactName: 'HomeIcon',
-    style: 'pf',
     usage: "import { HomeIcon } from '@patternfly/react-icons'",
-    unicode: '',
-    set: 'pf',
   },
   {
     name: 'circle-outline',
     reactName: 'CircleOutlineIcon',
-    style: 'pf',
     usage: "import { CircleOutlineIcon } from '@patternfly/react-icons'",
-    unicode: '',
-    set: 'pf',
   },
 ]
 
@@ -79,9 +70,7 @@ it('returns all icons with metadata', async () => {
   expect(body.total).toBe(3)
   expect(body.icons[0]).toHaveProperty('name')
   expect(body.icons[0]).toHaveProperty('reactName')
-  expect(body.icons[0]).toHaveProperty('style')
   expect(body.icons[0]).toHaveProperty('usage')
-  expect(body.icons[0]).toHaveProperty('unicode')
 
   jest.restoreAllMocks()
 })

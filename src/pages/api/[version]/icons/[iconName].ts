@@ -41,19 +41,19 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   const icons = await fetchIconsIndex(url)
   const icon = icons.find((i) => i.reactName === reactName)
-  if (!icon?.set) {
+  if (!icon) {
     return createJsonResponse(
       { error: `Icon '${reactName}' not found` },
       404,
     )
   }
 
-  const svgs = await fetchIconSvgs(url, icon.set)
+  const svgs = await fetchIconSvgs(url, 'pf')
   const svg = svgs?.[reactName] ?? null
 
   if (!svg) {
     return createJsonResponse(
-      { error: `Icon '${reactName}' not found in set '${icon.set}'` },
+      { error: `Icon '${reactName}' not found` },
       404,
     )
   }

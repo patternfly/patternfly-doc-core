@@ -142,12 +142,10 @@ export const GET: APIRoute = async ({ url }) => {
                           properties: {
                             name: { type: 'string', example: 'circle' },
                             reactName: { type: 'string', example: 'CircleIcon' },
-                            style: { type: 'string', example: 'pf' },
                             usage: {
                               type: 'string',
                               example: "import { CircleIcon } from '@patternfly/react-icons'",
                             },
-                            unicode: { type: 'string', example: '' },
                           },
                         },
                       },

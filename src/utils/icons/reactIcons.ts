@@ -4,27 +4,19 @@
  */
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export interface IconMetadata {
   name: string
   reactName: string
-  style: string
   usage: string
-  unicode: string
-  /** Set id for SVG lookup (used internally by API) */
-  set?: string
 }
 
 const PF_ICONS_SET_ID = 'pf'
 
-/** Resolve path to @patternfly/react-icons/dist/static (from project root). */
+/** Resolve path to @patternfly/react-icons/dist/static. Uses cwd so it works in dev and build. */
 function getStaticIconsDir(): string {
-  const projectRoot = path.resolve(__dirname, '../..')
   return path.join(
-    projectRoot,
+    process.cwd(),
     'node_modules',
     '@patternfly',
     'react-icons',
@@ -53,7 +45,7 @@ function reactNameToKebab(reactName: string): string {
 
 /**
  * Get all icons from @patternfly/react-icons/dist/static with metadata.
- * Shape: { name, reactName, style, usage, unicode }
+ * Shape: { name, reactName, usage }
  */
 export async function getAllIcons(): Promise<IconMetadata[]> {
   const staticDir = getStaticIconsDir()
@@ -71,10 +63,7 @@ export async function getAllIcons(): Promise<IconMetadata[]> {
     icons.push({
       name,
       reactName,
-      style: PF_ICONS_SET_ID,
       usage: `import { ${reactName} } from '@patternfly/react-icons'`,
-      unicode: '',
-      set: PF_ICONS_SET_ID,
     })
   }
 
