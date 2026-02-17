@@ -28,7 +28,7 @@ function createFetchMock(): typeof fetch {
         json: () => Promise.resolve(mockIconsIndex),
       } as Response)
     }
-    const match = url.match(/\/iconsSvgs\/([^/]+)\.json/)
+    const match = url.match(/\/api\/[^/]+\/icons\/([^/]+)\.json/)
     if (match) {
       const setId = match[1]
       const svgs = mockIconSvgs[setId] ?? {}

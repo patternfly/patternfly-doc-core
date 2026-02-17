@@ -32,15 +32,19 @@ export async function fetchIconsIndex(url: URL): Promise<IconMetadata[]> {
  * uses dynamic imports that fail in Cloudflare Workers.
  *
  * @param url - The URL object from the API route context
- * @param setId - Icon set id (e.g., "fa", "ci")
- * @returns Promise resolving to Record of iconName -> SVG string, or null if fetch fails
+ * @param version - Docs version (e.g. "v5")
+ * @param setId - Icon set id (e.g. "pf")
+ * @param assetsFetch - Optional; when provided (e.g. locals.runtime.env.ASSETS.fetch on Cloudflare), use it to fetch the asset
  */
 export async function fetchIconSvgs(
   url: URL,
+  version: string,
   setId: string,
 ): Promise<Record<string, string> | null> {
-  const iconsSvgsUrl = new URL(`/iconsSvgs/${setId}.json`, url.origin)
-  const response = await fetch(iconsSvgsUrl)
+  const iconsSvgsUrl = new URL(`/api/${version}/icons/${setId}.json`, url.origin)
+  const response = assetsFetch
+    ? await assetsFetch(new Request(iconsSvgsUrl))
+    : await fetch(iconsSvgsUrl)
 
   if (!response.ok) {
     return null

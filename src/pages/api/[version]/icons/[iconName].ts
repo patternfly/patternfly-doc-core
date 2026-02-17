@@ -48,7 +48,7 @@ export const GET: APIRoute = async ({ params, url }) => {
     )
   }
 
-  const svgs = await fetchIconSvgs(url, 'pf')
+  const svgs = await fetchIconSvgs(url, version, 'pf', assetsFetch)
   const svg = svgs?.[reactName] ?? null
 
   if (!svg) {
