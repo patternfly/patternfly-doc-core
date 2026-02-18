@@ -2,17 +2,9 @@
  * Utilities for working with @patternfly/react-icons.
  * Icons are loaded from @patternfly/react-icons/dist/static (SVG files).
  */
-import fs from 'fs'
-import path from 'path'
-
-export interface IconMetadata {
-  name: string
-  reactName: string
-  usage: string
-}
-
-const PF_ICONS_SET_ID = 'pf'
-
+import fs from 'node:fs'
+import path from 'node:path'
+import { IconMetadata, PF_ICONS_SET_ID } from './icons'
 /** Resolve path to @patternfly/react-icons/dist/static. Uses cwd so it works in dev and build. */
 function getStaticIconsDir(): string {
   return path.join(
@@ -68,24 +60,6 @@ export async function getAllIcons(): Promise<IconMetadata[]> {
   }
 
   return icons
-}
-
-/**
- * Filter icons by search term (case-insensitive match on name or reactName)
- */
-export function filterIcons(
-  icons: IconMetadata[],
-  filter: string,
-): IconMetadata[] {
-  if (!filter || !filter.trim()) {
-    return icons
-  }
-  const term = filter.toLowerCase().trim()
-  return icons.filter(
-    (icon) =>
-      icon.name.toLowerCase().includes(term) ||
-      icon.reactName.toLowerCase().includes(term),
-  )
 }
 
 /**

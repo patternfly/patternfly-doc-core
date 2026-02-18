@@ -2,9 +2,27 @@ import type { APIRoute } from 'astro'
 import { createJsonResponse } from '../../../../utils/apiHelpers'
 import { fetchApiIndex } from '../../../../utils/apiIndex/fetch'
 import { fetchIconsIndex } from '../../../../utils/icons/fetch'
-import { filterIcons } from '../../../../utils/icons/reactIcons'
+import { IconMetadata } from '../../../../utils/icons/icons'
 
 export const prerender = false
+
+/**
+ * Filter icons by search term (case-insensitive match on name or reactName)
+ */
+export function filterIcons(
+  icons: IconMetadata[],
+  filter: string,
+): IconMetadata[] {
+  if (!filter || !filter.trim()) {
+    return icons
+  }
+  const term = filter.toLowerCase().trim()
+  return icons.filter(
+    (icon) =>
+      icon.name.toLowerCase().includes(term) ||
+      icon.reactName.toLowerCase().includes(term),
+  )
+}
 
 /**
  * GET /api/{version}/icons
