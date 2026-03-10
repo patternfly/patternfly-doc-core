@@ -19,14 +19,7 @@ export const GET: APIRoute = async () => {
       },
     })
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: 'Failed to load props data', details: error }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+    const details = error instanceof Error ? error.message : String(error)
+    throw new Error(`Failed to prerender /props.json: ${details}`)
   }
 }
