@@ -1,7 +1,7 @@
  
 import type { APIRoute, GetStaticPaths } from 'astro'
-import { readFile } from 'fs/promises'
-import { resolve } from 'path'
+import { access, readFile } from 'fs/promises'
+import { isAbsolute, resolve } from 'path'
 import { createJsonResponse, createTextResponse } from '../../../../../../../utils/apiHelpers'
 import { generateAndWriteApiIndex } from '../../../../../../../utils/apiIndex/generate'
 import { getEnrichedCollections } from '../../../../../../../utils/apiRoutes/collections'
@@ -66,23 +66,38 @@ export const GET: APIRoute = async ({ params }) => {
 
   try {
     const collections = await getEnrichedCollections(version)
-    const contentEntryFilePath = findContentEntryFilePath(collections, {
+    const contentEntryMatch = findContentEntryFilePath(collections, {
       section,
       page,
       tab
     })
 
-    if (!contentEntryFilePath) {
+    if (!contentEntryMatch) {
       return createJsonResponse(
         { error: `Content entry not found for ${version}/${section}/${page}/${tab}` },
         404
       )
     }
 
+    const { filePath: contentEntryFilePath, base } = contentEntryMatch
+
+    // Resolve the content entry file path.
+    // In non-monorepo setups, filePath is relative to CWD and resolves directly.
+    // In monorepo setups, filePath may be relative to `base` instead of CWD.
+    // We try the original path first, then fall back to resolve(base, filePath).
+    let resolvedContentPath = contentEntryFilePath
+    if (base && !isAbsolute(contentEntryFilePath)) {
+      try {
+        await access(contentEntryFilePath)
+      } catch {
+        resolvedContentPath = resolve(base, contentEntryFilePath)
+      }
+    }
+
     // Read content entry file to extract imports
     let contentEntryFileContent: string
     try {
-      contentEntryFileContent = await readFile(contentEntryFilePath, 'utf8')
+      contentEntryFileContent = await readFile(resolvedContentPath, 'utf8')
     } catch (error) {
       const details = error instanceof Error ? error.message : String(error)
       return createJsonResponse(
@@ -110,8 +125,8 @@ export const GET: APIRoute = async ({ params }) => {
     // Strip query parameters (like ?raw) from the file path before reading
     const cleanFilePath = relativeExampleFilePath.split('?')[0]
 
-    // Read example file
-    const absoluteExampleFilePath = resolve(contentEntryFilePath, '../', cleanFilePath)
+    // Read example file, resolving relative to the content entry file's directory
+    const absoluteExampleFilePath = resolve(resolvedContentPath, '../', cleanFilePath)
     let exampleFileContent: string
     try {
       exampleFileContent = await readFile(absoluteExampleFilePath, 'utf8')
