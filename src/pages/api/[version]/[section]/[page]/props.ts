@@ -1,4 +1,6 @@
 import type { APIRoute } from 'astro'
+import { pascalCase } from 'change-case'
+
 import { createJsonResponse } from '../../../../../utils/apiHelpers'
 import { fetchProps } from '../../../../../utils/propsData/fetch'
 import { removeSubsection } from '../../../../../utils/case'
@@ -17,7 +19,7 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   try {
     const props = await fetchProps(url)
-    const propsData = props[removeSubsection(page)]
+    const propsData = props[pascalCase(removeSubsection(page))]
 
     if (propsData === undefined) {
       return createJsonResponse(

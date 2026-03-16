@@ -1,5 +1,5 @@
 import { GET } from '../../../../../../../pages/api/[version]/[section]/[page]/props'
-import { sentenceCase, removeSubsection } from '../../../../../../../utils/case'
+import { removeSubsection } from '../../../../../../../utils/case'
 
 /**
  * Mock fetchProps to return props data
@@ -13,13 +13,6 @@ jest.mock('../../../../../../../utils/propsData/fetch', () => ({
  * Mock sentenceCase and removeSubsection utilities
  */
 jest.mock('../../../../../../../utils/case', () => ({
-  sentenceCase: jest.fn((id: string) =>
-    // Simple mock: convert kebab-case to Sentence Case
-    id
-      .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  ),
   removeSubsection: jest.fn((page: string) => {
     // Simple mock: remove subsection prefix from page name
     if (page.includes('_')) {
@@ -52,7 +45,7 @@ const mockData = {
       },
     ],
   },
-  'Sample Data Row': {
+  SampleDataRow: {
     name: 'SampleDataRow',
     description: '',
     props: [
@@ -64,7 +57,7 @@ const mockData = {
       },
     ],
   },
-  'Dashboard Wrapper': {
+  DashboardWrapper: {
     name: 'DashboardWrapper',
     description: '',
     props: [
@@ -75,7 +68,7 @@ const mockData = {
       },
     ],
   },
-  'Keyboard Handler': {
+  KeyboardHandler: {
     name: 'KeyboardHandler',
     description: '',
     props: [
@@ -86,6 +79,11 @@ const mockData = {
         defaultValue: 'null',
       },
     ],
+  },
+  EmptyComponent: {
+    name: 'EmptyComponent',
+    description: '',
+    props: [],
   },
 }
 
@@ -108,10 +106,9 @@ it('returns props data for a valid page', async () => {
   expect(body).toHaveProperty('props')
   expect(body.name).toBe('Alert')
   expect(Array.isArray(body.props)).toBe(true)
-  expect(sentenceCase).toHaveBeenCalledWith('alert')
 })
 
-it('converts kebab-case page name to sentence case for lookup', async () => {
+it('converts kebab-case page name to pascal case for lookup', async () => {
   const response = await GET({
     params: { version: 'v6', section: 'components', page: 'sample-data-row' },
     url: new URL('http://localhost:4321/api/v6/components/sample-data-row/props'),
@@ -120,7 +117,6 @@ it('converts kebab-case page name to sentence case for lookup', async () => {
 
   expect(response.status).toBe(200)
   expect(body.name).toBe('SampleDataRow')
-  expect(sentenceCase).toHaveBeenCalledWith('sample-data-row')
 })
 
 it('handles multi-word page names correctly', async () => {
@@ -132,7 +128,6 @@ it('handles multi-word page names correctly', async () => {
 
   expect(response.status).toBe(200)
   expect(body.name).toBe('DashboardWrapper')
-  expect(sentenceCase).toHaveBeenCalledWith('dashboard-wrapper')
 })
 
 it('returns 404 error when props data is not found', async () => {
@@ -239,14 +234,6 @@ it('handles props with required field', async () => {
 })
 
 it('handles components with empty props array', async () => {
-  mockFetchProps.mockResolvedValueOnce({
-    'Empty Component': {
-      name: 'EmptyComponent',
-      description: '',
-      props: [],
-    },
-  })
-
   const response = await GET({
     params: { version: 'v6', section: 'components', page: 'empty-component' },
     url: new URL('http://localhost:4321/api/v6/components/empty-component/props'),
@@ -296,5 +283,4 @@ it('removes subsection from page name before looking up props', async () => {
   expect(response.status).toBe(200)
   expect(body.name).toBe('Checkbox')
   expect(removeSubsection).toHaveBeenCalledWith('forms_checkbox')
-  expect(sentenceCase).toHaveBeenCalledWith('checkbox')
 })
