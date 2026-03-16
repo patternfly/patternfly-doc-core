@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { createJsonResponse } from '../../../../../utils/apiHelpers'
 import { fetchProps } from '../../../../../utils/propsData/fetch'
-import { sentenceCase, removeSubsection } from '../../../../../utils/case'
+import { removeSubsection } from '../../../../../utils/case'
 
 export const prerender = false
 
@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   try {
     const props = await fetchProps(url)
-    const propsData = props[sentenceCase(removeSubsection(page))]
+    const propsData = props[removeSubsection(page)]
 
     if (propsData === undefined) {
       return createJsonResponse(
