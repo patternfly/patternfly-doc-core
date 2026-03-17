@@ -1,19 +1,12 @@
 import type { APIRoute } from 'astro'
 import { createJsonResponse } from '../../../../utils/apiHelpers'
-import { getConfig } from '../../../../../cli/getConfig'
-import { join } from 'node:path'
-import { readFileSync } from 'node:fs'
+import { fetchProps } from '../../../../utils/propsData/fetch'
 
 export const prerender = false
 
-export const GET: APIRoute = async ({ }) => {
+export const GET: APIRoute = async ({ url }) => {
   try {
-    const config = await getConfig(`${process.cwd()}/pf-docs.config.mjs`)
-    const outputDir = config?.outputDir || join(process.cwd(), 'dist')
-
-    const propsFilePath = join(outputDir, 'props.json')
-    const propsDataFile = readFileSync(propsFilePath)
-    const props = JSON.parse(propsDataFile.toString())
+    const props = await fetchProps(url)
 
     const propsKey = new RegExp("Props", 'i'); // ignore ComponentProps objects
     const names = Object.keys(props).filter(name => !propsKey.test(name))
@@ -27,6 +20,3 @@ export const GET: APIRoute = async ({ }) => {
     )
   }
 }
-
-
-
