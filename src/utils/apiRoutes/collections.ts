@@ -5,6 +5,7 @@ import { getDefaultTabForApi } from '../packageUtils'
 
 export type EnrichedContentEntry = {
   filePath: string
+  base?: string
   data: {
     tab: string
     [key: string]: any
@@ -20,20 +21,22 @@ export type EnrichedContentEntry = {
  * @returns Promise resolving to array of collection entries with enriched metadata
  */
 export async function getEnrichedCollections(version: string): Promise<EnrichedContentEntry[]> {
-  const collectionsToFetch = content
-    .filter((entry) => entry.version === version)
-    .map((entry) => entry.name as CollectionKey)
+  const contentEntries = content.filter((entry) => entry.version === version)
 
   const collections = await Promise.all(
-    collectionsToFetch.map((name) => getCollection(name))
+    contentEntries.map((entry) => getCollection(entry.name as CollectionKey))
   )
 
-  return collections.flat().map(({ data, filePath, ...rest }) => ({
-    filePath,
-    ...rest,
-    data: {
-      ...data,
-      tab: data.tab || data.source || getDefaultTabForApi(filePath),
-    },
-  }))
+  return collections.flatMap((collectionEntries, index) => {
+    const base = contentEntries[index].base
+    return collectionEntries.map(({ data, filePath = '', ...rest }) => ({
+      filePath,
+      base,
+      ...rest,
+      data: {
+        ...data,
+        tab: data.tab || data.source || getDefaultTabForApi(filePath),
+      },
+    }))
+  })
 }

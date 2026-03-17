@@ -66,12 +66,12 @@ export function findContentEntry(
  * @param entries - Array of enriched content entries to search
  * @param params - Parameters to match against (section, page, tab)
  *   - page may be underscore-separated for subsection pages (e.g., "forms_checkbox")
- * @returns The file path, or null if not found
+ * @returns Object with filePath and optional base, or null if not found
  */
 export function findContentEntryFilePath(
   entries: EnrichedContentEntry[],
   params: ContentMatchParams
-): string | null {
+): { filePath: string; base?: string } | null {
   // Find all matching entries using shared matching logic
   const matchingEntries = entries.filter((entry) => matchesParams(entry, params))
 
@@ -83,5 +83,5 @@ export function findContentEntryFilePath(
   const mdxEntry = matchingEntries.find((entry) => entry.filePath.endsWith('.mdx'))
   const selectedEntry = mdxEntry || matchingEntries[0]
 
-  return selectedEntry.filePath
+  return { filePath: selectedEntry.filePath, base: selectedEntry.base }
 }
