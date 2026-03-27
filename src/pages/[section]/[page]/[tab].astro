@@ -37,6 +37,12 @@ export async function getStaticPaths() {
     ),
   )
 
+  const apiOnly = process.env.PF_API_ONLY === 'true'
+
+  if (apiOnly) {
+    return []
+  }
+
   const flatCol = collections
     .flat()
     .map(({ data, filePath, ...rest }) => ({

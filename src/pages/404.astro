@@ -1,26 +1,22 @@
 ---
-import MainLayout from '../layouts/Main.astro'
-
 const apiOnly = process.env.PF_API_ONLY === 'true'
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>PatternFly</title>
+    <title>404 - Not Found</title>
   </head>
   <body>
     {apiOnly ? (
       <>
-        <h1>PatternFly API</h1>
+        <h1>404 - Not Found</h1>
         <p>This build only serves API routes. Content pages are not available.</p>
         <p>Available endpoints are under <a href="/api">/api</a>.</p>
       </>
     ) : (
-      <MainLayout title="PatternFly X Astro"> Page content </MainLayout>
+      <h1>404 - Page not found</h1>
     )}
   </body>
 </html>
