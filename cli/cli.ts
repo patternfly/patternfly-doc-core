@@ -113,7 +113,11 @@ async function initializeApiIndex(program: Command) {
 }
 
 async function buildProject(program: Command): Promise<DocsConfig | undefined> {
-  const { verbose } = program.opts()
+  const { verbose, apiOnly } = program.opts()
+
+  if (apiOnly) {
+    process.env.PF_API_ONLY = 'true'
+  }
 
   if (!config) {
     console.error(
@@ -191,6 +195,7 @@ program.name('pf-doc-core')
 program.option('--verbose', 'verbose mode', false)
 program.option('--props', 'generate props data', false)
 program.option('--dry-run', 'dry run mode', false)
+program.option('--api-only', 'only build API and component pages, skip standalone content pages', false)
 
 program.command('setup').action(async () => {
   await Promise.all([
@@ -212,6 +217,10 @@ program.command('init').action(async () => {
 })
 
 program.command('start').action(async () => {
+  const { apiOnly } = program.opts()
+  if (apiOnly) {
+    process.env.PF_API_ONLY = 'true'
+  }
   await updateContent(program)
   await initializeApiIndex(program)
 
