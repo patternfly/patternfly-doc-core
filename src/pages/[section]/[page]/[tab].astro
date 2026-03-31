@@ -31,17 +31,17 @@ import DocsTables from '../../../components/DocsTables.astro'
 import { addDemosOrDeprecated, getDefaultTab } from '../../../utils'
 
 export async function getStaticPaths() {
-  const collections = await Promise.all(
-    content.map(
-      async (entry) => await getCollection(entry.name as 'textContent'),
-    ),
-  )
-
   const apiOnly = process.env.PF_API_ONLY === 'true'
 
   if (apiOnly) {
     return []
   }
+  
+  const collections = await Promise.all(
+    content.map(
+      async (entry) => await getCollection(entry.name as 'textContent'),
+    ),
+  )
 
   const flatCol = collections
     .flat()
