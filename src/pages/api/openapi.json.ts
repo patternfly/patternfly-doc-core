@@ -104,6 +104,99 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       },
+      '/{version}/icons': {
+        get: {
+          summary: 'List available icons',
+          description:
+            'Returns list of all available icons from @patternfly/react-icons (dist/static) with metadata. Use filter query param to filter by name.',
+          operationId: 'getIcons',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              example: 'v6',
+            },
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              schema: { type: 'string' },
+              description: 'Filter icons by name (case-insensitive)',
+              example: 'circle',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'List of icons with metadata',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      icons: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            name: { type: 'string', example: 'circle' },
+                            reactName: { type: 'string', example: 'CircleIcon' },
+                            usage: {
+                              type: 'string',
+                              example: "import { CircleIcon } from '@patternfly/react-icons'",
+                            },
+                          },
+                        },
+                      },
+                      total: { type: 'integer' },
+                      filter: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/{version}/icons/{icon-name}': {
+        get: {
+          summary: 'Get icon SVG markup',
+          description:
+            'Returns actual SVG markup for the icon. Icon name: React component name (e.g., FaCircle, MdHome)',
+          operationId: 'getIconSvg',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              example: 'v6',
+            },
+            {
+              name: 'icon-name',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Icon identifier: React component name',
+              example: 'FaCircle',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'SVG markup for the icon',
+              content: {
+                'image/svg+xml': {
+                  schema: { type: 'string' },
+                },
+              },
+            },
+            '404': {
+              description: 'Icon not found',
+            },
+          },
+        },
+      },
       '/openapi.json': {
         get: {
           summary: 'Get OpenAPI specification',

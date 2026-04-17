@@ -368,6 +368,70 @@ export const GET: APIRoute = async () =>
           },
         },
         {
+          path: '/api/{version}/icons',
+          method: 'GET',
+          description: 'List all available icons with metadata from @patternfly/react-icons',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'filter',
+              in: 'query',
+              required: false,
+              type: 'string',
+              description: 'Filter icons by name (case-insensitive)',
+              example: 'circle',
+            },
+          ],
+          returns: {
+            type: 'object',
+            description: 'List of icons with name, reactName, usage',
+            example: {
+              icons: [
+                {
+                  name: 'circle',
+                  reactName: 'CircleIcon',
+                  usage: "import { CircleIcon } from '@patternfly/react-icons'",
+                },
+              ],
+              total: 1,
+              filter: 'circle',
+            },
+          },
+        },
+        {
+          path: '/api/{version}/icons/{icon-name}',
+          method: 'GET',
+          description: 'Get SVG markup for a specific icon',
+          parameters: [
+            {
+              name: 'version',
+              in: 'path',
+              required: true,
+              type: 'string',
+              example: 'v6',
+            },
+            {
+              name: 'icon-name',
+              in: 'path',
+              required: true,
+              type: 'string',
+              description: 'Icon identifier: React component name (e.g., FaCircle, MdHome)',
+              example: 'FaCircle',
+            },
+          ],
+          returns: {
+            type: 'string',
+            contentType: 'image/svg+xml',
+            description: 'SVG markup for the icon',
+          },
+        },
+        {
           path: '/api/{version}/{section}/{page}/{tab}/examples/{example}',
           method: 'GET',
           description: 'Get raw code for a specific example',
