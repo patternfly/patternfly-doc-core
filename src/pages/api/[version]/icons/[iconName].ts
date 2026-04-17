@@ -13,7 +13,7 @@ export const prerender = false
  * Returns actual SVG markup for the icon.
  * Icon name: React component name (e.g., FaCircle, MdHome)
  */
-export const GET: APIRoute = async ({ params, url }) => {
+export const GET: APIRoute = async ({ params, url, locals }) => {
   const { version, iconName: reactName } = params
 
   if (!version) {
@@ -48,7 +48,12 @@ export const GET: APIRoute = async ({ params, url }) => {
     )
   }
 
-  const svgs = await fetchIconSvgs(url, version, 'pf', assetsFetch)
+  const svgs = await fetchIconSvgs(
+    url,
+    version,
+    'pf',
+    (locals as any)?.runtime?.env?.ASSETS?.fetch,
+  )
   const svg = svgs?.[reactName] ?? null
 
   if (!svg) {
