@@ -64,7 +64,7 @@ export async function getStaticPaths() {
       return {
         params: {
           page: kebabCase(entry.data.id),
-          section: entry.data.section,
+          section: kebabCase(entry.data.section),
           tab,
         },
         props: { entry, ...entry.data },

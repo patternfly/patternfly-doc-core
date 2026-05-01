@@ -13,6 +13,7 @@ import { buildPropsData } from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
 import { mkdir, copyFile } from 'fs/promises'
+import { fileURLToPath } from 'url'
 import { fileExists } from './fileExists.js'
 
 const currentDir = process.cwd()
@@ -34,8 +35,11 @@ try {
     .replace('file://', '')
 } catch (e: any) {
   if (e.code === 'ERR_MODULE_NOT_FOUND') {
-    console.log('@patternfly/patternfly-doc-core not found, using current directory as astroRoot')
-    astroRoot = process.cwd()
+    // When running from the doc-core package itself (e.g. via portal: link),
+    // derive astroRoot from the CLI's own location (dist/cli/cli.js)
+    const cliDir = dirname(fileURLToPath(import.meta.url))
+    astroRoot = resolve(cliDir, '..', '..')
+    console.log('Resolved astroRoot from CLI location:', astroRoot)
   } else {
     console.error('Error resolving astroRoot', e)
   }

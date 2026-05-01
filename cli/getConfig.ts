@@ -5,6 +5,8 @@ export interface CollectionDefinition {
   version?: string
   pattern: string
   name: string
+  frontmatterDefaults?: Record<string, string>
+  frontmatterMapping?: Record<string, string>
 }
 
 export interface PropsGlobs {
