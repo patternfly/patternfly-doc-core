@@ -16,7 +16,20 @@ export const NavSection = ({
   const isExpanded = window.location.pathname.includes(kebabCase(sectionId))
   const isActive = entries.some((entry) => entry.id === activeItem)
 
-  const items = entries.map((entry) => (
+  // Group entries by subsection
+  const topLevelEntries = entries.filter((entry) => !entry.data.subsection)
+  const subsections = new Map<string, TextContentEntry[]>()
+  entries.forEach((entry) => {
+    if (entry.data.subsection) {
+      const sub = entry.data.subsection
+      if (!subsections.has(sub)) {
+        subsections.set(sub, [])
+      }
+      subsections.get(sub)!.push(entry)
+    }
+  })
+
+  const renderEntry = (entry: TextContentEntry) => (
     <NavEntry
       key={entry.id}
       entry={entry}
@@ -25,7 +38,7 @@ export const NavSection = ({
         window.location.pathname.includes(kebabCase(entry.data.id))
       }
     />
-  ))
+  )
 
   return (
     <NavExpandable
@@ -34,7 +47,23 @@ export const NavSection = ({
       isExpanded={isExpanded}
       id={`nav-section-${sectionId}`}
     >
-      {items}
+      {topLevelEntries.map(renderEntry)}
+      {Array.from(subsections.entries()).map(([subsection, subEntries]) => {
+        const subIsExpanded = subEntries.some(
+          (entry) => activeItem === entry.id || window.location.pathname.includes(kebabCase(entry.data.id))
+        )
+        return (
+          <NavExpandable
+            key={subsection}
+            title={sentenceCase(subsection)}
+            isActive={subIsExpanded}
+            isExpanded={subIsExpanded || isExpanded}
+            id={`nav-subsection-${sectionId}-${subsection}`}
+          >
+            {subEntries.map(renderEntry)}
+          </NavExpandable>
+        )
+      })}
     </NavExpandable>
   )
 }
