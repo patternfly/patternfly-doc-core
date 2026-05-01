@@ -77,7 +77,8 @@ export async function getStaticPaths() {
 }
 
 const { entry, propComponents, cssPrefix } = Astro.props
-const { title, id, section } = entry.data
+const { title, id, section: rawSection } = entry.data
+const section = kebabCase(rawSection)
 
 const { Content } = await render(entry)
 const currentPath = Astro.url.pathname

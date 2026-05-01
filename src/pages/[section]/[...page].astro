@@ -74,7 +74,7 @@ const { Content } = await render(entry)
 
 if (tabsDictionary[id]) {
   // if tab exists, rewrite to first tab content
-  return Astro.rewrite(`/${section}/${kebabCase(id)}/${tabsDictionary[id][0]}`)
+  return Astro.rewrite(`/${kebabCase(section)}/${kebabCase(id)}/${tabsDictionary[id][0]}`)
 }
 ---
 
