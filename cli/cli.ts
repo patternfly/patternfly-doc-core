@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import { Command } from 'commander'
 import { build, dev, preview, sync } from 'astro'
-import { join, resolve } from 'path'
+import { dirname, join, resolve } from 'path'
 import { createCollectionContent } from './createCollectionContent.js'
 import { setFsRootDir } from './setFsRootDir.js'
 import { createConfigFile } from './createConfigFile.js'
