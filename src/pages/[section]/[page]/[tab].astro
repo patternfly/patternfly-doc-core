@@ -64,7 +64,7 @@ export async function getStaticPaths() {
       return {
         params: {
           page: kebabCase(entry.data.id),
-          section: entry.data.section,
+          section: kebabCase(entry.data.section),
           tab,
         },
         props: { entry, ...entry.data },
@@ -77,7 +77,8 @@ export async function getStaticPaths() {
 }
 
 const { entry, propComponents, cssPrefix } = Astro.props
-const { title, id, section } = entry.data
+const { title, id, section: rawSection } = entry.data
+const section = kebabCase(rawSection)
 
 const { Content } = await render(entry)
 const currentPath = Astro.url.pathname

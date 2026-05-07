@@ -8,6 +8,7 @@ export interface TextContentEntry {
     section: string
     tab?: string
     sortValue?: number
+    subsection?: string
   }
 }
 

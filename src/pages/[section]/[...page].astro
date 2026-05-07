@@ -57,7 +57,7 @@ export async function getStaticPaths() {
     }
 
     return {
-      params: { page: kebabCase(entry.data.id), section: entry.data.section },
+      params: { page: kebabCase(entry.data.id), section: kebabCase(entry.data.section) },
       props: {
         entry,
         title: entry.data.title,
@@ -74,7 +74,7 @@ const { Content } = await render(entry)
 
 if (tabsDictionary[id]) {
   // if tab exists, rewrite to first tab content
-  return Astro.rewrite(`/${section}/${kebabCase(id)}/${tabsDictionary[id][0]}`)
+  return Astro.rewrite(`/${kebabCase(section)}/${kebabCase(id)}/${tabsDictionary[id][0]}`)
 }
 ---
 

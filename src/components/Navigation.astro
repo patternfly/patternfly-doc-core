@@ -39,7 +39,7 @@ const sortedSections = [...orderedSections, ...unorderedSections.sort()]
 const navData = sortedSections.map((section) => {
   const entries = navDataRaw
     .filter((entry) => entry.data.section === section)
-    .map(entry => ({ id: entry.id, data: { id: entry.data.id, section, sortValue: entry.data.sortValue }} as TextContentEntry))
+    .map(entry => ({ id: entry.id, data: { id: entry.data.id, section, sortValue: entry.data.sortValue, subsection: entry.data.subsection }} as TextContentEntry))
 
   const uniqueEntries = [
     ...entries
