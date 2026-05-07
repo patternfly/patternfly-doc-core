@@ -1,5 +1,5 @@
 function getHeaders(
-  type: 'application/json' | 'text/plain',
+  type: 'application/json' | 'text/plain' | 'image/svg+xml',
   contentLength?: number,
 ): HeadersInit {
   const headers: HeadersInit = {
@@ -33,6 +33,16 @@ export function createTextResponse(
   return new Response(content, {
     status,
     headers: getHeaders('text/plain', content.length),
+  })
+}
+
+export function createSvgResponse(
+  content: string,
+  status: number = 200,
+): Response {
+  return new Response(content, {
+    status,
+    headers: getHeaders('image/svg+xml', content.length),
   })
 }
 

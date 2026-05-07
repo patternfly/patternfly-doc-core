@@ -1,7 +1,7 @@
 {
     "$schema": "node_modules/wrangler/config-schema.json",
     "name": "patternfly-docs-core",
-    "compatibility_date": "2025-06-17",
+    "compatibility_date": "2026-02-18",
     "compatibility_flags": ["nodejs_compat"],
     "observability": {
       "enabled": true

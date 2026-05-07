@@ -53,6 +53,45 @@ export async function getApiIndex(): Promise<ApiIndex> {
 }
 
 /**
+ * Reads only the versions array from the API index file.
+ * Use this when the full index may not be generated yet or has a minimal structure
+ * (e.g. during getStaticPaths for icon routes). Does not validate examples/css.
+ *
+ * @returns Promise resolving to array of version strings (e.g., ['v5', 'v6'])
+ * @throws Error if the index file is missing or has no valid "versions" array
+ */
+export async function getVersionsFromIndexFile(): Promise<string[]> {
+  const outputDir = await getOutputDir()
+  const indexPath = join(outputDir, 'apiIndex.json')
+
+  try {
+    const content = await readFile(indexPath, 'utf-8')
+    const parsed = JSON.parse(content)
+
+    if (!parsed.versions || !Array.isArray(parsed.versions)) {
+      throw new Error(
+        `Invalid API index structure at ${indexPath}: missing or invalid "versions" array`,
+      )
+    }
+
+    return parsed.versions
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error(
+        `API index file not found at ${indexPath}. ` +
+          'Please run the build process to generate the index.',
+      )
+    }
+    if (error instanceof SyntaxError) {
+      throw new Error(
+        `API index contains invalid JSON at ${indexPath}. Please rebuild to regenerate the index file.`,
+      )
+    }
+    throw error
+  }
+}
+
+/**
  * Gets all available documentation versions
  *
  * @returns Promise resolving to array of version strings (e.g., ['v5', 'v6'])
