@@ -42,7 +42,7 @@ export async function fetchIconSvgs(
   setId: string,
   assetsFetch?: (input: Request) => Promise<Response>,
 ): Promise<Record<string, string> | null> {
-  const iconsSvgsUrl = new URL(`/api/${version}/icons/${setId}.json`, url.origin)
+  const iconsSvgsUrl = new URL(`/api/${version}/icons/${setId}`, url.origin)
   const response = assetsFetch
     ? await assetsFetch(new Request(iconsSvgsUrl))
     : await fetch(iconsSvgsUrl)
