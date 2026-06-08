@@ -6,7 +6,7 @@ import { getIconSvgsForSet } from '../../../../utils/icons/reactIcons'
 /**
  * Prerender at build time so this doesn't run in the Cloudflare Worker.
  * getIconSvgsForSet() reads from @patternfly/react-icons/dist/static (Node fs).
- * Serves JSON of all icon SVGs for a set (e.g. /api/v6/icons/pf).
+ * Serves JSON of all icon SVGs for a set (e.g. /api/v6/iconsets/pf).
  */
 export const prerender = true
 
