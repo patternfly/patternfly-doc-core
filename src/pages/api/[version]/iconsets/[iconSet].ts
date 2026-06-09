@@ -1,7 +1,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro'
-import { getVersionsFromIndexFile } from '../../../../utils/apiIndex/get'
 import { createJsonResponse } from '../../../../utils/apiHelpers'
 import { getIconSvgsForSet } from '../../../../utils/icons/reactIcons'
+import { content } from '../../../../content'
 
 /**
  * Prerender at build time so this doesn't run in the Cloudflare Worker.
@@ -11,7 +11,7 @@ import { getIconSvgsForSet } from '../../../../utils/icons/reactIcons'
 export const prerender = true
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const versions = await getVersionsFromIndexFile()
+  const versions = [...new Set(content.map((entry: any) => entry.version))]
   return versions.flatMap((version) => [
     { params: { version, iconSet: 'pf' } },
   ])
