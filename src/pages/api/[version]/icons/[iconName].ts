@@ -39,29 +39,38 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
     )
   }
 
-  const icons = await fetchIconsIndex(url)
-  const icon = icons.find((i) => i.reactName === reactName)
-  if (!icon) {
+  try {
+    const icons = await fetchIconsIndex(url)
+    const icon = icons.find((i) => i.reactName === reactName)
+    if (!icon) {
+      return createJsonResponse(
+        { error: `Icon '${reactName}' not found` },
+        404,
+      )
+    }
+
+    const assets = (locals as any)?.runtime?.env?.ASSETS
+    const svgs = await fetchIconSvgs(
+      url,
+      version,
+      'pf',
+      assets?.fetch?.bind(assets),
+    )
+    const svg = svgs?.[reactName] ?? null
+
+    if (!svg) {
+      return createJsonResponse(
+        { error: `Icon '${reactName}' not found` },
+        404,
+      )
+    }
+
+    return createSvgResponse(svg)
+  } catch (error) {
+    const details = error instanceof Error ? error.message : String(error)
     return createJsonResponse(
-      { error: `Icon '${reactName}' not found` },
-      404,
+      { error: 'Failed to load icon data', details },
+      500,
     )
   }
-
-  const svgs = await fetchIconSvgs(
-    url,
-    version,
-    'pf',
-    (locals as any)?.runtime?.env?.ASSETS?.fetch,
-  )
-  const svg = svgs?.[reactName] ?? null
-
-  if (!svg) {
-    return createJsonResponse(
-      { error: `Icon '${reactName}' not found` },
-      404,
-    )
-  }
-
-  return createSvgResponse(svg)
 }
