@@ -213,7 +213,9 @@ export async function generateApiIndex(): Promise<ApiIndex> {
 
     // Convert sets to sorted arrays
     // Sections are now always flat strings (subsections are in page names)
-    index.sections[version] = Array.from(sections).sort()
+    // Add hardcoded API endpoints (icons, tokens) to the sections list
+    const allSections = new Set([...sections, 'icons', 'tokens'])
+    index.sections[version] = Array.from(allSections).sort()
 
     Object.entries(sectionPages).forEach(([key, pages]) => {
       index.pages[key] = Array.from(pages).sort()
