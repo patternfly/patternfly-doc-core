@@ -17,6 +17,7 @@
     "/layouts/*",
     "/patterns/*",
     "/utility-classes/*",
-    "/extensions/*"
+    "/extensions/*",
+    "/api/*/iconsets/*"
   ]
 }

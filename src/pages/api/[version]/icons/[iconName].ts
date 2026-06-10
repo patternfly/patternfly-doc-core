@@ -13,7 +13,7 @@ export const prerender = false
  * Returns actual SVG markup for the icon.
  * Icon name: React component name (e.g., FaCircle, MdHome)
  */
-export const GET: APIRoute = async ({ params, url, locals }) => {
+export const GET: APIRoute = async ({ params, url }) => {
   const { version, iconName: reactName } = params
 
   if (!version) {
@@ -39,29 +39,32 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
     )
   }
 
-  const icons = await fetchIconsIndex(url)
-  const icon = icons.find((i) => i.reactName === reactName)
-  if (!icon) {
+  try {
+    const icons = await fetchIconsIndex(url)
+    const icon = icons.find((i) => i.reactName === reactName)
+    if (!icon) {
+      return createJsonResponse(
+        { error: `Icon '${reactName}' not found` },
+        404,
+      )
+    }
+
+    const svgs = await fetchIconSvgs(url, version, 'pf')
+    const svg = svgs?.[reactName] ?? null
+
+    if (!svg) {
+      return createJsonResponse(
+        { error: `Icon '${reactName}' not found` },
+        404,
+      )
+    }
+
+    return createSvgResponse(svg)
+  } catch (error) {
+    const details = error instanceof Error ? error.message : String(error)
     return createJsonResponse(
-      { error: `Icon '${reactName}' not found` },
-      404,
+      { error: 'Failed to load icon data', details },
+      500,
     )
   }
-
-  const svgs = await fetchIconSvgs(
-    url,
-    version,
-    'pf',
-    (locals as any)?.runtime?.env?.ASSETS?.fetch,
-  )
-  const svg = svgs?.[reactName] ?? null
-
-  if (!svg) {
-    return createJsonResponse(
-      { error: `Icon '${reactName}' not found` },
-      404,
-    )
-  }
-
-  return createSvgResponse(svg)
 }
