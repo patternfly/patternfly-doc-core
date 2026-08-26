@@ -113,7 +113,19 @@ async function initializeApiIndex(program: Command) {
 }
 
 async function buildProject(program: Command): Promise<DocsConfig | undefined> {
-  const { verbose } = program.opts()
+  const { verbose, site } = program.opts()
+
+  // By default only the API (and its supporting static endpoints) are built.
+  // Pass `--site` to also build the documentation site UI pages. The astro
+  // config reads BUILD_SITE to decide whether to inject the site routes.
+  if (site) {
+    process.env.BUILD_SITE = 'true'
+    if (verbose) {
+      console.log('Building API and documentation site pages')
+    }
+  } else if (verbose) {
+    console.log('Building API only (pass --site to also build the site pages)')
+  }
 
   if (!config) {
     console.error(
@@ -191,6 +203,7 @@ program.name('pf-doc-core')
 program.option('--verbose', 'verbose mode', false)
 program.option('--props', 'generate props data', false)
 program.option('--dry-run', 'dry run mode', false)
+program.option('--site', 'also build the documentation site pages (API only by default)', false)
 
 program.command('setup').action(async () => {
   await Promise.all([
