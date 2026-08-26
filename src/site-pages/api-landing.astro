@@ -1,0 +1,25 @@
+---
+/**
+ * Lightweight landing page served at `/` for API-only builds.
+ *
+ * This file intentionally imports nothing heavy (no MainLayout, no PatternFly
+ * React components) so it is not part of the memory-intensive SSR bundle. The
+ * `optional-site-pages` integration injects this at `/` only when the site UI
+ * is NOT being built. See architecture.md.
+ */
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>PatternFly API</title>
+  </head>
+  <body>
+    <h1>PatternFly API</h1>
+    <p>This build only serves API routes. Content pages are not available.</p>
+    <p>Available endpoints are under <a href="/api">/api</a>.</p>
+  </body>
+</html>

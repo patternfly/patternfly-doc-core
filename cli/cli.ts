@@ -117,10 +117,22 @@ async function initializeApiIndex(program: Command) {
 }
 
 async function buildProject(program: Command): Promise<DocsConfig | undefined> {
-  const { verbose, apiOnly } = program.opts()
+  const { verbose, site } = program.opts()
 
-  if (apiOnly) {
+  // API-only is the default. The full documentation site UI is opt-in via
+  // `--site`, which tells the astro config to inject the site routes
+  // (BUILD_SITE). When not building the site, PF_API_ONLY switches the
+  // remaining stub pages (e.g. 404) to their API-only messaging.
+  if (site) {
+    process.env.BUILD_SITE = 'true'
+    if (verbose) {
+      console.log('Building API and documentation site pages')
+    }
+  } else {
     process.env.PF_API_ONLY = 'true'
+    if (verbose) {
+      console.log('Building API only (pass --site to also build the site pages)')
+    }
   }
 
   if (!config) {
@@ -199,7 +211,7 @@ program.name('pf-doc-core')
 program.option('--verbose', 'verbose mode', false)
 program.option('--props', 'generate props data', false)
 program.option('--dry-run', 'dry run mode', false)
-program.option('--api-only', 'only build API and component pages, skip standalone content pages', false)
+program.option('--site', 'also build the documentation site UI pages (API only by default)', false)
 
 program.command('setup').action(async () => {
   await Promise.all([
@@ -221,10 +233,8 @@ program.command('init').action(async () => {
 })
 
 program.command('start').action(async () => {
-  const { apiOnly } = program.opts()
-  if (apiOnly) {
-    process.env.PF_API_ONLY = 'true'
-  }
+  // The dev server always serves the full site (see the astro config), so no
+  // API-only handling is needed here.
   await updateContent(program)
   await initializeApiIndex(program)
 
