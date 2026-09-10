@@ -9,7 +9,10 @@ import { createConfigFile } from './createConfigFile.js'
 import { updatePackageFile } from './updatePackageFile.js'
 import { DocsConfig, getConfig } from './getConfig.js'
 import { symLinkConfig } from './symLinkConfig.js'
-import { buildPropsData } from './buildPropsData.js'
+import {
+  buildPackagePropsData,
+  buildPropsData,
+} from './buildPropsData.js'
 import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
 import { mkdir, copyFile } from 'fs/promises'
@@ -243,6 +246,24 @@ program.command('generate-props').action(async () => {
   await generateProps(program, true)
   console.log('\nProps data generated')
 })
+
+program
+  .command('generate-package-props')
+  .argument('[outputFile]', 'package metadata output path', 'schema/props.json')
+  .action(async (outputFile: string) => {
+    const { verbose } = program.opts()
+    const { repoRoot } = config
+    const rootDir = repoRoot ? resolve(currentDir, repoRoot) : currentDir
+
+    await buildPackagePropsData({
+      rootDir,
+      configFile: `${currentDir}/pf-docs.config.mjs`,
+      outputFile,
+      verbose,
+    })
+
+    console.log(`\nPackage props data generated at ${outputFile}`)
+  })
 
 program.command('serve').action(async () => {
   await updateContent(program)
