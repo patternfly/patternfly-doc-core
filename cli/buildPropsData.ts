@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 
 import { glob } from 'glob'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
+import { mkdir, readFile, writeFile } from 'fs/promises'
+import { dirname, join, resolve } from 'path'
 
 import { tsDocgen } from './tsDocGen.js'
 import { getConfig, PropsGlobs } from './getConfig.js'
 
-interface Prop {
+export interface Prop {
   name: string
   type: string
   description?: string
@@ -15,13 +15,20 @@ interface Prop {
   defaultValue?: string
   hide?: boolean
 }
-interface TsDoc {
+export interface TsDoc {
   name: string
   description: string
   props: Prop[]
 }
-interface PropsData {
+export interface PropsData {
   [key: string]: TsDoc
+}
+
+export interface PackagePropsData {
+  formatVersion: 1
+  package: string
+  packageVersion: string
+  components: PropsData
 }
 
 // Build unique names for components with a "variant" extension
@@ -50,7 +57,7 @@ async function getFiles(root: string, globs: PropsGlobs[]) {
   return files.flat()
 }
 
-async function getPropsData(files: string[], verbose: boolean) {
+async function getPropsData(files: string[], verbose: boolean): Promise<PropsData> {
   const perFilePropsData = await Promise.all(
     files.map(async (file) => {
       if (verbose) {
@@ -83,7 +90,14 @@ async function getPropsData(files: string[], verbose: boolean) {
   return combinedPropsData
 }
 
-export async function buildPropsData(
+interface BuildPropsOptions {
+  rootDir: string
+  configFile: string
+  outputFile: string
+  verbose: boolean
+}
+
+async function getConfiguredPropsData(
   rootDir: string,
   configFile: string,
   verbose: boolean,
@@ -102,7 +116,7 @@ export async function buildPropsData(
     return
   }
 
-  const { propsGlobs, outputDir } = config
+  const { propsGlobs } = config
   if (!propsGlobs) {
     console.error('No props data found in config')
     return
@@ -111,12 +125,61 @@ export async function buildPropsData(
   const files = await getFiles(rootDir, propsGlobs)
   verboseModeLog(`Found ${files.length} files to parse`)
 
-  const propsData = await getPropsData(files, verbose)
+  return {
+    propsData: await getPropsData(files, verbose),
+    outputDir: config.outputDir,
+    verboseModeLog,
+  }
+}
 
+export async function buildPropsData(
+  rootDir: string,
+  configFile: string,
+  verbose: boolean,
+) {
+  const configuredData = await getConfiguredPropsData(rootDir, configFile, verbose)
+  if (!configuredData) {
+    return
+  }
+
+  const { propsData, outputDir, verboseModeLog } = configuredData
   const propsFile = join(outputDir, 'props.json')
-
   const absolutePropsFilePath = join(process.cwd(), propsFile)
   verboseModeLog(`Writing props data to ${absolutePropsFilePath}`)
 
   await writeFile(propsFile, JSON.stringify(propsData))
+}
+
+export async function buildPackagePropsData({
+  rootDir,
+  configFile,
+  outputFile,
+  verbose,
+}: BuildPropsOptions): Promise<PackagePropsData | undefined> {
+  const configuredData = await getConfiguredPropsData(rootDir, configFile, verbose)
+  if (!configuredData) {
+    return
+  }
+
+  const packageJson = JSON.parse(
+    await readFile(join(rootDir, 'package.json'), 'utf8'),
+  ) as { name?: string; version?: string }
+
+  if (!packageJson.name || !packageJson.version) {
+    throw new Error('Package metadata must include name and version in package.json')
+  }
+
+  const packagePropsData: PackagePropsData = {
+    formatVersion: 1,
+    package: packageJson.name,
+    packageVersion: packageJson.version,
+    components: configuredData.propsData,
+  }
+
+  const outputPath = resolve(rootDir, outputFile)
+  await mkdir(dirname(outputPath), { recursive: true })
+  configuredData.verboseModeLog(`Writing package props data to ${outputPath}`)
+  await writeFile(outputPath, `${JSON.stringify(packagePropsData, null, 2)}\n`)
+
+  return packagePropsData
 }

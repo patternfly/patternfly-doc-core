@@ -1,6 +1,9 @@
-import { writeFile } from 'fs/promises'
+import { mkdir, readFile, writeFile } from 'fs/promises'
 import { glob } from 'glob'
-import { buildPropsData } from '../buildPropsData'
+import {
+  buildPackagePropsData,
+  buildPropsData,
+} from '../buildPropsData'
 import { getConfig } from '../getConfig'
 import { tsDocgen } from '../tsDocGen'
 
@@ -207,4 +210,36 @@ it('should not log verbose messages when not run in verbose mode', async () => {
 
   // Should not have any verbose logging calls
   expect(mockConsoleLog).not.toHaveBeenCalled()
+})
+
+it('should write package metadata with package identity and components', async () => {
+  ;(getConfig as jest.Mock).mockResolvedValue(validConfigResponse)
+  ;(glob as unknown as jest.Mock).mockResolvedValueOnce(['files/one'])
+  ;(glob as unknown as jest.Mock).mockResolvedValueOnce([])
+  ;(tsDocgen as jest.Mock).mockResolvedValue(validTsDocGenResponseOne)
+  ;(readFile as jest.Mock).mockResolvedValue(
+    JSON.stringify({ name: '@patternfly/test-package', version: '1.2.3' }),
+  )
+
+  const result = await buildPackagePropsData({
+    rootDir: '/root',
+    configFile: '/config',
+    outputFile: 'schema/props.json',
+    verbose: false,
+  })
+
+  expect(result).toEqual({
+    formatVersion: 1,
+    package: '@patternfly/test-package',
+    packageVersion: '1.2.3',
+    components: {
+      ComponentOne: validTsDocGenResponseOne[0],
+      ComponentTwo: validTsDocGenResponseOne[1],
+    },
+  })
+  expect(mkdir).toHaveBeenCalledWith('/root/schema', { recursive: true })
+  expect(writeFile).toHaveBeenCalledWith(
+    '/root/schema/props.json',
+    `${JSON.stringify(result, null, 2)}\n`,
+  )
 })
