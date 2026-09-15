@@ -12,6 +12,7 @@
     "start:cli": "npm run build:cli && node ./dist/cli/cli.js start",
     "start:astro": "astro dev",
     "build": "npm run build:cli && node --max-old-space-size=8192 ./dist/cli/cli.js build",
+    "build:all": "npm run build:cli && node --max-old-space-size=8192 ./dist/cli/cli.js build --site",
     "build:astro": "astro check && astro build",
     "build:cli": "tsc --build ./cli/tsconfig.json",
     "build:cli:watch": "tsc --build --watch ./cli/tsconfig.json",
