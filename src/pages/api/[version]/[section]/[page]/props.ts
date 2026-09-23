@@ -4,11 +4,13 @@ import { pascalCase } from 'change-case'
 import { createJsonResponse } from '../../../../../utils/apiHelpers'
 import { fetchProps } from '../../../../../utils/propsData/fetch'
 import { removeSubsection } from '../../../../../utils/case'
+import { fetchApiIndex } from '../../../../../utils/apiIndex/fetch'
+import { getPrimaryPropComponent } from '../../../../../utils/apiIndex/props'
 
 export const prerender = false
 
 export const GET: APIRoute = async ({ params, url }) => {
-  const { page } = params
+  const { version, section, page } = params
 
   if (!page) {
     return createJsonResponse(
@@ -19,11 +21,23 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   try {
     const props = await fetchProps(url)
-    const propsData = props[pascalCase(removeSubsection(page))]
+    const requestedComponent = url.searchParams.get('component')
+    let propsData = props[pascalCase(removeSubsection(page))]
+
+    // Page labels can differ from their primary React component name. A documented
+    // member can be selected without exposing props outside its parent page.
+    if (requestedComponent !== null || propsData === undefined) {
+      const index = await fetchApiIndex(url)
+      const propComponents = index.propComponents?.[`${version}::${section}::${page}`] || []
+      const component = requestedComponent ?? getPrimaryPropComponent(page, propComponents)
+      propsData = requestedComponent !== null && !propComponents.includes(component)
+        ? undefined
+        : props[component]
+    }
 
     if (propsData === undefined) {
       return createJsonResponse(
-        { error: `Props data for ${page} not found` },
+        { error: `Props data for ${requestedComponent ?? page} not found` },
         404,
       )
     }

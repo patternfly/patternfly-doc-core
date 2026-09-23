@@ -4,12 +4,36 @@ import path from 'path'
 import { fileExists } from './fileExists.js'
 
 function handleTsExamples(content: string): string {
-  //regex link: https://regexr.com/8f0bu
-  const ExampleBlockRegex = /```[tj]s file=['"]\.?\/?(\w*)\.(\w*)['"]\s*\n```/g
+  // File fences may include options before or after file=, and refer to sibling packages.
+  // Only convert empty fences; inline code samples should remain code blocks.
+  const exampleBlockRegex = /^```[tj]sx?\b([^\r\n]*)\r?\n\s*```/gm
+  const imports = new Map<string, string>()
+  const names = new Set<string>()
 
-  //the first capture group is the example file name without the extension or path, the second is the extension
-  const replacementString = `\nimport $1 from "./$1.$2?raw"\n\n<LiveExample src={$1} />`
-  return content.replace(ExampleBlockRegex, replacementString)
+  return content.replace(exampleBlockRegex, (block, attributes: string) => {
+    const file = attributes.match(/\bfile=(['"])([^'"\r\n]+\.[tj]sx?)\1/)
+    if (!file) {
+      return block
+    }
+
+    const filePath = file[2].startsWith('.') ? file[2] : `./${file[2]}`
+    let name = imports.get(filePath)
+    let importStatement = ''
+    if (!name) {
+      const baseName = path.basename(filePath, path.extname(filePath)).replace(/\W/g, '_')
+      const identifier = /^[A-Za-z_]/.test(baseName) ? baseName : `Example_${baseName}`
+      name = identifier
+      let suffix = 2
+      while (names.has(name)) {
+        name = `${identifier}_${suffix++}`
+      }
+      names.add(name)
+      imports.set(filePath, name)
+      importStatement = `\nimport ${name} from ${JSON.stringify(`${filePath}?raw`)}\n`
+    }
+
+    return `${importStatement}\n<LiveExample src={${name}} />`
+  })
 }
 
 async function handleHTMLExamples(

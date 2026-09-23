@@ -57,6 +57,8 @@ export interface ApiIndex {
    * (e.g., { 'v6::components::alert': ['react'], 'v6::components::forms_checkbox': ['react'] })
    */
   tabs: Record<string, string[]>
+  /** Documented React props members by version::section::page, in frontmatter order. */
+  propComponents?: Record<string, string[]>
   /** Examples by version::section::page::tab with titles
    * (e.g., { 'v6::components::alert::react': [{exampleName: 'AlertDefault', title: 'Default alert'}] })
    */
@@ -119,6 +121,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     sections: {},
     pages: {},
     tabs: {},
+    propComponents: {},
     examples: {},
     css: {},
   }
@@ -184,6 +187,11 @@ export async function generateApiIndex(): Promise<ApiIndex> {
         pageTabs[tabKey] = new Set()
       }
       pageTabs[tabKey].add(tab)
+
+      // Keep the active React mapping separate from HTML and deprecated variants.
+      if (tab === 'react' && entry.data.propComponents?.length) {
+        index.propComponents![tabKey] = [...new Set<string>(entry.data.propComponents)]
+      }
 
       // Collect examples for this tab
       const exampleKey = `${tabKey}::${tab}`

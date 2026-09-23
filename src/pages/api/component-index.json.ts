@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
-import { getApiIndex } from '../../utils/apiIndex/get'
+import { generateApiIndex } from '../../utils/apiIndex/generate'
+import { getPrimaryPropComponent } from '../../utils/apiIndex/props'
 import { removeSubsection } from '../../utils/case'
 import { getOutputDir } from '../../utils/getOutputDir'
 import { join } from 'path'
@@ -14,6 +15,7 @@ interface ComponentEntry {
   hasProps: boolean
   hasCss: boolean
   exampleCount: number
+  component: string
 }
 
 export interface ComponentIndex {
@@ -31,20 +33,17 @@ function pageToPascalCase(page: string): string {
 
 export const GET: APIRoute = async () => {
   try {
-    const index = await getApiIndex()
+    // This route can prerender before the routes that write apiIndex.json.
+    // Generate from current collections rather than a previous build's index.
+    const index = await generateApiIndex()
 
-    // props.json keys include both component names ("Alert") and their prop
-    // interfaces ("AlertProps"). Filter out the interface entries to get the
-    // set of component names that have prop documentation available.
+    // Frontmatter may document both component and interface props records.
     let componentNamesWithProps = new Set<string>()
     try {
       const outputDir = await getOutputDir()
       const propsFile = await readFile(join(outputDir, 'props.json'), 'utf-8')
       const propsData = JSON.parse(propsFile)
-      const propsSuffixPattern = /Props/i
-      componentNamesWithProps = new Set(
-        Object.keys(propsData).filter((name) => !propsSuffixPattern.test(name)),
-      )
+      componentNamesWithProps = new Set(Object.keys(propsData))
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
         throw error
@@ -60,6 +59,7 @@ export const GET: APIRoute = async () => {
     const sections = index.sections[version] || []
 
     const components: Record<string, ComponentEntry> = {}
+    const aliases: Record<string, ComponentEntry> = {}
 
     for (const section of sections) {
       const pagesKey = `${version}::${section}`
@@ -79,7 +79,9 @@ export const GET: APIRoute = async () => {
         const hasCss = tabsKey in index.css && index.css[tabsKey].length > 0
 
         const pascalName = pageToPascalCase(page)
-        const hasProps = componentNamesWithProps.has(pascalName)
+        const propComponents = index.propComponents?.[tabsKey] || []
+        const primaryComponent = getPrimaryPropComponent(page, propComponents)
+        const hasProps = componentNamesWithProps.has(primaryComponent)
 
         // Prefer the first occurrence when multiple sections produce the same
         // PascalCase key (e.g., components/table vs extensions/data-view_table)
@@ -91,12 +93,24 @@ export const GET: APIRoute = async () => {
             hasProps,
             hasCss,
             exampleCount,
+            component: primaryComponent,
+          }
+
+          for (const component of propComponents) {
+            if (!aliases[component]) {
+              aliases[component] = {
+                ...components[pascalName],
+                component,
+                hasProps: componentNamesWithProps.has(component),
+              }
+            }
           }
         }
       }
     }
 
-    const componentIndex: ComponentIndex = { version, components }
+    // Existing page-derived keys win; aliases make Nav and FileUpload discoverable.
+    const componentIndex: ComponentIndex = { version, components: { ...aliases, ...components } }
 
     return new Response(JSON.stringify(componentIndex), {
       status: 200,
