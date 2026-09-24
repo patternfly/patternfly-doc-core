@@ -111,6 +111,23 @@ it.each([
   expect(await response.json()).toEqual({ name, description: '', props: [] })
 })
 
+it('prefers the frontmatter component over a colliding page-name props record', async () => {
+  mockFetchProps.mockResolvedValue({
+    Navigation: { name: 'Navigation', description: '', props: [] },
+    Nav: { name: 'Nav', description: '', props: [] },
+  })
+  mockFetchApiIndex.mockResolvedValue({
+    propComponents: { 'v6::components::navigation': ['Nav'] },
+  })
+
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page: 'navigation' },
+    url: new URL('http://localhost/api/v6/components/navigation/props'),
+  } as any)
+
+  expect((await response.json()).name).toBe('Nav')
+})
+
 it('returns props for a documented secondary component', async () => {
   mockFetchProps.mockResolvedValue({
     ...mockData,
