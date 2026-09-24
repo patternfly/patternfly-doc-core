@@ -65,6 +65,29 @@ it('keeps inline code samples intact', async () => {
   expect(writeFile).toHaveBeenCalledWith('test.mdx', content)
 })
 
+it('converts indented file fences with matching backtick or tilde closers', async () => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(
+    '   ````tsx file="Indented.tsx"\n    `````\n~~~ts file="Tilde.ts"\n~~~~',
+  )
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).toContain('import Indented from "./Indented.tsx?raw"')
+  expect(converted).toContain('import Tilde from "./Tilde.ts?raw"')
+})
+
+it('keeps file fences with invalid closing markers intact', async () => {
+  const content = '````ts file="Example.ts"\n```\n~~~ts file="Tilde.ts"\n~~~ text'
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(content)
+
+  await convertToMDX('test.md')
+
+  expect(writeFile).toHaveBeenCalledWith('test.mdx', content)
+})
+
 it('reuses repeated imports and disambiguates filenames in different directories', async () => {
   ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
   ;(readFile as jest.Mock).mockResolvedValue(

@@ -6,11 +6,18 @@ import { fileExists } from './fileExists.js'
 function handleTsExamples(content: string): string {
   // File fences may include options before or after file=, and refer to sibling packages.
   // Only convert empty fences; inline code samples should remain code blocks.
-  const exampleBlockRegex = /^```[tj]sx?\b([^\r\n]*)\r?\n\s*```/gm
+  const exampleBlockRegex = /^ {0,3}([`~]{3,})[tj]sx?\b([^\r\n]*)\r?\n(?:[ \t]*\r?\n)*[ \t]*([`~]+[ \t]*)$/gm
   const imports = new Map<string, string>()
   const names = new Set<string>()
 
-  return content.replace(exampleBlockRegex, (block, attributes: string) => {
+  return content.replace(exampleBlockRegex, (block, openingFence: string, attributes: string, closingFence: string) => {
+    const closingMarker = closingFence.trim()
+    if (!/^`+$|^~+$/.test(openingFence) ||
+      !closingMarker.startsWith(openingFence) ||
+      !new RegExp(`^${openingFence[0]}+$`).test(closingMarker)) {
+      return block
+    }
+
     const file = attributes.match(/\bfile=(['"])([^'"\r\n]+\.[tj]sx?)\1/)
     if (!file) {
       return block
