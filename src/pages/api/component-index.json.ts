@@ -86,27 +86,28 @@ export const GET: APIRoute = async () => {
           componentNamesWithProps.has(component) ||
           (isDeprecatedOnly && componentNamesWithProps.has(`${component}-deprecated`))
         const hasProps = hasPropsForComponent(primaryComponent)
+        const pageEntry = {
+          section,
+          page,
+          tabs,
+          hasProps,
+          hasCss,
+          exampleCount,
+          component: primaryComponent,
+        }
 
         // Prefer the first occurrence when multiple sections produce the same
         // PascalCase key (e.g., components/table vs extensions/data-view_table)
         if (!components[pascalName]) {
-          components[pascalName] = {
-            section,
-            page,
-            tabs,
-            hasProps,
-            hasCss,
-            exampleCount,
-            component: primaryComponent,
-          }
+          components[pascalName] = pageEntry
+        }
 
-          for (const component of propComponents) {
-            if (!aliases[component]) {
-              aliases[component] = {
-                ...components[pascalName],
-                component,
-                hasProps: hasPropsForComponent(component),
-              }
+        for (const component of propComponents) {
+          if (!aliases[component]) {
+            aliases[component] = {
+              ...pageEntry,
+              component,
+              hasProps: hasPropsForComponent(component),
             }
           }
         }

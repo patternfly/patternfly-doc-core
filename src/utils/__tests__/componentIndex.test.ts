@@ -19,10 +19,12 @@ beforeEach(() => {
     { data: { section: 'components', id: 'Navigation', tab: 'html' }, body: '', filePath: '/html/Nav.md' },
     { data: { section: 'components', id: 'Navigation', tab: 'react', propComponents: ['OldNav'] }, body: '', filePath: '/deprecated/components/Nav.md' },
     { data: { section: 'components', id: 'Chip', tab: 'react-deprecated', propComponents: ['Chip', 'ChipGroup'] }, body: '', filePath: '/deprecated/components/Chip.md' },
+    { data: { section: 'components', id: 'Table', tab: 'react', propComponents: ['Table'] }, body: '', filePath: '/components/Table.md' },
+    { data: { section: 'extensions', subsection: 'data-view', id: 'Table', tab: 'react', propComponents: ['DataViewTable'] }, body: '', filePath: '/extensions/DataViewTable.md' },
     { data: { section: 'foundations-and-styles', subsection: 'layouts', id: 'Flex', tab: 'react', propComponents: ['Flex', 'FlexItem'] }, body: '<LiveExample src={FlexBasic} />', filePath: '/layouts/Flex.md' },
   ])
   ;(readFile as jest.Mock).mockResolvedValue(JSON.stringify(Object.fromEntries(
-    ['Nav', 'NavItem', 'FileUpload', 'FileUploadField', 'ActionGroup', 'Form', 'Flex', 'FlexItem', 'Chip-deprecated', 'ChipGroup-deprecated'].map((name) => [name, { name, props: [] }]),
+    ['Nav', 'NavItem', 'FileUpload', 'FileUploadField', 'ActionGroup', 'Form', 'Flex', 'FlexItem', 'Chip-deprecated', 'ChipGroup-deprecated', 'Table', 'DataViewTable'].map((name) => [name, { name, props: [] }]),
   )))
 })
 
@@ -46,8 +48,9 @@ it('indexes current collections, preserving page keys and exposing documented me
   expect(components.NavMissingProps).toMatchObject({ page: 'navigation', component: 'NavMissingProps', hasProps: false })
   expect(components.FileUpload).toMatchObject({ page: 'file-upload_simple-file-upload', component: 'FileUpload' })
   expect(components.FileUploadField).toMatchObject({ page: 'file-upload_simple-file-upload', component: 'FileUploadField' })
-  expect(components.Chip).toMatchObject({ page: 'chip', component: 'Chip', hasProps: true })
-  expect(components.ChipGroup).toMatchObject({ page: 'chip', component: 'ChipGroup', hasProps: true })
+    expect(components.Chip).toMatchObject({ page: 'chip', component: 'Chip', hasProps: true })
+    expect(components.ChipGroup).toMatchObject({ page: 'chip', component: 'ChipGroup', hasProps: true })
+    expect(components.DataViewTable).toMatchObject({ page: 'data-view_table', component: 'DataViewTable', hasProps: true })
   expect(components.Flex).toMatchObject({ page: 'layouts_flex', tabs: ['react'], exampleCount: 1 })
   expect(components.Form).toMatchObject({ hasProps: true })
   // Only props are read from disk: an old apiIndex.json cannot seed the new index.
