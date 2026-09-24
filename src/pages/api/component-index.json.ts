@@ -81,7 +81,11 @@ export const GET: APIRoute = async () => {
         const pascalName = pageToPascalCase(page)
         const propComponents = index.propComponents?.[tabsKey] || []
         const primaryComponent = getPrimaryPropComponent(page, propComponents)
-        const hasProps = componentNamesWithProps.has(primaryComponent)
+        const isDeprecatedOnly = !tabs.includes('react') && tabs.includes('react-deprecated')
+        const hasPropsForComponent = (component: string) =>
+          componentNamesWithProps.has(component) ||
+          (isDeprecatedOnly && componentNamesWithProps.has(`${component}-deprecated`))
+        const hasProps = hasPropsForComponent(primaryComponent)
 
         // Prefer the first occurrence when multiple sections produce the same
         // PascalCase key (e.g., components/table vs extensions/data-view_table)
@@ -101,7 +105,7 @@ export const GET: APIRoute = async () => {
               aliases[component] = {
                 ...components[pascalName],
                 component,
-                hasProps: componentNamesWithProps.has(component),
+                hasProps: hasPropsForComponent(component),
               }
             }
           }

@@ -154,6 +154,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const tabExamples: Record<string, { exampleName: string; title: string | null }[]> = {}
     const pageCss: Record<string, { name: string; value: string; var: string }[]> = {}
     const pageCssPrefixes: Record<string, string | string[]> = {}
+    const deprecatedPropComponents: Record<string, string[]> = {}
 
     flatEntries.forEach((entry: any) => {
       const { section, subsection, id } = entry.data
@@ -188,9 +189,11 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       }
       pageTabs[tabKey].add(tab)
 
-      // Keep the active React mapping separate from HTML and deprecated variants.
+      // Prefer active React members, but retain deprecated-only pages such as Chip.
       if (tab === 'react' && entry.data.propComponents?.length) {
         index.propComponents![tabKey] = [...new Set<string>(entry.data.propComponents)]
+      } else if (tab === 'react-deprecated' && entry.data.propComponents?.length) {
+        deprecatedPropComponents[tabKey] = [...new Set<string>(entry.data.propComponents)]
       }
 
       // Collect examples for this tab
@@ -204,6 +207,12 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       // Key by version::section::page (tabKey) so each page gets its own tokens
       if (entry.data.cssPrefix && !pageCssPrefixes[tabKey]) {
         pageCssPrefixes[tabKey] = entry.data.cssPrefix
+      }
+    })
+
+    Object.entries(deprecatedPropComponents).forEach(([key, propComponents]) => {
+      if (!index.propComponents![key]) {
+        index.propComponents![key] = propComponents
       }
     })
 

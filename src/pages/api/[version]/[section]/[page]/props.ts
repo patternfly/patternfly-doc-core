@@ -28,11 +28,14 @@ export const GET: APIRoute = async ({ params, url }) => {
     // member can be selected without exposing props outside its parent page.
     if (requestedComponent !== null || propsData === undefined) {
       const index = await fetchApiIndex(url)
-      const propComponents = index.propComponents?.[`${version}::${section}::${page}`] || []
+      const indexKey = `${version}::${section}::${page}`
+      const propComponents = index.propComponents?.[indexKey] || []
       const component = requestedComponent ?? getPrimaryPropComponent(page, propComponents)
+      const tabs = index.tabs?.[indexKey] || []
+      const isDeprecatedOnly = !tabs.includes('react') && tabs.includes('react-deprecated')
       propsData = requestedComponent !== null && !propComponents.includes(component)
         ? undefined
-        : props[component]
+        : props[`${component}${isDeprecatedOnly ? '-deprecated' : ''}`]
     }
 
     if (propsData === undefined) {

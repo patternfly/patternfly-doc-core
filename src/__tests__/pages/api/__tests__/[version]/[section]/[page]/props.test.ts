@@ -140,6 +140,24 @@ it('rejects a component selector outside the requested page', async () => {
   expect(response.status).toBe(404)
 })
 
+it('returns deprecated props for a deprecated-only page', async () => {
+  mockFetchProps.mockResolvedValue({
+    ...mockData,
+    'Chip-deprecated': { name: 'Chip', description: '', props: [] },
+  })
+  mockFetchApiIndex.mockResolvedValue({
+    propComponents: { 'v6::components::chip': ['Chip', 'ChipGroup'] },
+    tabs: { 'v6::components::chip': ['react-deprecated'] },
+  })
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page: 'chip' },
+    url: new URL('http://localhost/api/v6/components/chip/props'),
+  } as any)
+
+  expect(response.status).toBe(200)
+  expect((await response.json()).name).toBe('Chip')
+})
+
 it('returns props data for a valid page', async () => {
   const response = await GET({
     params: { version: 'v6', section: 'components', page: 'alert' },
