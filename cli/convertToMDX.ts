@@ -6,7 +6,7 @@ import { fileExists } from './fileExists.js'
 function handleTsExamples(content: string): string {
   // File fences may include options before or after file=, and refer to sibling packages.
   // Only convert empty fences; inline code samples should remain code blocks.
-  const exampleBlockRegex = /^ {0,3}([`~]{3,})[tj]sx?\b([^\r\n]*)\r?\n(?:[ \t]*\r?\n)*[ \t]*([`~]+[ \t]*)$/gm
+  const exampleBlockRegex = /^ {0,3}([`~]{3,})[tj]sx?\b([^\r\n]*)\r?\n(?:[ \t]*\r?\n)* {0,3}([`~]+[ \t]*)$/gm
   const imports = new Map<string, string>()
   const names = new Set<string>()
 
