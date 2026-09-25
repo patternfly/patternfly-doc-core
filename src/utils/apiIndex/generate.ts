@@ -57,6 +57,8 @@ export interface ApiIndex {
    * (e.g., { 'v6::components::alert': ['react'], 'v6::components::forms_checkbox': ['react'] })
    */
   tabs: Record<string, string[]>
+  /** Documented React props members by version::section::page, in frontmatter order. */
+  propComponents?: Record<string, string[]>
   /** Examples by version::section::page::tab with titles
    * (e.g., { 'v6::components::alert::react': [{exampleName: 'AlertDefault', title: 'Default alert'}] })
    */
@@ -119,6 +121,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     sections: {},
     pages: {},
     tabs: {},
+    propComponents: {},
     examples: {},
     css: {},
   }
@@ -151,6 +154,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
     const tabExamples: Record<string, { exampleName: string; title: string | null }[]> = {}
     const pageCss: Record<string, { name: string; value: string; var: string }[]> = {}
     const pageCssPrefixes: Record<string, string | string[]> = {}
+    const deprecatedPropComponents: Record<string, string[]> = {}
 
     flatEntries.forEach((entry: any) => {
       const { section, subsection, id } = entry.data
@@ -185,6 +189,13 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       }
       pageTabs[tabKey].add(tab)
 
+      // Prefer active React members, but retain deprecated-only pages such as Chip.
+      if (tab === 'react' && entry.data.propComponents?.length) {
+        index.propComponents![tabKey] = [...new Set<string>(entry.data.propComponents)]
+      } else if (tab === 'react-deprecated' && entry.data.propComponents?.length) {
+        deprecatedPropComponents[tabKey] = [...new Set<string>(entry.data.propComponents)]
+      }
+
       // Collect examples for this tab
       const exampleKey = `${tabKey}::${tab}`
       const examplesWithTitles = extractExamplesWithTitles(entry.body || '')
@@ -196,6 +207,12 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       // Key by version::section::page (tabKey) so each page gets its own tokens
       if (entry.data.cssPrefix && !pageCssPrefixes[tabKey]) {
         pageCssPrefixes[tabKey] = entry.data.cssPrefix
+      }
+    })
+
+    Object.entries(deprecatedPropComponents).forEach(([key, propComponents]) => {
+      if (!index.propComponents![key]) {
+        index.propComponents![key] = propComponents
       }
     })
 

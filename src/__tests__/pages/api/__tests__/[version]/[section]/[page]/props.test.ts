@@ -5,6 +5,10 @@ import { removeSubsection } from '../../../../../../../utils/case'
  * Mock fetchProps to return props data
  */
 const mockFetchProps = jest.fn()
+const mockFetchApiIndex = jest.fn()
+jest.mock('../../../../../../../utils/apiIndex/fetch', () => ({
+  fetchApiIndex: (...args: any[]) => mockFetchApiIndex(...args),
+}))
 jest.mock('../../../../../../../utils/propsData/fetch', () => ({
   fetchProps: (...args: any[]) => mockFetchProps(...args),
 }))
@@ -90,6 +94,85 @@ const mockData = {
 beforeEach(() => {
   jest.clearAllMocks()
   mockFetchProps.mockResolvedValue(mockData)
+  mockFetchApiIndex.mockResolvedValue({ propComponents: {} })
+})
+
+it.each([
+  ['navigation', 'Nav'],
+  ['file-upload_simple-file-upload', 'FileUpload'],
+])('resolves the frontmatter component for %s', async (page, name) => {
+  mockFetchProps.mockResolvedValue({ [name]: { name, description: '', props: [] } })
+  mockFetchApiIndex.mockResolvedValue({ propComponents: { [`v6::components::${page}`]: [name] } })
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page },
+    url: new URL(`http://localhost/api/v6/components/${page}/props`),
+  } as any)
+  expect(response.status).toBe(200)
+  expect(await response.json()).toEqual({ name, description: '', props: [] })
+})
+
+it('prefers the frontmatter component over a colliding page-name props record', async () => {
+  mockFetchProps.mockResolvedValue({
+    Navigation: { name: 'Navigation', description: '', props: [] },
+    Nav: { name: 'Nav', description: '', props: [] },
+  })
+  mockFetchApiIndex.mockResolvedValue({
+    propComponents: { 'v6::components::navigation': ['Nav'] },
+  })
+
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page: 'navigation' },
+    url: new URL('http://localhost/api/v6/components/navigation/props'),
+  } as any)
+
+  expect((await response.json()).name).toBe('Nav')
+})
+
+it('returns props for a documented secondary component', async () => {
+  mockFetchProps.mockResolvedValue({
+    ...mockData,
+    NavItem: { name: 'NavItem', description: '', props: [] },
+  })
+  mockFetchApiIndex.mockResolvedValue({
+    propComponents: { 'v6::components::navigation': ['Nav', 'NavList', 'NavItem'] },
+  })
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page: 'navigation' },
+    url: new URL('http://localhost/api/v6/components/navigation/props?component=NavItem'),
+  } as any)
+
+  expect(response.status).toBe(200)
+  expect((await response.json()).name).toBe('NavItem')
+})
+
+it('rejects a component selector outside the requested page', async () => {
+  mockFetchApiIndex.mockResolvedValue({
+    propComponents: { 'v6::components::navigation': ['Nav', 'NavList', 'NavItem'] },
+  })
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page: 'navigation' },
+    url: new URL('http://localhost/api/v6/components/navigation/props?component=Button'),
+  } as any)
+
+  expect(response.status).toBe(404)
+})
+
+it('returns deprecated props for a deprecated-only page', async () => {
+  mockFetchProps.mockResolvedValue({
+    ...mockData,
+    'Chip-deprecated': { name: 'Chip', description: '', props: [] },
+  })
+  mockFetchApiIndex.mockResolvedValue({
+    propComponents: { 'v6::components::chip': ['Chip', 'ChipGroup'] },
+    tabs: { 'v6::components::chip': ['react-deprecated'] },
+  })
+  const response = await GET({
+    params: { version: 'v6', section: 'components', page: 'chip' },
+    url: new URL('http://localhost/api/v6/components/chip/props'),
+  } as any)
+
+  expect(response.status).toBe(200)
+  expect((await response.json()).name).toBe('Chip')
 })
 
 it('returns props data for a valid page', async () => {
