@@ -83,8 +83,7 @@ export const GET: APIRoute = async () => {
         const primaryComponent = getPrimaryPropComponent(page, propComponents)
         const isDeprecatedOnly = !tabs.includes('react') && tabs.includes('react-deprecated')
         const hasPropsForComponent = (component: string) =>
-          componentNamesWithProps.has(component) ||
-          (isDeprecatedOnly && componentNamesWithProps.has(`${component}-deprecated`))
+          componentNamesWithProps.has(`${component}${isDeprecatedOnly ? '-deprecated' : ''}`)
         const hasProps = hasPropsForComponent(primaryComponent)
         const pageEntry = {
           section,

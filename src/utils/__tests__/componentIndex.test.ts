@@ -57,3 +57,17 @@ it('indexes current collections, preserving page keys and exposing documented me
   expect(readFile).toHaveBeenCalledTimes(1)
   expect(readFile).toHaveBeenCalledWith('/output/props.json', 'utf-8')
 })
+
+it('only advertises deprecated props when the suffixed record exists', async () => {
+  ;(readFile as jest.Mock).mockResolvedValue(JSON.stringify({
+    Chip: { name: 'Chip', props: [] },
+    'ChipGroup-deprecated': { name: 'ChipGroup', props: [] },
+  }))
+
+  const response = await GET({} as any)
+  const { components } = await response.json()
+
+  expect(response.status).toBe(200)
+  expect(components.Chip).toMatchObject({ page: 'chip', hasProps: false })
+  expect(components.ChipGroup).toMatchObject({ page: 'chip', hasProps: true })
+})
