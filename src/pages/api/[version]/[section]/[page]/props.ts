@@ -1,14 +1,14 @@
 import type { APIRoute } from 'astro'
-import { pascalCase } from 'change-case'
 
 import { createJsonResponse } from '../../../../../utils/apiHelpers'
 import { fetchProps } from '../../../../../utils/propsData/fetch'
-import { removeSubsection } from '../../../../../utils/case'
+import { fetchApiIndex } from '../../../../../utils/apiIndex/fetch'
+import { getPrimaryPropComponent } from '../../../../../utils/apiIndex/props'
 
 export const prerender = false
 
 export const GET: APIRoute = async ({ params, url }) => {
-  const { page } = params
+  const { version, section, page } = params
 
   if (!page) {
     return createJsonResponse(
@@ -19,11 +19,26 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   try {
     const props = await fetchProps(url)
-    const propsData = props[pascalCase(removeSubsection(page))]
+    const requestedComponent = url.searchParams.get('component')
+    const index = await fetchApiIndex(url)
+    const indexKey = `${version}::${section}::${page}`
+    const propComponents = index.propComponents?.[indexKey] || []
+    const component = requestedComponent ?? getPrimaryPropComponent(page, propComponents)
+    const tabs = index.tabs?.[indexKey] || []
+    const isDeprecatedOnly = !tabs.includes('react') && tabs.includes('react-deprecated')
+    let propsData = props[`${component}${isDeprecatedOnly ? '-deprecated' : ''}`]
+
+    // Page labels can differ from their primary React component name. A documented
+    // member can be selected without exposing props outside its parent page.
+    if (requestedComponent !== null) {
+      propsData = !propComponents.includes(component)
+        ? undefined
+        : props[`${component}${isDeprecatedOnly ? '-deprecated' : ''}`]
+    }
 
     if (propsData === undefined) {
       return createJsonResponse(
-        { error: `Props data for ${page} not found` },
+        { error: `Props data for ${requestedComponent ?? page} not found` },
         404,
       )
     }

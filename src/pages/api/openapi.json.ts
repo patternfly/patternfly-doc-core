@@ -471,7 +471,7 @@ export const GET: APIRoute = async ({ url }) => {
       '/{version}/{section}/{page}/props': {
         get: {
           summary: 'Get component props',
-          description: 'Returns the props for the specified component. Automatically handles subsection-prefixed page names by removing the subsection prefix before lookup.',
+          description: 'Returns props for a page component or a documented member selected by component.',
           operationId: 'getProps',
           parameters: [
             {
@@ -504,6 +504,14 @@ export const GET: APIRoute = async ({ url }) => {
                 type: 'string',
               },
               example: 'alert or forms_checkbox',
+            },
+            {
+              name: 'component',
+              in: 'query',
+              required: false,
+              description: 'Exact documented component name from component-index.',
+              schema: { type: 'string' },
+              example: 'NavItem',
             },
           ],
           responses: {

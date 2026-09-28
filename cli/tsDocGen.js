@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises'
-import { parse } from 'react-docgen'
+import { parse, builtinResolvers } from 'react-docgen'
 import ts from 'typescript'
 
 const annotations = [
@@ -44,7 +44,10 @@ function addAnnotations(prop) {
 function getComponentMetadata(filename, sourceText) {
   let parsedComponents = null
   try {
-    parsedComponents = parse(sourceText, { filename })
+    parsedComponents = parse(sourceText, {
+      filename,
+      resolver: new builtinResolvers.FindExportedDefinitionsResolver(),
+    })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err) {
     // console.warn(`No component found in ${filename}:`, err);

@@ -41,6 +41,78 @@ it('should convert a file with JS/TS examples', async () => {
   expect(writeFile).toHaveBeenCalledWith('test.mdx', expectedContent)
 })
 
+it.each([
+  ['ts isFullscreen file="./BackdropBasic.tsx"', 'BackdropBasic', './BackdropBasic.tsx'],
+  ['ts file="CardSubtitle.tsx" isBeta', 'CardSubtitle', './CardSubtitle.tsx'],
+  ['tsx file="../other-package/examples/DataListDraggable.tsx"', 'DataListDraggable', '../other-package/examples/DataListDraggable.tsx'],
+])('converts file fences with options and relative paths: %s', async (fence, name, file) => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(`\`\`\`${fence}\n\n\`\`\``)
+
+  await convertToMDX('test.md')
+
+  expect(writeFile).toHaveBeenCalledWith('test.mdx',
+    `\nimport ${name} from "${file}?raw"\n\n<LiveExample src={${name}} />`)
+})
+
+it('keeps inline code samples intact', async () => {
+  const content = '```ts file="Example.tsx"\nconst value = 1\n```'
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(content)
+
+  await convertToMDX('test.md')
+
+  expect(writeFile).toHaveBeenCalledWith('test.mdx', content)
+})
+
+it('converts indented file fences with matching backtick or tilde closers', async () => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(
+    '   ````tsx file="Indented.tsx"\n   `````\n~~~ts file="Tilde.ts"\n~~~~',
+  )
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).toContain('import Indented from "./Indented.tsx?raw"')
+  expect(converted).toContain('import Tilde from "./Tilde.ts?raw"')
+})
+
+it('does not convert a fence containing a four-space-indented marker', async () => {
+  const content = '```ts file="Example.ts"\n    ```\n```'
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(content)
+
+  await convertToMDX('test.md')
+
+  expect(writeFile).toHaveBeenCalledWith('test.mdx', content)
+})
+
+it('keeps file fences with invalid closing markers intact', async () => {
+  const content = '````ts file="Example.ts"\n```\n~~~ts file="Tilde.ts"\n~~~ text'
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(content)
+
+  await convertToMDX('test.md')
+
+  expect(writeFile).toHaveBeenCalledWith('test.mdx', content)
+})
+
+it('reuses repeated imports and disambiguates filenames in different directories', async () => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(
+    ['one/Example.tsx', 'one/Example.tsx', 'two/Example.tsx']
+      .map((file) => `\`\`\`ts file="${file}"\n\`\`\``).join('\n'),
+  )
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted.match(/import Example from/g)).toHaveLength(1)
+  expect(converted).toContain('import Example_2 from "./two/Example.tsx?raw"')
+  expect(converted).toContain('<LiveExample src={Example_2} />')
+})
+
 it('should convert a file with HTML examples', async () => {
   const mockContent = '# Test Content\n```html\n<div>Test HTML</div>\n```'
   const expectedContent =
@@ -160,4 +232,3 @@ it('should preserve HTML comments in HTML files', async () => {
     expectedHTMLContent,
   )
 })
-

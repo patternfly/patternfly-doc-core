@@ -84,7 +84,7 @@ async function generateProps(program: Command, forceProps: boolean = false) {
     console.log('Verbose mode enabled')
   }
 
-  buildPropsData(rootDir, `${currentDir}/pf-docs.config.mjs`, verbose)
+  await buildPropsData(rootDir, `${currentDir}/pf-docs.config.mjs`, verbose)
 }
 
 async function transformMDContentToMDX() {
