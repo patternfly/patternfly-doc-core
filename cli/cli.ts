@@ -3,7 +3,10 @@
 import { Command } from 'commander'
 import { build, dev, preview, sync } from 'astro'
 import { dirname, join, resolve } from 'path'
-import { createCollectionContent } from './createCollectionContent.js'
+import {
+  createCollectionContent,
+  resolveContentEntryGlob,
+} from './createCollectionContent.js'
 import { setFsRootDir } from './setFsRootDir.js'
 import { createConfigFile } from './createConfigFile.js'
 import { updatePackageFile } from './updatePackageFile.js'
@@ -87,12 +90,34 @@ async function generateProps(program: Command, forceProps: boolean = false) {
   await buildPropsData(rootDir, `${currentDir}/pf-docs.config.mjs`, verbose)
 }
 
-async function transformMDContentToMDX() {
-  if (config.content) {
-    await Promise.all(
-      config.content.map((contentObj) => convertToMDX(contentObj.pattern)),
-    )
+async function transformMDContentToMDX(verbose = false) {
+  if (!config.content) {
+    return
   }
+
+  const repoRootDir = config.repoRoot
+    ? resolve(currentDir, config.repoRoot)
+    : currentDir
+
+  await Promise.all(
+    config.content.map(async (contentObj) => {
+      const globPath = resolveContentEntryGlob(
+        contentObj,
+        currentDir,
+        repoRootDir,
+        verbose,
+      )
+
+      if (!globPath) {
+        throw new Error(
+          `Unable to resolve documentation content "${contentObj.name}". ` +
+            'Check its base or packageName configuration.',
+        )
+      }
+
+      await convertToMDX(globPath)
+    }),
+  )
 }
 
 async function initializeApiIndex(program: Command) {
@@ -140,9 +165,9 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
     return config
   }
   await updateContent(program)
+  await transformMDContentToMDX(verbose)
   await generateProps(program, true)
   await initializeApiIndex(program)
-  await transformMDContentToMDX()
 
   const docsOutputDir = join(absoluteOutputDir, 'docs')
 
@@ -150,20 +175,6 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
     root: astroRoot,
     outDir: docsOutputDir,
   })
-
-  // copy the apiIndex.json file to the docs directory so it can be served as a static asset
-  try {
-    const apiIndexPath = join(absoluteOutputDir, 'apiIndex.json')
-    const docsApiIndexPath = join(absoluteOutputDir, 'docs', 'apiIndex.json')
-    await copyFile(apiIndexPath, docsApiIndexPath)
-
-    if (verbose) {
-      console.log('Copied apiIndex.json to docs directory')
-    }
-  } catch (error) {
-    console.error('Failed to copy apiIndex.json to docs directory:', error)
-    throw error
-  }
 
   return config
 }
@@ -224,11 +235,12 @@ program.command('init').action(async () => {
 })
 
 program.command('start').action(async () => {
-  const { apiOnly } = program.opts()
+  const { apiOnly, verbose } = program.opts()
   if (apiOnly) {
     process.env.PF_API_ONLY = 'true'
   }
   await updateContent(program)
+  await transformMDContentToMDX(verbose)
   await initializeApiIndex(program)
 
   // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to

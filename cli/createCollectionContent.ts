@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { writeFile } from 'fs/promises'
 import { dirname, join, resolve } from 'path'
-import { getConfig } from './getConfig.js'
+import { getConfig, type CollectionDefinition } from './getConfig.js'
 import { existsSync } from 'fs'
 
 /**
@@ -9,12 +9,12 @@ import { existsSync } from 'fs'
  * looks for the package in the parent directories until it is found, stopping if it is not found
  * and the repoRootDir is reached.
  */
-const findPackage = (
+export const findPackage = (
   dir: string,
   packageName: string,
   repoRootDir: string,
   verbose?: boolean,
-) => {
+): string | null => {
   const nodeModulesPath = join(dir, 'node_modules')
 
   if (verbose) {
@@ -40,6 +40,33 @@ const findPackage = (
 
   const parentDir = dirname(dir)
   return findPackage(parentDir, packageName, repoRootDir, verbose)
+}
+
+export function resolveContentEntryGlob(
+  contentEntry: CollectionDefinition,
+  configDir: string,
+  repoRootDir: string,
+  verbose?: boolean,
+): string | null {
+  if (contentEntry.base) {
+    const basePath = resolve(configDir, contentEntry.base)
+    return existsSync(basePath)
+      ? join(basePath, contentEntry.pattern)
+      : null
+  }
+
+  if (!contentEntry.packageName) {
+    return null
+  }
+
+  const packagePath = findPackage(
+    configDir,
+    contentEntry.packageName,
+    repoRootDir,
+    verbose,
+  )
+
+  return packagePath ? join(packagePath, contentEntry.pattern) : null
 }
 
 export async function createCollectionContent(

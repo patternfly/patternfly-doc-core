@@ -1,12 +1,12 @@
 import type { APIRoute } from 'astro'
-import { getApiIndex } from '../utils/apiIndex/get'
+import { generateApiIndex } from '../utils/apiIndex/generate'
 
 // Prerender at build time so this doesn't run in the Cloudflare Worker
 export const prerender = true
 
 export const GET: APIRoute = async () => {
   try {
-    const index = await getApiIndex()
+    const index = await generateApiIndex()
     return new Response(JSON.stringify(index), {
       status: 200,
       headers: {

@@ -1,9 +1,16 @@
-import { readFile } from 'fs/promises'
+import { readFile, writeFile } from 'fs/promises'
 import { getCollection } from 'astro:content'
 import { GET } from '../../pages/api/component-index.json'
-import { generateApiIndex } from '../apiIndex/generate'
+import {
+  generateAndWriteApiIndex,
+  generateApiIndex,
+} from '../apiIndex/generate'
 
-jest.mock('fs/promises', () => ({ readFile: jest.fn() }))
+jest.mock('fs/promises', () => ({
+  readFile: jest.fn(),
+  writeFile: jest.fn(),
+  mkdir: jest.fn(),
+}))
 jest.mock('astro:content', () => ({ getCollection: jest.fn() }))
 jest.mock('../../content', () => ({ content: [{ name: 'react-component-docs', version: 'v6' }] }))
 jest.mock('../getOutputDir', () => ({ getOutputDir: jest.fn().mockResolvedValue('/output') }))
@@ -21,7 +28,7 @@ beforeEach(() => {
     { data: { section: 'components', id: 'Chip', tab: 'react-deprecated', propComponents: ['Chip', 'ChipGroup'] }, body: '', filePath: '/deprecated/components/Chip.md' },
     { data: { section: 'components', id: 'Table', tab: 'react', propComponents: ['Table'] }, body: '', filePath: '/components/Table.md' },
     { data: { section: 'extensions', subsection: 'data-view', id: 'Table', tab: 'react', propComponents: ['DataViewTable'] }, body: '', filePath: '/extensions/DataViewTable.md' },
-    { data: { section: 'foundations-and-styles', subsection: 'layouts', id: 'Flex', tab: 'react', propComponents: ['Flex', 'FlexItem'] }, body: '<LiveExample src={FlexBasic} />', filePath: '/layouts/Flex.md' },
+    { data: { section: 'foundations-and-styles', subsection: 'layouts', id: 'Flex', tab: 'react', propComponents: ['Flex', 'FlexItem'] }, body: '### Basic flex\n<LiveExample src={FlexBasic} />', filePath: '/layouts/Flex.md' },
   ])
   ;(readFile as jest.Mock).mockResolvedValue(JSON.stringify(Object.fromEntries(
     ['Nav', 'NavItem', 'FileUpload', 'FileUploadField', 'ActionGroup', 'Form', 'Flex', 'FlexItem', 'Chip-deprecated', 'ChipGroup-deprecated', 'Table', 'DataViewTable'].map((name) => [name, { name, props: [] }]),
@@ -35,7 +42,9 @@ it('retains active frontmatter mappings without HTML or deprecated entries overw
   expect(index.propComponents?.['v6::components::navigation']).toEqual(['Nav', 'NavItem', 'NavMissingProps'])
   expect(index.propComponents?.['v6::components::chip']).toEqual(['Chip', 'ChipGroup'])
   expect(index.propComponents?.['v6::foundations-and-styles::layouts_flex']).toEqual(['Flex', 'FlexItem'])
-  expect(index.examples['v6::foundations-and-styles::layouts_flex::react']).toEqual([{ exampleName: 'FlexBasic', title: null }])
+  expect(index.examples['v6::foundations-and-styles::layouts_flex::react']).toEqual([
+    { exampleName: 'FlexBasic', title: 'Basic flex' },
+  ])
 })
 
 it('indexes current collections, preserving page keys and exposing documented members', async () => {
@@ -56,6 +65,16 @@ it('indexes current collections, preserving page keys and exposing documented me
   // Only props are read from disk: an old apiIndex.json cannot seed the new index.
   expect(readFile).toHaveBeenCalledTimes(1)
   expect(readFile).toHaveBeenCalledWith('/output/props.json', 'utf-8')
+})
+
+it('coalesces concurrent API index writes', async () => {
+  const [firstIndex, secondIndex] = await Promise.all([
+    generateAndWriteApiIndex(),
+    generateAndWriteApiIndex(),
+  ])
+
+  expect(firstIndex).toEqual(secondIndex)
+  expect(writeFile).toHaveBeenCalledTimes(1)
 })
 
 it('only advertises deprecated props when the suffixed record exists', async () => {

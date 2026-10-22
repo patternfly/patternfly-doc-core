@@ -3,7 +3,6 @@ import { glob } from 'astro/loaders'
 
 import { content } from './content'
 import type { CollectionDefinition } from '../cli/getConfig'
-import { convertToMDX } from '../cli/convertToMDX'
 
 function defineContent(contentObj: CollectionDefinition) {
   const { base, packageName, pattern, name, frontmatterDefaults, frontmatterMapping } = contentObj
@@ -20,7 +19,7 @@ function defineContent(contentObj: CollectionDefinition) {
     'core-component-docs': 'html',
   }
 
-  convertToMDX(`${base}/${pattern}`)
+  // Conversion is completed by the CLI before Astro loads collections.
   const mdxPattern = pattern.replace(/\.md$/, '.mdx')
 
   const hasExternalFrontmatter = !!(frontmatterDefaults || frontmatterMapping)
