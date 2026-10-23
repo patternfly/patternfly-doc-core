@@ -270,7 +270,8 @@ export async function writeApiIndex(index: ApiIndex): Promise<void> {
     await writeFile(indexPath, JSON.stringify(index, null, 2))
     console.log(`✓ Generated API index with ${index.versions.length} versions`)
   } catch (error) {
-    console.warn('Warning: Could not write API index file:', error)
+    console.error('Could not write API index file:', error)
+    throw error
   }
 }
 
@@ -280,8 +281,21 @@ export async function writeApiIndex(index: ApiIndex): Promise<void> {
  *
  * @returns Promise resolving to the generated API index
  */
+let indexWriteInFlight: Promise<ApiIndex> | null = null
+
 export async function generateAndWriteApiIndex(): Promise<ApiIndex> {
-  const index = await generateApiIndex()
-  await writeApiIndex(index)
-  return index
+  if (indexWriteInFlight) {
+    return indexWriteInFlight
+  }
+
+  indexWriteInFlight = generateApiIndex()
+    .then(async (index) => {
+      await writeApiIndex(index)
+      return index
+    })
+    .finally(() => {
+      indexWriteInFlight = null
+    })
+
+  return indexWriteInFlight
 }
