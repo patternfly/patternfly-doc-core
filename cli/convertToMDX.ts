@@ -76,10 +76,28 @@ function removeNoLiveTags(content: string): string {
   return content.replace(/```no[lL]ive/g, '```')
 }
 
+// Binding shapes between `import` and `from` that should be removed.
+// Ordered longest-first so the compound form wins before its default-only prefix.
+const removableBindingForms = [
+  String.raw`[\w$]+\s*,\s*\{[\w$\s,]*\}`, // import Chatbot, { ChatbotDisplayMode }
+  String.raw`[\w$]+`, // import Chatbot
+  String.raw`\{[\w$\s,]*\}`, // import { Foo, Bar as Baz }
+]
+
+// Module path that is absolute (not ./ or ../) and not a CSS file
+const absoluteNonCssModule = String.raw`['"](?!\.\.?\/)(?!.*\.css['"])[^'"]*['"]`
+
+// Optional TypeScript-only `type` keyword (e.g. import type Foo from 'pkg')
+const optionalTypeKeyword = String.raw`(?:type\s+)?`
+
+const removableImportRegex = new RegExp(
+  String.raw`^import ${optionalTypeKeyword}(?:${removableBindingForms.join('|')}) from ${absoluteNonCssModule};?\n`,
+  'gm',
+)
+
 function removeExistingImports(content: string): string {
   // Remove imports that are absolute and not CSS
-  const importRegex = /^import (?:type\s+)?(?:[\w$]+(?:\s*,\s*\{[\w$\s,]*\})?|\{[\w$\s,]*\}) from ['"](?!\.\.?\/)(?!.*\.css['"])[^'"]*['"];?\n/gm
-  return content.replace(importRegex, '')
+  return content.replace(removableImportRegex, '')
 }
 
 function convertCommentsToMDX(content: string): string {
