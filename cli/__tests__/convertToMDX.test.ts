@@ -113,6 +113,52 @@ it('reuses repeated imports and disambiguates filenames in different directories
   expect(converted).toContain('<LiveExample src={Example_2} />')
 })
 
+it.each([
+  // [description, importLine, shouldBeRemoved]
+  ['default absolute import', "import Chatbot from '@patternfly/chatbot/dist/dynamic/Chatbot'", true],
+  ['named absolute import', "import { Foo } from '@patternfly/react-core'", true],
+  ['aliased named absolute import', "import { Foo as Bar } from '@patternfly/react-core'", true],
+  ['multiple named absolute imports', "import { Foo, Bar } from '@patternfly/react-core'", true],
+  ['compound default and named absolute import', "import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'", true],
+  ['semicolon-terminated absolute import', "import Chatbot from '@patternfly/chatbot/dist/dynamic/Chatbot';", true],
+  ['default type-only absolute import', "import type Foo from '@patternfly/some-package'", true],
+  ['named type-only absolute import', "import type { Bar } from '@patternfly/some-package'", true],
+  ['relative import', "import Kept from './Kept'", false],
+  ['parent-relative import', "import Kept from '../Kept'", false],
+  ['relative named import', "import { Kept } from './Kept'", false],
+  ['absolute CSS import', "import '@patternfly/react-core/dist/styles/base.css'", false],
+  // Known gap: namespace imports are not matched; this row documents current behavior
+  ['namespace import (known gap)', "import * as React from 'react'", false],
+])('import removal: %s', async (_desc, importLine, shouldBeRemoved) => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(`${importLine}\n# Heading`)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  if (shouldBeRemoved) {
+    expect(converted).not.toContain(importLine)
+  } else {
+    expect(converted).toContain(importLine)
+  }
+})
+
+it('removes multi-line compound absolute imports', async () => {
+  const importBlock = `import ChatbotHeader, {
+  ChatbotHeaderMain,
+  ChatbotHeaderActions,
+} from '@patternfly/chatbot/dist/dynamic/ChatbotHeader'`
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(`${importBlock}\n# Heading`)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).not.toContain('import ChatbotHeader')
+  expect(converted).not.toContain('ChatbotHeaderMain')
+  expect(converted).toContain('# Heading')
+})
+
 it('removes combined imports before generating colliding example imports', async () => {
   const mockContent = `import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'
 \`\`\`tsx file="./Chatbot.tsx" isFullscreen
