@@ -127,8 +127,6 @@ it.each([
   ['parent-relative import', "import Kept from '../Kept'", false],
   ['relative named import', "import { Kept } from './Kept'", false],
   ['absolute CSS import', "import '@patternfly/react-core/dist/styles/base.css'", false],
-  // Known gap: namespace imports are not matched; this row documents current behavior
-  ['namespace import (known gap)', "import * as React from 'react'", false],
 ])('import removal: %s', async (_desc, importLine, shouldBeRemoved) => {
   ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
   ;(readFile as jest.Mock).mockResolvedValue(`${importLine}\n# Heading`)
@@ -141,6 +139,47 @@ it.each([
   } else {
     expect(converted).toContain(importLine)
   }
+})
+
+it.each<[string, string, (converted: string) => void]>([
+  // [limitation, input, assertion of CURRENT (imperfect) behavior]
+  // These rows document accepted gaps, not desired behavior. None are reachable in the
+  // currently audited docs. Fixing most of them requires fence-masking (running the
+  // transforms only on unfenced segments); flipping a row is a deliberate contract change.
+  [
+    'absolute imports inside code fences are stripped, corrupting the sample',
+    "```js\nimport { Button } from '@patternfly/react-core';\nconst x = 1;\n```",
+    (converted) => {
+      expect(converted).not.toContain("import { Button } from '@patternfly/react-core';")
+      expect(converted).toContain('const x = 1;')
+    },
+  ],
+  [
+    'empty file= fences nested inside outer demo fences are still converted',
+    '````md\n```ts file="./Example.tsx"\n```\n````',
+    (converted) => {
+      expect(converted).toContain('import Example from "./Example.tsx?raw"')
+      expect(converted).toContain('<LiveExample src={Example} />')
+    },
+  ],
+  [
+    'HTML comments inside code fences are rewritten to MDX comments',
+    '```\n<!-- note -->\n```',
+    (converted) => expect(converted).toContain('{/* note */}'),
+  ],
+  [
+    'namespace absolute imports are preserved',
+    "import * as React from 'react'\n# Heading",
+    (converted) => expect(converted).toContain("import * as React from 'react'"),
+  ],
+])('known limitation (documents current behavior; changing it is a deliberate decision): %s', async (_desc, input, assertCurrentBehavior) => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(input)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  assertCurrentBehavior(converted)
 })
 
 it('removes multi-line compound absolute imports', async () => {
