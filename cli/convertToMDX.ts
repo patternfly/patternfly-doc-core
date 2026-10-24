@@ -78,7 +78,7 @@ function removeNoLiveTags(content: string): string {
 
 function removeExistingImports(content: string): string {
   // Remove imports that are absolute and not CSS
-  const importRegex = /^import {?[\w\s,\n]*}? from ['"](?!\.\.?\/)(?!.*\.css['"])[^'"]*['"];?\n/gm
+  const importRegex = /^import (?:type\s+)?(?:[\w$]+(?:\s*,\s*\{[\w$\s,]*\})?|\{[\w$\s,]*\}) from ['"](?!\.\.?\/)(?!.*\.css['"])[^'"]*['"];?\n/gm
   return content.replace(importRegex, '')
 }
 

@@ -113,6 +113,44 @@ it('reuses repeated imports and disambiguates filenames in different directories
   expect(converted).toContain('<LiveExample src={Example_2} />')
 })
 
+it('removes combined imports before generating colliding example imports', async () => {
+  const mockContent = `import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'
+\`\`\`tsx file="./Chatbot.tsx" isFullscreen
+\`\`\`
+\`\`\`tsx file="./ChatbotDisplayMode.tsx"
+\`\`\``
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(mockContent)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).not.toContain("import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'")
+  expect(converted).toContain('import Chatbot from "./Chatbot.tsx?raw"')
+  expect(converted).toContain('<LiveExample src={Chatbot} />')
+  expect(converted).toContain('import ChatbotDisplayMode from "./ChatbotDisplayMode.tsx?raw"')
+  expect(converted).toContain('<LiveExample src={ChatbotDisplayMode} />')
+})
+
+it('removes type-only absolute imports so MDX never sees TypeScript-only syntax', async () => {
+  const mockContent = `import type Foo from '@patternfly/some-package'
+import type { Bar } from '@patternfly/some-package'
+import Kept from './Kept'
+\`\`\`tsx file="./Foo.tsx"
+\`\`\``
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(mockContent)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).not.toContain("import type Foo from '@patternfly/some-package'")
+  expect(converted).not.toContain("import type { Bar } from '@patternfly/some-package'")
+  expect(converted).toContain("import Kept from './Kept'")
+  expect(converted).toContain('import Foo from "./Foo.tsx?raw"')
+  expect(converted).toContain('<LiveExample src={Foo} />')
+})
+
 it('should convert a file with HTML examples', async () => {
   const mockContent = '# Test Content\n```html\n<div>Test HTML</div>\n```'
   const expectedContent =
