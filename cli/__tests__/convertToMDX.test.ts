@@ -172,6 +172,22 @@ it.each<[string, string, (converted: string) => void]>([
     "import * as React from 'react'\n# Heading",
     (converted) => expect(converted).toContain("import * as React from 'react'"),
   ],
+  [
+    'bound absolute CSS imports with a ?url suffix are stripped',
+    "import styles from '@patternfly/react-core/dist/styles/base.css?url'\n<div className={styles} />",
+    (converted) => {
+      expect(converted).not.toContain("import styles from '@patternfly/react-core/dist/styles/base.css?url'")
+      expect(converted).toContain('<div className={styles} />')
+    },
+  ],
+  [
+    'bound absolute CSS imports with a ?inline suffix are stripped',
+    "import styles from '@patternfly/react-core/dist/styles/base.css?inline'\n<div className={styles} />",
+    (converted) => {
+      expect(converted).not.toContain("import styles from '@patternfly/react-core/dist/styles/base.css?inline'")
+      expect(converted).toContain('<div className={styles} />')
+    },
+  ],
 ])('known limitation (documents current behavior; changing it is a deliberate decision): %s', async (_desc, input, assertCurrentBehavior) => {
   ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
   ;(readFile as jest.Mock).mockResolvedValue(input)
@@ -198,12 +214,17 @@ it('removes multi-line compound absolute imports', async () => {
   expect(converted).toContain('# Heading')
 })
 
-it('removes combined imports before generating colliding example imports', async () => {
-  const mockContent = `import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'
-\`\`\`tsx file="./Chatbot.tsx" isFullscreen
-\`\`\`
-\`\`\`tsx file="./ChatbotDisplayMode.tsx"
-\`\`\``
+it.each([
+  ['LF', '\n'],
+  ['CRLF', '\r\n'],
+])('removes combined imports before generating colliding example imports with %s line endings', async (_lineEndingName, lineEnding) => {
+  const mockContent = [
+    "import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'",
+    '\`\`\`tsx file="./Chatbot.tsx" isFullscreen',
+    '\`\`\`',
+    '\`\`\`tsx file="./ChatbotDisplayMode.tsx"',
+    '\`\`\`',
+  ].join(lineEnding)
   ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
   ;(readFile as jest.Mock).mockResolvedValue(mockContent)
 

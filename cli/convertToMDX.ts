@@ -91,7 +91,7 @@ const absoluteNonCssModule = String.raw`['"](?!\.\.?\/)(?!.*\.css['"])[^'"]*['"]
 const optionalTypeKeyword = String.raw`(?:type\s+)?`
 
 const removableImportRegex = new RegExp(
-  String.raw`^import ${optionalTypeKeyword}(?:${removableBindingForms.join('|')}) from ${absoluteNonCssModule};?\n`,
+  String.raw`^import ${optionalTypeKeyword}(?:${removableBindingForms.join('|')}) from ${absoluteNonCssModule};?\r?\n`,
   'gm',
 )
 
