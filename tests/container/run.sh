@@ -9,6 +9,10 @@ ORG_REPO="${ORG_REPO:-https://github.com/patternfly/patternfly-org.git}"
 
 if [[ "${ORG_REF}" == "latest" ]]; then
   ORG_REF="$(git ls-remote "${ORG_REPO}" HEAD | awk 'NR == 1 { print $1 }')"
+  if [[ -z "${ORG_REF}" ]]; then
+    echo "Error: Could not resolve PF-Org HEAD for ${ORG_REPO}." >&2
+    exit 1
+  fi
 fi
 
 if command -v podman >/dev/null 2>&1; then
