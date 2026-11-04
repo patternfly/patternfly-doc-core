@@ -1,0 +1,16 @@
+# Exclude entire build context, then add back only doc-core pack inputs (see Containerfile COPY . .)
+**
+
+!package.json
+!package-lock.json
+!astro.config.mjs
+!tsconfig.json
+!wrangler.jsonc
+!cli
+!cli/**
+!src
+!src/**
+!public
+!public/**
+!textContent
+!textContent/**

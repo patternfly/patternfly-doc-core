@@ -2,7 +2,7 @@
  * Tests for API Index utilities
  *
  * Architecture:
- * - Build-time: getApiIndex() imports static data from data.ts
+ * - Build-time: getApiIndex() reads the emitted index file
  * - Runtime: fetchApiIndex() fetches /apiIndex.json via HTTP
  */
 import { getApiIndex, getVersions, getSections, getPages, getTabs, getExamples } from '../apiIndex/get'

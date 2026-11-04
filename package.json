@@ -24,6 +24,9 @@
     "lint": "eslint . --cache --cache-strategy content",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:api:integration-dev": "ORG_REF=${ORG_REF:-latest} tests/container/run.sh && npm run test:api:integration-jest -- --testPathPattern=apiIntegration -u",
+    "test:api:integration": "ORG_REF=${ORG_REF:-latest} tests/container/run.sh && npm run test:api:integration-jest -- --testPathPattern=apiIntegration",
+    "test:api:integration-jest": "jest -c jest.org-audit.config.ts",
     "semantic-release": "semantic-release",
     "cf-typegen": "wrangler types",
     "clean": "rm -rf dist .astro .wrangler"

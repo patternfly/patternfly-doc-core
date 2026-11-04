@@ -3,7 +3,7 @@ import type { APIRoute, GetStaticPaths } from 'astro'
 import { access, readFile } from 'fs/promises'
 import { isAbsolute, resolve } from 'path'
 import { createJsonResponse, createTextResponse } from '../../../../../../../utils/apiHelpers'
-import { generateAndWriteApiIndex } from '../../../../../../../utils/apiIndex/generate'
+import { generateApiIndex } from '../../../../../../../utils/apiIndex/generate'
 import { getEnrichedCollections } from '../../../../../../../utils/apiRoutes/collections'
 import { findContentEntryFilePath } from '../../../../../../../utils/apiRoutes/contentMatching'
 import { extractImports, extractExampleFilePath } from '../../../../../../../utils/apiRoutes/exampleParsing'
@@ -11,8 +11,8 @@ import { extractImports, extractExampleFilePath } from '../../../../../../../uti
 export const prerender = true
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // Generate index file (will be cached if already generated)
-  const index = await generateAndWriteApiIndex()
+  // Generate the build-time index.
+  const index = await generateApiIndex()
 
   const paths: {
     params: {

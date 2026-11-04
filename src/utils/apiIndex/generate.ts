@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { join } from 'path'
-import { writeFile, mkdir } from 'fs/promises'
+import { readFile } from 'fs/promises'
 import { getCollection } from 'astro:content'
 import type { CollectionKey } from 'astro:content'
 import { content } from '../../content'
@@ -106,15 +106,28 @@ function extractExamplesWithTitles(
   return examples
 }
 
+type PrecomputedExamplesByPath = Record<
+  string,
+  { exampleName: string; title: string | null }[]
+>
+
+async function readPrecomputedExamplesByPath(
+  outputDir: string,
+): Promise<PrecomputedExamplesByPath> {
+  const cachePath = join(outputDir, '.precomputed-examples.json')
+  return JSON.parse(await readFile(cachePath, 'utf8')) as PrecomputedExamplesByPath
+}
+
 /**
- * Generates API index by analyzing all content collections
- * Extracts versions, sections, pages, and tabs into a hierarchical structure
- * This runs during build time when getCollection() is available
- *
- * @returns Promise resolving to complete API index structure
+ * Builds API index by analyzing all content collections.
  */
 export async function generateApiIndex(): Promise<ApiIndex> {
   console.log('Generating API index from content collections...')
+
+  const precomputedExamplesByPath =
+    process.env.PF_DOCS_REQUIRE_PRECOMPUTED_EXAMPLES === 'true'
+      ? await readPrecomputedExamplesByPath(await getOutputDir())
+      : null
 
   const index: ApiIndex = {
     versions: [],
@@ -141,11 +154,9 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       .filter((entry: any) => entry.version === version)
       .map((entry: any) => entry.name as CollectionKey)
 
-    const collections = await Promise.all(
-      collectionsToFetch.map((name) => getCollection(name)),
-    )
-
+    const collections = await Promise.all(collectionsToFetch.map((name) => getCollection(name)))
     const flatEntries = collections.flat()
+    flatEntries.sort((a, b) => String(a.filePath).localeCompare(String(b.filePath)))
 
     // Collect sections, pages, and tabs in a single pass
     const sections = new Set<string>()
@@ -181,8 +192,7 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       sectionPages[pageKey].add(page)
 
       // Collect tab
-      const entryTab =
-        entry.data.tab || entry.data.source || getDefaultTabForApi(entry.filePath)
+      const entryTab = entry.data.tab || entry.data.source || getDefaultTabForApi(entry.filePath)
       const tab = addDemosOrDeprecated(entryTab, entry.filePath)
       if (!pageTabs[tabKey]) {
         pageTabs[tabKey] = new Set()
@@ -196,9 +206,10 @@ export async function generateApiIndex(): Promise<ApiIndex> {
         deprecatedPropComponents[tabKey] = [...new Set<string>(entry.data.propComponents)]
       }
 
-      // Collect examples for this tab
       const exampleKey = `${tabKey}::${tab}`
-      const examplesWithTitles = extractExamplesWithTitles(entry.body || '')
+      const examplesWithTitles = precomputedExamplesByPath
+        ? precomputedExamplesByPath[entry.filePath || ''] || []
+        : extractExamplesWithTitles(entry.body || '')
       if (examplesWithTitles.length > 0) {
         tabExamples[exampleKey] = examplesWithTitles
       }
@@ -242,9 +253,11 @@ export async function generateApiIndex(): Promise<ApiIndex> {
       index.tabs[key] = Array.from(tabs).sort(sortSources)
     })
 
-    Object.entries(tabExamples).forEach(([key, examples]) => {
-      index.examples[key] = examples
-    })
+    Object.entries(tabExamples)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([key, examples]) => {
+        index.examples[key] = examples
+      })
 
     // Add CSS token objects to index
     Object.entries(pageCss).forEach(([key, tokens]) => {
@@ -253,49 +266,4 @@ export async function generateApiIndex(): Promise<ApiIndex> {
   }
 
   return index
-}
-
-/**
- * Writes API index to a apiIndex.json file in the user defined output directory
- * This file is used by server-side API routes to avoid runtime getCollection() calls
- *
- * @param index - The API index structure to write
- */
-export async function writeApiIndex(index: ApiIndex): Promise<void> {
-  const outputDir = await getOutputDir()
-  const indexPath = join(outputDir, 'apiIndex.json')
-
-  try {
-    await mkdir(outputDir, { recursive: true })
-    await writeFile(indexPath, JSON.stringify(index, null, 2))
-    console.log(`✓ Generated API index with ${index.versions.length} versions`)
-  } catch (error) {
-    console.error('Could not write API index file:', error)
-    throw error
-  }
-}
-
-/**
- * Generates and writes API index in a single operation
- * Called during build in getStaticPaths to ensure index exists for server routes
- *
- * @returns Promise resolving to the generated API index
- */
-let indexWriteInFlight: Promise<ApiIndex> | null = null
-
-export async function generateAndWriteApiIndex(): Promise<ApiIndex> {
-  if (indexWriteInFlight) {
-    return indexWriteInFlight
-  }
-
-  indexWriteInFlight = generateApiIndex()
-    .then(async (index) => {
-      await writeApiIndex(index)
-      return index
-    })
-    .finally(() => {
-      indexWriteInFlight = null
-    })
-
-  return indexWriteInFlight
 }
