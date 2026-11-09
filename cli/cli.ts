@@ -195,7 +195,7 @@ async function deploy(program: Command) {
     // Deploy using Wrangler
     const { execSync } = await import('child_process')
 
-    execSync(`wrangler pages deploy`, {
+    execSync(`wrangler deploy`, {
       stdio: 'inherit',
       cwd: currentDir,
     })

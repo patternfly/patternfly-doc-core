@@ -1,10 +1,14 @@
 {
     "$schema": "node_modules/wrangler/config-schema.json",
     "name": "patternfly-docs-core",
+    "main": "@astrojs/cloudflare/entrypoints/server",
     "compatibility_date": "2026-02-18",
     "compatibility_flags": ["nodejs_compat"],
+    "assets": {
+      "directory": "dist/docs/client",
+      "binding": "ASSETS"
+    },
     "observability": {
       "enabled": true
-    },
-    "pages_build_output_dir": "dist/docs"
+    }
   }
