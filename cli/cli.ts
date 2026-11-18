@@ -161,7 +161,7 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
     outDir: docsOutputDir,
   })
   await copyFile(
-    join(docsOutputDir, 'apiIndex.json'),
+    join(docsOutputDir, 'client', 'apiIndex.json'),
     join(absoluteOutputDir, 'apiIndex.json'),
   )
 
@@ -184,7 +184,7 @@ async function deploy(program: Command) {
     // Deploy using Wrangler
     const { execSync } = await import('child_process')
 
-    execSync(`wrangler pages deploy`, {
+    execSync(`wrangler deploy`, {
       stdio: 'inherit',
       cwd: currentDir,
     })

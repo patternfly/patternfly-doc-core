@@ -13,6 +13,18 @@ export default defineConfig({
       noExternal: ["@patternfly/*", "react-dropzone"],
       external: ["fs", "node:fs", "node:path", "path", "fs/promises"]
     },
+    environments: {
+      ssr: {
+        resolve: {
+          noExternal: ["@patternfly/*", "react-dropzone"],
+        },
+      },
+      prerender: {
+        resolve: {
+          noExternal: ["@patternfly/*", "react-dropzone"],
+        },
+      },
+    },
     server: {
       fs: {
         allow: ['./']
@@ -20,6 +32,7 @@ export default defineConfig({
     },
   },
   adapter: cloudflare({
-    imageService: 'compile'
+    imageService: 'compile',
+    prerenderEnvironment: 'node',
   })
 });
