@@ -2,15 +2,15 @@
  * PatternFly Documentation API
  *
  * Architecture:
- * - Build-time: Static API index generated from content collections (data.ts)
+ * - Build-time: Astro emits the static API index from content collections
  * - Runtime: Routes fetch /apiIndex.json (prerendered static file) via HTTP
  * - Workers-compatible: No Node.js filesystem APIs in SSR handlers
  * - Optimized bundle: Runtime handlers don't bundle the 500KB+ index data
  * - Flattened structure: Subsections are kebab-cased and encoded into page names with underscores (e.g., "forms_checkbox")
  *
  * Data Flow:
- * 1. Build: generateApiIndex() → data.ts + apiIndex.json
- * 2. Static paths: getStaticPaths() uses getApiIndex() (build-time import)
+ * 1. Build: prepare examples, then Astro emits /apiIndex.json
+ * 2. Static paths: generateApiIndex() reads the prepared snapshot
  * 3. SSR handlers: GET handlers use fetchApiIndex(url) (runtime fetch)
  */
 import type { APIRoute } from 'astro'
@@ -510,7 +510,7 @@ export const GET: APIRoute = async () =>
           'GET /api/v6/components/forms_checkbox/react/examples/CheckboxBasic → (example code)',
         ],
         architecture: {
-          buildTime: 'Static index generated to data.ts and apiIndex.json',
+          buildTime: 'Astro emits the static apiIndex.json from prepared content',
           runtime: 'SSR routes fetch /apiIndex.json to avoid bundling data into Workers',
           optimization: 'Workers bundle is ~110K instead of 500KB+ with embedded data',
           flattenedStructure: 'Subsections are kebab-cased and encoded into page names with underscores (e.g., "forms_checkbox")',

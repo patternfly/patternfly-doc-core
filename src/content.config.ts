@@ -19,8 +19,8 @@ function defineContent(contentObj: CollectionDefinition) {
     'core-component-docs': 'html',
   }
 
-  // Conversion is completed by the CLI before Astro loads collections.
-  const mdxPattern = pattern.replace(/\.md$/, '.mdx')
+  // Load only the generated form: source Markdown and generated MDX have the same IDs.
+  const mdxPattern = pattern.replace(/\.(?:md|\{md,mdx\})$/, '.mdx')
 
   const hasExternalFrontmatter = !!(frontmatterDefaults || frontmatterMapping)
 

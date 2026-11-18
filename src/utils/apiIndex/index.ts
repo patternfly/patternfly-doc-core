@@ -3,10 +3,8 @@
  *
  * This module provides two different ways to access the API index:
  *
- * 1. Build-time (getApiIndex): Imports static data from data.ts
- *    - Used in getStaticPaths() and other build-time code
- *    - Has access to Node.js filesystem APIs
- *    - Bundles data into the module
+ * 1. Prerender (generateApiIndex): Builds from content collections and the
+ *    precomputed examples snapshot. Astro emits /apiIndex.json from this result.
  *
  * 2. Runtime (fetchApiIndex): Fetches /apiIndex.json via HTTP
  *    - Used in SSR route handlers (Cloudflare Workers)
@@ -17,8 +15,6 @@
 
 export {
   generateApiIndex,
-  writeApiIndex,
-  generateAndWriteApiIndex,
   type ApiIndex,
 } from './generate'
 

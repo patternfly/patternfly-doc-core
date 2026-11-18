@@ -63,7 +63,7 @@ jest.mock('../../../../../../../../../utils', () => ({
 }))
 
 jest.mock('../../../../../../../../../utils/apiIndex/generate', () => ({
-  generateAndWriteApiIndex: jest.fn().mockResolvedValue({
+  generateApiIndex: jest.fn().mockResolvedValue({
     versions: ['v6'],
     sections: { v6: ['components'] },
     pages: { 'v6::components': ['alert'] },

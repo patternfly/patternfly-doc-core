@@ -113,6 +113,150 @@ it('reuses repeated imports and disambiguates filenames in different directories
   expect(converted).toContain('<LiveExample src={Example_2} />')
 })
 
+it.each([
+  // [description, importLine, shouldBeRemoved]
+  ['default absolute import', "import Chatbot from '@patternfly/chatbot/dist/dynamic/Chatbot'", true],
+  ['named absolute import', "import { Foo } from '@patternfly/react-core'", true],
+  ['aliased named absolute import', "import { Foo as Bar } from '@patternfly/react-core'", true],
+  ['multiple named absolute imports', "import { Foo, Bar } from '@patternfly/react-core'", true],
+  ['compound default and named absolute import', "import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'", true],
+  ['semicolon-terminated absolute import', "import Chatbot from '@patternfly/chatbot/dist/dynamic/Chatbot';", true],
+  ['default type-only absolute import', "import type Foo from '@patternfly/some-package'", true],
+  ['named type-only absolute import', "import type { Bar } from '@patternfly/some-package'", true],
+  ['relative import', "import Kept from './Kept'", false],
+  ['parent-relative import', "import Kept from '../Kept'", false],
+  ['relative named import', "import { Kept } from './Kept'", false],
+  ['absolute CSS import', "import '@patternfly/react-core/dist/styles/base.css'", false],
+])('import removal: %s', async (_desc, importLine, shouldBeRemoved) => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(`${importLine}\n# Heading`)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  if (shouldBeRemoved) {
+    expect(converted).not.toContain(importLine)
+  } else {
+    expect(converted).toContain(importLine)
+  }
+})
+
+it.each<[string, string, (converted: string) => void]>([
+  // [limitation, input, assertion of CURRENT (imperfect) behavior]
+  // These rows document accepted gaps, not desired behavior. None are reachable in the
+  // currently audited docs. Fixing most of them requires fence-masking (running the
+  // transforms only on unfenced segments); flipping a row is a deliberate contract change.
+  [
+    'absolute imports inside code fences are stripped, corrupting the sample',
+    "```js\nimport { Button } from '@patternfly/react-core';\nconst x = 1;\n```",
+    (converted) => {
+      expect(converted).not.toContain("import { Button } from '@patternfly/react-core';")
+      expect(converted).toContain('const x = 1;')
+    },
+  ],
+  [
+    'empty file= fences nested inside outer demo fences are still converted',
+    '````md\n```ts file="./Example.tsx"\n```\n````',
+    (converted) => {
+      expect(converted).toContain('import Example from "./Example.tsx?raw"')
+      expect(converted).toContain('<LiveExample src={Example} />')
+    },
+  ],
+  [
+    'HTML comments inside code fences are rewritten to MDX comments',
+    '```\n<!-- note -->\n```',
+    (converted) => expect(converted).toContain('{/* note */}'),
+  ],
+  [
+    'namespace absolute imports are preserved',
+    "import * as React from 'react'\n# Heading",
+    (converted) => expect(converted).toContain("import * as React from 'react'"),
+  ],
+  [
+    'bound absolute CSS imports with a ?url suffix are stripped',
+    "import styles from '@patternfly/react-core/dist/styles/base.css?url'\n<div className={styles} />",
+    (converted) => {
+      expect(converted).not.toContain("import styles from '@patternfly/react-core/dist/styles/base.css?url'")
+      expect(converted).toContain('<div className={styles} />')
+    },
+  ],
+  [
+    'bound absolute CSS imports with a ?inline suffix are stripped',
+    "import styles from '@patternfly/react-core/dist/styles/base.css?inline'\n<div className={styles} />",
+    (converted) => {
+      expect(converted).not.toContain("import styles from '@patternfly/react-core/dist/styles/base.css?inline'")
+      expect(converted).toContain('<div className={styles} />')
+    },
+  ],
+])('known limitation (documents current behavior; changing it is a deliberate decision): %s', async (_desc, input, assertCurrentBehavior) => {
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(input)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  assertCurrentBehavior(converted)
+})
+
+it('removes multi-line compound absolute imports', async () => {
+  const importBlock = `import ChatbotHeader, {
+  ChatbotHeaderMain,
+  ChatbotHeaderActions,
+} from '@patternfly/chatbot/dist/dynamic/ChatbotHeader'`
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(`${importBlock}\n# Heading`)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).not.toContain('import ChatbotHeader')
+  expect(converted).not.toContain('ChatbotHeaderMain')
+  expect(converted).toContain('# Heading')
+})
+
+it.each([
+  ['LF', '\n'],
+  ['CRLF', '\r\n'],
+])('removes combined imports before generating colliding example imports with %s line endings', async (_lineEndingName, lineEnding) => {
+  const mockContent = [
+    "import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'",
+    '\`\`\`tsx file="./Chatbot.tsx" isFullscreen',
+    '\`\`\`',
+    '\`\`\`tsx file="./ChatbotDisplayMode.tsx"',
+    '\`\`\`',
+  ].join(lineEnding)
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(mockContent)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).not.toContain("import Chatbot, { ChatbotDisplayMode } from '@patternfly/chatbot/dist/dynamic/Chatbot'")
+  expect(converted).toContain('import Chatbot from "./Chatbot.tsx?raw"')
+  expect(converted).toContain('<LiveExample src={Chatbot} />')
+  expect(converted).toContain('import ChatbotDisplayMode from "./ChatbotDisplayMode.tsx?raw"')
+  expect(converted).toContain('<LiveExample src={ChatbotDisplayMode} />')
+})
+
+it('removes type-only absolute imports so MDX never sees TypeScript-only syntax', async () => {
+  const mockContent = `import type Foo from '@patternfly/some-package'
+import type { Bar } from '@patternfly/some-package'
+import Kept from './Kept'
+\`\`\`tsx file="./Foo.tsx"
+\`\`\``
+  ;(glob as unknown as jest.Mock).mockResolvedValue(['test.md'])
+  ;(readFile as jest.Mock).mockResolvedValue(mockContent)
+
+  await convertToMDX('test.md')
+
+  const converted = (writeFile as jest.Mock).mock.calls[0][1]
+  expect(converted).not.toContain("import type Foo from '@patternfly/some-package'")
+  expect(converted).not.toContain("import type { Bar } from '@patternfly/some-package'")
+  expect(converted).toContain("import Kept from './Kept'")
+  expect(converted).toContain('import Foo from "./Foo.tsx?raw"')
+  expect(converted).toContain('<LiveExample src={Foo} />')
+})
+
 it('should convert a file with HTML examples', async () => {
   const mockContent = '# Test Content\n```html\n<div>Test HTML</div>\n```'
   const expectedContent =

@@ -2,6 +2,10 @@
 /* eslint-disable no-console */
 import { Command } from 'commander'
 import { build, dev, preview, sync } from 'astro'
+import {
+  precomputeExamplesByPath,
+  writePrecomputedExamplesCache,
+} from './precomputeExamplesByPath.js'
 import { dirname, join, resolve } from 'path'
 import {
   createCollectionContent,
@@ -20,7 +24,6 @@ import { hasFile } from './hasFile.js'
 import { convertToMDX } from './convertToMDX.js'
 import { mkdir, copyFile } from 'fs/promises'
 import { fileURLToPath } from 'url'
-import { fileExists } from './fileExists.js'
 
 const currentDir = process.cwd()
 const config = await getConfig(`${currentDir}/pf-docs.config.mjs`)
@@ -120,30 +123,6 @@ async function transformMDContentToMDX(verbose = false) {
   )
 }
 
-async function initializeApiIndex(program: Command) {
-  const { verbose } = program.opts()
-  const templateIndexPath = join(astroRoot, 'cli', 'templates', 'apiIndex.json')
-  const targetIndexPath = join(absoluteOutputDir, 'apiIndex.json')
-  const indexExists = await fileExists(targetIndexPath)
-
-  // early return if the file exists from a previous build
-  if (indexExists) {
-    if (verbose) {
-      console.log('apiIndex.json already exists, skipping initialization')
-    }
-    return
-  }
-
-  try {
-    await copyFile(templateIndexPath, targetIndexPath)
-    if (verbose) {
-      console.log('Initialized apiIndex.json')
-    }
-  } catch (e: any) {
-    console.error('Error copying apiIndex.json template:', e)
-  }
-}
-
 async function buildProject(program: Command): Promise<DocsConfig | undefined> {
   const { verbose, apiOnly } = program.opts()
 
@@ -167,7 +146,13 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
   await updateContent(program)
   await transformMDContentToMDX(verbose)
   await generateProps(program, true)
-  await initializeApiIndex(program)
+
+  process.env.PF_DOCS_ROOT = currentDir
+  process.env.PF_DOCS_REQUIRE_PRECOMPUTED_EXAMPLES = 'true'
+  await writePrecomputedExamplesCache(
+    absoluteOutputDir,
+    await precomputeExamplesByPath(config, currentDir, astroRoot),
+  )
 
   const docsOutputDir = join(absoluteOutputDir, 'docs')
 
@@ -175,6 +160,10 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
     root: astroRoot,
     outDir: docsOutputDir,
   })
+  await copyFile(
+    join(docsOutputDir, 'apiIndex.json'),
+    join(absoluteOutputDir, 'apiIndex.json'),
+  )
 
   return config
 }
@@ -239,9 +228,9 @@ program.command('start').action(async () => {
   if (apiOnly) {
     process.env.PF_API_ONLY = 'true'
   }
+  process.env.PF_DOCS_ROOT = currentDir
   await updateContent(program)
   await transformMDContentToMDX(verbose)
-  await initializeApiIndex(program)
 
   // if a props file hasn't been generated yet, but the consumer has propsData, it will cause a runtime error so to
   // prevent that we're just creating a props file regardless of what they say if one doesn't exist yet

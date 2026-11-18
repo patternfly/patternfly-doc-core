@@ -33,8 +33,7 @@ function pageToPascalCase(page: string): string {
 
 export const GET: APIRoute = async () => {
   try {
-    // This route can prerender before the routes that write apiIndex.json.
-    // Generate from current collections rather than a previous build's index.
+    // Generate from current collections and the prepared examples snapshot.
     const index = await generateApiIndex()
 
     // Frontmatter may document both component and interface props records.
