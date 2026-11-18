@@ -161,7 +161,7 @@ async function buildProject(program: Command): Promise<DocsConfig | undefined> {
     outDir: docsOutputDir,
   })
   await copyFile(
-    join(docsOutputDir, 'apiIndex.json'),
+    join(docsOutputDir, 'client', 'apiIndex.json'),
     join(absoluteOutputDir, 'apiIndex.json'),
   )
 
